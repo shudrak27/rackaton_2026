@@ -118,10 +118,17 @@ def page_overview(d: dict) -> None:
     st.markdown("### One letter for everyone does not work equally well")
     c = st.columns(5)
     c[0].metric("Invitations 2020–2024", num(m["n_invitations"]))
-    c[1].metric("Women", num(m["n_clients"]))
-    c[2].metric("Attendance within 12 months", pct(m["attendance_overall"]))
-    c[3].metric("Model ROC-AUC (2024)", f"{metric(d, 'roc_auc'):.3f}",
-                delta=f"+{metric(d, 'roc_auc') - metric(d, 'roc_auc', 'baseline'):.3f} vs. rule")
+    c[1].metric("Attendance within 12 months", pct(m["attendance_overall"]))
+    t10 = next((r for r in d.get("targeting", []) if abs(r["share"] - 0.1) < 1e-9), None)
+    if t10:
+        c[2].metric("Lowest-risk 10%: attendance", pct(t10["bottom_attendance_model"], 0),
+                    delta=f"rule: {pct(t10['bottom_attendance_rule'], 0)}", delta_color="off",
+                    help="Women the model says need only a letter. Rule = number of previous invitations.")
+        fewer = 1 - t10["top_wasted_model"] / t10["top_wasted_rule"]
+        c[3].metric("Top-10% outreach: needless contacts", num(t10["top_wasted_model"]),
+                    delta=f"-{fewer:.0%} vs. rule ({num(t10['top_wasted_rule'])})", delta_color="inverse",
+                    help=f"Intensive outreach (e.g. phone) to the {num(t10['n'])} highest-risk women "
+                         "in 2024: how many of them would have attended anyway.")
     recent = d["recently_screened_per_year"]
     c[4].metric("Wasted invitations / year", num(sum(r["n"] for r in recent) / len(recent)),
                 help="Invitations sent to women screened 0–6 months before the invitation.")
@@ -143,11 +150,26 @@ def page_overview(d: dict) -> None:
 def page_who(d: dict) -> None:
     st.markdown("### 01 WHO — who is most likely not to attend")
     c = st.columns(4)
-    c[0].metric("ROC-AUC model", f"{metric(d, 'roc_auc'):.3f}")
-    c[1].metric("ROC-AUC rule 'number of invitations'", f"{metric(d, 'roc_auc', 'baseline'):.3f}")
     dec = pd.DataFrame(d["deciles"])
-    c[2].metric("Attendance, lowest-risk decile", pct(dec.iloc[0]["attendance"]))
-    c[3].metric("Attendance, highest-risk decile", pct(dec.iloc[-1]["attendance"]))
+    c[0].metric("Attendance, lowest-risk decile", pct(dec.iloc[0]["attendance"]))
+    c[1].metric("Attendance, highest-risk decile", pct(dec.iloc[-1]["attendance"]))
+    c[2].metric("ROC-AUC model", f"{metric(d, 'roc_auc'):.3f}",
+                help="Random = 0.5. The rule is already strong because invitation history is VZP's best signal.")
+    c[3].metric("ROC-AUC rule 'number of invitations'", f"{metric(d, 'roc_auc', 'baseline'):.3f}")
+
+    if d.get("targeting"):
+        tg = pd.DataFrame(d["targeting"])
+        tg["Selected"] = tg["share"].map(lambda s: f"{s:.0%}") + " (" + tg["n"].map(num) + " women)"
+        st.markdown("#### Model vs. rule in people (test 2024)")
+        st.dataframe(pd.DataFrame({
+            "Selected share": tg["Selected"],
+            "Lowest risk → attendance, model": tg["bottom_attendance_model"],
+            "Lowest risk → attendance, rule": tg["bottom_attendance_rule"],
+            "Highest risk → needless contacts, model": tg["top_wasted_model"],
+            "Highest risk → needless contacts, rule": tg["top_wasted_rule"],
+        }), hide_index=True, width="stretch", column_config={
+            "Lowest risk → attendance, model": st.column_config.NumberColumn(format="percent"),
+            "Lowest risk → attendance, rule": st.column_config.NumberColumn(format="percent")})
 
     left, right = st.columns(2)
     roc = go.Figure()

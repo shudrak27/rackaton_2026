@@ -66,6 +66,27 @@ def _gain(y: np.ndarray, score: np.ndarray, steps: int = 20) -> list[dict]:
     return out
 
 
+def targeting_comparison(y: np.ndarray, model: np.ndarray, rule: np.ndarray,
+                         shares=(0.1, 0.2, 0.3), seed: int = 0) -> list[dict]:
+    """Model vs rule in people, not AUC (y = 1 means non-attendance).
+
+    top: intensive outreach to the highest-risk share -> attenders contacted needlessly.
+    bottom: lowest-risk share ("a letter is enough") -> their attendance.
+    The rule has few distinct values; ties are broken randomly (fixed seed), not by row order."""
+    rule = rule + np.random.default_rng(seed).random(len(rule)) * 1e-6
+    att = 1 - y
+    rows = []
+    for share in shares:
+        m = max(int(share * len(y)), 1)
+        top_m, top_r = np.argsort(-model)[:m], np.argsort(-rule)[:m]
+        bot_m, bot_r = np.argsort(model)[:m], np.argsort(rule)[:m]
+        rows.append({"share": share, "n": m,
+                     "top_wasted_model": int(att[top_m].sum()), "top_wasted_rule": int(att[top_r].sum()),
+                     "bottom_attendance_model": float(att[bot_m].mean()),
+                     "bottom_attendance_rule": float(att[bot_r].mean())})
+    return rows
+
+
 def _records(path) -> list[dict]:
     return pd.read_csv(path).replace({np.nan: None}).to_dict("records") if path.exists() else []
 
@@ -127,6 +148,7 @@ def build_payload(cfg: dict) -> dict:
         "test_metrics": _records(reports / "test_metrics.csv"),
         "roc": {"model": _curve(y, risk), "baseline": _curve(y, base)},
         "gain": {"model": _gain(y, risk), "baseline": _gain(y, base)},
+        "targeting": targeting_comparison(y, risk, base),
         "deciles": _records(reports / "decile_table.csv"),
         "calibration": _records(reports / "calibration.csv"),
         "feature_importance": _records(reports / "feature_importance.csv")[:15],
