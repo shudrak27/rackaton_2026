@@ -85,6 +85,8 @@ The modelling target is `non_attendance = 1 − attended_12m`.
 - `PRIOR_SCREEN_COUNT_5Y` counts procedure codes (~2 per screening); `NEVER_SCREENED_BEFORE_FLAG` means
   "no screening in the 5-year window".
 - `INVITATION_SEQUENCE` resets after attendance (a streak of non-responses).
+- The 5-year window is not perfectly aligned across fields: 193 invitations have a last screening
+  61–76 months ago while `PRIOR_SCREEN_COUNT_5Y = 0` (~0.25% of rows incl. the 55–60 month edge).
 - The 12-month window is closed for all years (`cutoff_date: 2025-12-31`).
 - Cohort: women continuously insured with VZP in 2015–2025. Results are evaluated on this group only.
 
