@@ -6,6 +6,8 @@ import {
 import { BREAKDOWNS, FEATURES, SEGMENTS, num, pct } from "./labels.js";
 import { nPerGroup } from "./power.js";
 import { Badge, Chart, ChartTooltip, Icon, Kpi, LegendItem, Notice, Panel, Table } from "./components.jsx";
+import { InterventionActions } from "./intervention-info.jsx";
+import { PLAYBOOKS, PILOT_SEGMENTS } from "./interventions.js";
 
 const INDIGO = "#626cf0", TEAL = "#55bca8", CORAL = "#ec858b", GREY = "#b4bbcf";
 const SEGMENT_COLORS = {
@@ -67,7 +69,7 @@ function SegmentTable({ d, compact = false }) {
       <td><strong>{r.label}</strong></td>
       <td className="n">{num(r.n)}</td><td><div className="table-progress"><div className="progress-track"><i className="progress-fill" style={{ width: `${r.share * 100}%` }} /></div>{pct(r.share)}</div></td>
       <td className="n"><Badge tone={r.attendance >= d.meta.attendance_overall ? "teal" : "neutral"}>{pct(r.attendance)}</Badge></td>
-      <td className="intervention-cell">{r.intervention}</td>
+      <td className="intervention-cell"><div>{PLAYBOOKS[r.segment]?.title || r.intervention}</div><InterventionActions segment={r.segment} d={d} /></td>
     </tr>)}</tbody>
   </Table>;
 }
@@ -243,21 +245,22 @@ export function What({ d, navigate }) {
 }
 
 export function Verify({ d }) {
-  const seg = segmentRows(d);
-  const initial = seg.find((r) => r.segment === "repeated_nonresponder") || seg[0];
+  const seg = segmentRows(d).filter((r) => PILOT_SEGMENTS.includes(r.segment));
+  const initial = seg.find((r) => r.segment === "lapsed_regular") || seg[0];
   const [segment, setSegment] = useState(initial.segment);
   const row = seg.find((r) => r.segment === segment) || initial;
-  const [baseline, setBaseline] = useState(+(initial.attendance * 100).toFixed(1));
+  const [baselineOverride, setBaselineOverride] = useState(null);
+  const baseline = baselineOverride ?? +(row.attendance * 100).toFixed(2);
   const [mde, setMde] = useState(2);
   const [power, setPower] = useState(.8);
-  const n = nPerGroup(Number(baseline) / 100, mde / 100, .05, power);
+  const n = nPerGroup(baselineOverride === null ? row.attendance : Number(baselineOverride) / 100, mde / 100, .05, power);
   const design = useMemo(() => {
     const by = {};
-    for (const r of d.experiment_design) (by[r.segment] ??= {})[r.mde_pp] = r.n_per_arm;
+    for (const r of d.experiment_design.filter((r) => PILOT_SEGMENTS.includes(r.segment))) (by[r.segment] ??= {})[r.mde_pp] = r.n_per_arm;
     return by;
   }, [d]);
   const mdes = [...new Set(d.experiment_design.map((r) => r.mde_pp))].sort((a, b) => a - b);
-  function changeSegment(value) { setSegment(value); setBaseline(+((seg.find((r) => r.segment === value)?.attendance || 0) * 100).toFixed(1)); }
+  function changeSegment(value) { setSegment(value); setBaselineOverride(null); }
   return <>
     <Panel title="From prediction to evidence" subtitle="A randomized test of segment-specific support" className="section-gap" action={<Badge tone="amber">PLANNING</Badge>}>
       <div className="experiment-steps">{[
@@ -269,16 +272,18 @@ export function Verify({ d }) {
     <Panel title="Sample size calculator" subtitle="Plan a two-arm trial for an absolute increase in attendance" className="section-gap" action={<Badge>1:1 ALLOCATION</Badge>}>
       <div className="controls calculator-controls">
         <label className="field">Target segment<select aria-label="Target segment" value={segment} onChange={(e) => changeSegment(e.target.value)}>{seg.map((r) => <option key={r.segment} value={r.segment}>{r.label}</option>)}</select></label>
-        <label className="field">Baseline attendance (%)<input type="number" min={.1} max={99.9} step={.1} value={baseline} onChange={(e) => setBaseline(e.target.value)} /></label>
+        <label className="field">Baseline attendance (%)<input type="number" min={.1} max={99.9} step={.01} value={baseline} onChange={(e) => setBaselineOverride(e.target.value)} /></label>
         <label className="field">Minimum detectable effect: +{mde.toFixed(1)} pp<input type="range" min={.5} max={10} step={.5} value={mde} onChange={(e) => setMde(+e.target.value)} /></label>
         <label className="field">Statistical power<select value={power} onChange={(e) => setPower(+e.target.value)}>{[.7, .8, .9].map((p) => <option key={p} value={p}>{pct(p, 0)}</option>)}</select></label>
       </div>
+      <div className="planner-intervention"><span><Icon name={PLAYBOOKS[segment].icon} size={18} />{PLAYBOOKS[segment].title}</span><InterventionActions segment={segment} d={d} /></div>
+      {segment === "care_no_prevention" && <div className="panel-body"><Notice tone="amber">These sizes assume individual randomization. If practices are randomized to avoid spillover, recalculate for clustering before recruitment.</Notice></div>}
       {n == null ? <p className="result-error" role="alert">Choose a positive baseline and effect whose sum is below 100%.</p> : <div className="calculator-results" aria-live="polite">
         <div><span className="result-label">Required per arm</span><div className="result-number">{num(n)}</div><span className="result-note">Women in each group</span></div>
         <div><span className="result-label">Total participants</span><div className="result-number">{num(n * 2)}</div><span className="result-note">Control + treatment</span></div>
         <div><span className="result-label">Available in test-year segment</span><div className="result-number">{num(row.n)}</div><Badge tone={2 * n <= row.n ? "teal" : "amber"}>{2 * n <= row.n ? "Within annual segment size" : "Exceeds annual segment size"}</Badge></div>
       </div>}
-      <div className="panel-footer">Two-sided α = 0.05 · Historical segment size is an upper recruitment bound. Effect size is a planning assumption.</div>
+      <div className="panel-footer">Two-sided α = 0.05 · The default historical baseline uses full precision. Segment size is an upper recruitment bound; effect size is a planning assumption. Only defined outreach pilots are listed.</div>
     </Panel>
     <Panel title="Recruitment requirements by segment" subtitle="Women per arm · α = 0.05 · 80% power" className="section-gap" footer="Exported planning scenarios. The calculator above updates independently when you change its inputs.">
       <Table label="Sample sizes by segment and detectable effect"><thead><tr><th>Segment</th>{mdes.map((m) => <th key={m} className="n">+{m} pp</th>)}</tr></thead>

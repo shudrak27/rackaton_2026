@@ -2,7 +2,7 @@
 
 export const SEGMENTS = {
   first_invitation: "First invitation",
-  lapsed_regular: "Screened before, now overdue",
+  lapsed_regular: "Last screening over 2 years ago",
   other: "Other",
   repeated_nonresponder: "Repeated non-responder",
   care_no_prevention: "In care, no prevention",
