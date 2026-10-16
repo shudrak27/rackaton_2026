@@ -28,12 +28,12 @@ def _fit_small(prepared, cfg):
 
 def test_score_new_invitations_without_target(raw, prepared, cfg):
     df, feats, model = _fit_small(prepared, cfg)
-    bundle = make_bundle(model, df[feats], "lgbm")
+    bundle = make_bundle(model, df[feats], "lgbm", cfg)
     new = raw.drop(columns=[s.ATTENDED]).head(500).copy()
     new.loc[new.index[:3], s.REGION] = "UNSEEN"  # unseen category must not break scoring
     out = score(new, bundle, cfg)
     assert len(out) == 500 and out["risk_non_attendance"].between(0, 1).all()
-    assert out["intervention"].notna().all()
+    assert out["recommended_intervention"].notna().all()
     # same rows scored in training and scoring paths give the same risk
     ref = model.predict_proba(df[feats].head(500).iloc[3:])[:, 1]
     got = out.set_index(s.CLIENT_ID).loc[df[s.CLIENT_ID].head(500).iloc[3:], "risk_non_attendance"]
