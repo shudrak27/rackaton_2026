@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "jupyter", "matplotlib"]
+dev = ["pytest", "jupyter", "matplotlib", "python-pptx"]
 ui = ["streamlit", "plotly"]
 
 [tool.setuptools.packages.find]
