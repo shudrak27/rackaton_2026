@@ -25,9 +25,16 @@ const segmentRows = (d) => d.segments.map((r) => ({ ...r, attendance: 1 - r.non_
 
 // Short axis labels: long ones make Recharts hide neighbouring ticks.
 const GROUP_LABELS = { none_in_5y: "No screen in 5y", "61+ (window edge)": "61+*" };
+// Groups that are "no information" rather than a value range: drawn in grey.
+const NO_DATA_GROUPS = new Set(["none_in_5y"]);
+const BREAKDOWN_NOTES = {
+  months_since_last_screening: "Grey: no screening recorded in the 5-year history window (82% of invitations, no date to count from). " +
+    "* 61+: edge of that window in the VZP data (193 invitations).",
+  prior_invitations: "0 = first invitation; 10 = ten or more previous invitations.",
+};
 
 export function RateBars({ rows = [], color = INDIGO, horizontal = false, width, height }) {
-  const data = rows.map((r) => ({ ...r, group: GROUP_LABELS[r.group] ?? String(r.group),
+  const data = rows.map((r) => ({ ...r, key: String(r.group), group: GROUP_LABELS[r.group] ?? String(r.group),
     err: [Math.max(0, r.attendance - r.ci_low), Math.max(0, r.ci_high - r.attendance)] }));
   return <BarChart width={width} height={height} data={data} layout={horizontal ? "vertical" : "horizontal"}
     margin={{ top: 8, right: 18, left: horizontal ? 5 : -12, bottom: 8 }} barCategoryGap="30%">
@@ -36,6 +43,7 @@ export function RateBars({ rows = [], color = INDIGO, horizontal = false, width,
       : <><XAxis {...AXIS} dataKey="group" interval={0} /><YAxis {...AXIS} tickFormatter={pctTick} width={58} /></>}
     <Tooltip cursor={{ fill: "#f4f5ff" }} content={<ChartTooltip showCount />} />
     <Bar dataKey="attendance" name="Attendance" fill={color} radius={horizontal ? [0, 3, 3, 0] : [4, 4, 0, 0]} maxBarSize={42} isAnimationActive={false}>
+      {data.map((r) => <Cell key={r.key} fill={NO_DATA_GROUPS.has(r.key) ? GREY : color} />)}
       <ErrorBar dataKey="err" width={3} stroke="#a6adc4" direction={horizontal ? "x" : "y"} />
     </Bar>
   </BarChart>;
@@ -187,7 +195,8 @@ export function Why({ d }) {
       <div className="controls panel-controls"><label className="field">Break down by<select value={key} onChange={(e) => setKey(e.target.value)}>
         {Object.entries(BREAKDOWNS).filter(([id]) => d.attendance_by[id]).map(([id, name]) => <option key={id} value={id}>{name}</option>)}</select></label></div>
       <Chart height={290} label={`Attendance by ${BREAKDOWNS[key]}`}><RateBars rows={d.attendance_by[key]} /></Chart>
-      <div className="chart-caption">Attendance within 12 months · whiskers show the intervals provided in the aggregate export.</div>
+      <div className="chart-caption">Attendance within 12 months · whiskers show 95% confidence intervals.
+        {BREAKDOWN_NOTES[key] && <><br />{BREAKDOWN_NOTES[key]}</>}</div>
     </Panel>
     <Panel title="Regional variation" subtitle="Territorial offices with the lowest and highest attendance" className="section-gap" action={<Badge tone="neutral">{regions.length} OFFICES</Badge>}>
       <div className="controls panel-controls"><label className="field">Offices at each end: {k}<input type="range" min={5} max={20} value={k} onChange={(e) => setK(+e.target.value)} /></label></div>
