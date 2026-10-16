@@ -23,7 +23,7 @@ from screening.data import schema as s
 from screening.evaluation import explain, fairness, metrics
 from screening.experiment import power
 from screening.features import build
-from screening.models import baseline, champion, flaml_search, optuna_tune
+from screening.models import baseline, calibration, champion, flaml_search, optuna_tune
 from screening.policy import budget
 from screening.scoring import make_bundle
 from screening.segments import rules
@@ -44,6 +44,25 @@ def _tuning_subset(train_df: pd.DataFrame, n_clients: int | None, seed: int) -> 
         return train_df
     keep = np.random.default_rng(seed).choice(clients, n_clients, replace=False)
     return train_df[train_df[s.CLIENT_ID].isin(keep)].reset_index(drop=True)
+
+
+def _fit_final(make_model, train_df: pd.DataFrame, X_tr: pd.DataFrame, y_tr: pd.Series,
+               cfg: dict) -> tuple:
+    """Returns (model used for predictions, underlying base model).
+
+    With calibration, the base model is fitted on train minus the most recent
+    `holdout_months` and the calibrator on that holdout; otherwise on the full train."""
+    cc = cfg.get("calibration") or {}
+    if not cc.get("method"):
+        base = make_model()
+        base.fit(X_tr, y_tr)
+        return base, base
+    fit_mask, holdout = calibration.recent_holdout(train_df, cc["holdout_months"])
+    base = make_model()
+    base.fit(X_tr[fit_mask], y_tr[fit_mask])
+    model = calibration.CalibratedModel(base, cc["method"]).fit(X_tr[holdout], y_tr[holdout])
+    mlflow.log_params({"calibration": cc["method"], "calibration_holdout_rows": int(holdout.sum())})
+    return model, base
 
 
 def train(cfg: dict) -> dict:
@@ -99,8 +118,7 @@ def train(cfg: dict) -> dict:
         else:
             name = "optuna_lgbm"
         mlflow.set_tag("champion", name)
-        model = candidates[name]()
-        model.fit(X_tr, y_tr)
+        model, base_model = _fit_final(candidates[name], train_df, X_tr, y_tr, cfg)
         proba = model.predict_proba(X_te)[:, 1]
 
         # Evaluation on the out-of-time test year, model vs rule baseline
@@ -108,13 +126,21 @@ def train(cfg: dict) -> dict:
         base_m = metrics.summary(y_te, baseline.baseline_score(test_df), top_k, is_proba=False)
         mlflow.log_metrics({f"test_{k}": v for k, v in model_m.items()})
         mlflow.log_metrics({f"test_baseline_{k}": v for k, v in base_m.items()})
-        comparison = pd.DataFrame({"model": model_m, "baseline": base_m}).reset_index(names="metric")
+        columns = {"model": model_m, "baseline": base_m}
+        if model is not base_model:
+            raw = base_model.predict_proba(X_te)[:, 1]
+            columns["model_uncalibrated"] = metrics.summary(y_te, raw, top_k)
+            mlflow.log_metrics({f"test_uncalibrated_{k}": v
+                                for k, v in columns["model_uncalibrated"].items()})
+            _save(metrics.calibration_table(y_te, raw), "calibration_uncalibrated", reports_dir)
+        comparison = pd.DataFrame(columns).reset_index(names="metric")
         _save(comparison, "test_metrics", reports_dir)
         _save(metrics.decile_table(y_te, proba), "decile_table", reports_dir)
         _save(metrics.calibration_table(y_te, proba), "calibration", reports_dir)
 
-        # PROČ: drivers
-        _save(explain.importance(model, X_te, y_te, seed=cfg["seed"]), "feature_importance", reports_dir)
+        # PROČ: drivers (of the base model: calibration is a monotone transform)
+        _save(explain.importance(base_model, X_te, y_te, seed=cfg["seed"]),
+              "feature_importance", reports_dir)
 
         # CO + JAK OVĚŘIT: segments and experiment sizing
         seg = rules.assign(test_df, cfg)
@@ -146,10 +172,10 @@ def train(cfg: dict) -> dict:
         joblib.dump(make_bundle(model, X_tr, name, cfg, reference_risk=proba),
                     models_dir / "model.joblib")
         mlflow.log_artifact(str(models_dir / "model.joblib"))
-        if isinstance(model, lgb.LGBMClassifier):
+        if isinstance(base_model, lgb.LGBMClassifier):
             # Native booster (text format): logging the sklearn wrapper goes through skops ->
             # threadpoolctl, which breaks on non-ASCII paths on Windows.
-            mlflow.lightgbm.log_model(model.booster_, name="model")
+            mlflow.lightgbm.log_model(base_model.booster_, name="model")
         log.info("MLflow run %s", run.info.run_id)
 
     return {"model": model_m, "baseline": base_m, "champion": name, "run_id": run.info.run_id}

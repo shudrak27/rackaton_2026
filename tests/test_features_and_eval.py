@@ -52,3 +52,10 @@ def test_pipeline_smoke(tmp_path, cfg, raw):
     assert res["model"]["roc_auc"] > 0.6
     assert res["champion"] in ("optuna_lgbm", "flaml_lgbm")
     assert (tmp_path / "models" / "model.joblib").exists()
+
+    # UI export: aggregates only, no client identifiers anywhere in the payload
+    from screening.export_ui import export
+    out = export(c)
+    text = out.read_text(encoding="utf-8")
+    assert '"deciles"' in text and '"segments"' in text and '"roc"' in text
+    assert s.CLIENT_ID not in text

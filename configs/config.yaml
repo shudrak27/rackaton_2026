@@ -25,7 +25,7 @@ split:
   # Train only on invitations whose outcome was known when the test year started
   # (honest backtest: drops the last outcome_window_months before test_year).
   purge_months: 12
-  n_folds: 5             # GroupKFold by client_id within the training set
+  n_folds: 3             # GroupKFold by client_id within the training set (tuning + champion)
 
 flaml:
   enabled: true
@@ -34,14 +34,20 @@ flaml:
   estimator_list: [lgbm, xgboost, rf, extra_tree, lrl1]
 
 optuna:
-  n_trials: 50
-  timeout: null          # Seconds; null means no timeout
+  n_trials: 40
+  timeout: 900           # Seconds; whichever comes first (full real-data run ~25-30 min)
   metric: roc_auc        # roc_auc | average_precision | neg_log_loss
   early_stopping_rounds: 50
-  max_estimators: 3000
+  max_estimators: 2000
   # Tune and select the champion on a random client subset, retaining all their rows.
   # Final fitting uses the full training set. null = all; try ~100000 for 1.3M rows.
   tune_sample_clients: 100000
+
+# Fit a monotone calibrator on the most recent training months (attendance drifts by year).
+# null method = no calibration.
+calibration:
+  method: isotonic       # isotonic | sigmoid | null
+  holdout_months: 6
 
 mlflow:
   tracking_uri: sqlite:///mlflow.db
