@@ -16,6 +16,7 @@ python -m screening profile                            # Data overview and leaka
 python -m screening train --time-budget 60 --n-trials 20
 python -m screening score --input data/raw/new.csv     # Risk + segment + intervention -> reports/scored.csv
 python -m screening export-ui                          # UI/slide aggregates -> reports/ui/data.json
+streamlit run app/dashboard.py                         # demo dashboard (pip install -e ".[ui]")
 mlflow ui --backend-store-uri sqlite:///mlflow.db      # http://127.0.0.1:5000
 python -m screening power --p 0.10 --mde 0.02          # Sample size per A/B arm
 
