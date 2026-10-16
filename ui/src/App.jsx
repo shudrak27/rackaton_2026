@@ -32,12 +32,13 @@ function Card({ title, children, height = 320 }) {
   );
 }
 
-function RateBars({ rows, color = RED, horizontal = false }) {
+// ResponsiveContainer injects width/height into its direct child; forward them to the chart.
+export function RateBars({ rows, color = RED, horizontal = false, width, height }) {
   const data = withErr(rows);
   const tip = <Tooltip formatter={(v, k, p) => [`${pct(v)} (n = ${num(p.payload.n)})`, "Attendance"]} />;
   if (horizontal) {
     return (
-      <BarChart data={data} layout="vertical" margin={{ left: 40, right: 20 }}>
+      <BarChart width={width} height={height} data={data} layout="vertical" margin={{ left: 40, right: 20 }}>
         <CartesianGrid strokeDasharray="3 3" horizontal={false} />
         <XAxis type="number" tickFormatter={pctTick} />
         <YAxis type="category" dataKey="group" width={150} tick={{ fontSize: 11 }} />
@@ -47,7 +48,7 @@ function RateBars({ rows, color = RED, horizontal = false }) {
     );
   }
   return (
-    <BarChart data={data} margin={{ left: 0, right: 10 }}>
+    <BarChart width={width} height={height} data={data} margin={{ left: 0, right: 10 }}>
       <CartesianGrid strokeDasharray="3 3" vertical={false} />
       <XAxis dataKey="group" tick={{ fontSize: 12 }} />
       <YAxis tickFormatter={pctTick} />
