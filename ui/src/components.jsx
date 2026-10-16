@@ -4,6 +4,9 @@ import { num } from "./labels.js";
 
 const paths = {
   activity: <path d="M3 12h4l3-8 4 16 3-8h4" />,
+  message: <><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-2 2V11.5A8.5 8.5 0 0 1 10.5 3h2A8.5 8.5 0 0 1 21 11.5Z" /><path d="M7 9h9M7 13h6" /></>,
+  phone: <path d="m7 3 3 5-3 2c1 3 4 6 7 7l2-3 5 3c0 3-2 5-5 4C9 19 5 15 3 8 2 5 4 3 7 3Z" />,
+  doctor: <><path d="M5 3v6a4 4 0 0 0 8 0V3M3 3h4M11 3h4M9 13v3a5 5 0 0 0 10 0v-2" /><circle cx="19" cy="11" r="3" /></>,
   overview: <><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></>,
   chart: <><path d="M4 4v16h16M8 15l4-5 4 3 5-8" /><path d="M17 5h4v4" /></>,
   drivers: <><path d="M4 7h16M4 17h16" /><circle cx="9" cy="7" r="3" /><circle cx="15" cy="17" r="3" /></>,
