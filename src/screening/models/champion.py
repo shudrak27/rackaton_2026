@@ -10,6 +10,7 @@ from collections.abc import Callable
 import numpy as np
 import pandas as pd
 from flaml import AutoML
+from flaml.automl.data import DataTransformer
 
 from screening.models.optuna_tune import SCORERS
 
@@ -17,24 +18,25 @@ from screening.models.optuna_tune import SCORERS
 class FlamlModel:
     """FLAML's best estimator refit from scratch.
 
-    FLAML imputes / encodes data at the AutoML level (`_transformer`), not inside the estimator
-    wrapper, so the transformer fitted during the search is applied here as well.
+    FLAML imputes / encodes data at the AutoML level (DataTransformer), not inside the
+    estimator wrapper. A fresh transformer is fitted on every `fit`, so imputation statistics
+    never come from the validation fold.
     """
 
     def __init__(self, automl: AutoML):
         self.task = automl._state.task
-        self.transformer = automl._transformer
-        self.estimator = type(automl.model)(task="binary", **automl.best_config)
-
-    def _prep(self, X: pd.DataFrame):
-        return self.task.preprocess(X, self.transformer)
+        self.estimator_cls = type(automl.model)
+        self.config = dict(automl.best_config)
 
     def fit(self, X: pd.DataFrame, y: pd.Series) -> "FlamlModel":
-        self.estimator.fit(self._prep(X), y)
+        self.transformer = DataTransformer()
+        Xt, yt = self.transformer.fit_transform(X, y, self.task)
+        self.estimator = self.estimator_cls(task="binary", **self.config)
+        self.estimator.fit(Xt, yt)
         return self
 
     def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
-        return self.estimator.predict_proba(self._prep(X))
+        return self.estimator.predict_proba(self.task.preprocess(X, self.transformer))
 
 
 def flaml_factory(automl: AutoML) -> Callable:

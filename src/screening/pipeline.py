@@ -7,6 +7,7 @@
 Everything is logged into one parent MLflow run; FLAML and every Optuna trial are nested runs.
 """
 
+import json
 import logging
 
 import joblib
@@ -19,10 +20,11 @@ import pandas as pd
 from screening.config import resolve
 from screening.data import load, split
 from screening.data import schema as s
-from screening.evaluation import explain, metrics
+from screening.evaluation import explain, fairness, metrics
 from screening.experiment import power
 from screening.features import build
 from screening.models import baseline, champion, flaml_search, optuna_tune
+from screening.policy import budget
 from screening.scoring import make_bundle
 from screening.segments import rules
 from screening.tracking import log_df, setup_mlflow
@@ -55,7 +57,8 @@ def train(cfg: dict) -> dict:
 
     df = load.load(cfg)
     df, feats = build.build(df, cfg)
-    train_df, test_df = split.temporal_split(df, cfg["split"]["test_year"])
+    train_df, test_df = split.temporal_split(df, cfg["split"]["test_year"],
+                                             cfg["split"].get("purge_months", 0))
     tune_df = _tuning_subset(train_df, cfg["optuna"].get("tune_sample_clients"), cfg["seed"])
     folds = split.group_folds(tune_df, cfg["split"]["n_folds"])
     X_tr, y_tr = train_df[feats], train_df[s.TARGET]
@@ -125,7 +128,23 @@ def train(cfg: dict) -> dict:
                                       y=y_te.to_numpy())
         scored.to_parquet(reports_dir / "scored_test.parquet", index=False)
 
-        joblib.dump(make_bundle(model, X_tr, name), models_dir / "model.joblib")
+        # Fairness: model quality and shortlist representation per group
+        fc = cfg.get("fairness") or {}
+        for col in fc.get("group_columns", []):
+            if col in scored.columns:
+                _save(fairness.group_metrics(scored, "y", "risk_non_attendance", col,
+                                             fc.get("top_k", 0.2)), f"fairness_{col}", reports_dir)
+
+        # Budget plan for the test-year wave under ASSUMED intervention effects
+        if cfg.get("interventions") and cfg.get("policy", {}).get("budget_czk"):
+            plan = budget.allocate(scored, cfg["interventions"], cfg["policy"]["budget_czk"])
+            plan_summary = budget.summary(plan)
+            mlflow.log_dict(plan_summary, "budget_summary.json")
+            (reports_dir / "budget_summary.json").write_text(
+                json.dumps(plan_summary, indent=2, ensure_ascii=False), encoding="utf-8")
+
+        joblib.dump(make_bundle(model, X_tr, name, cfg, reference_risk=proba),
+                    models_dir / "model.joblib")
         mlflow.log_artifact(str(models_dir / "model.joblib"))
         if isinstance(model, lgb.LGBMClassifier):
             # Native booster (text format): logging the sklearn wrapper goes through skops ->

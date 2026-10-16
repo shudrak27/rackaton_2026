@@ -4,10 +4,10 @@
 seed: 42
 
 data:
-  path: data/raw/synthetic.parquet      # CSV or Parquet
+  path: data/raw/Rakhaton2026.csv       # VZP export (auto-detected) or canonical CSV/Parquet
   # Extraction date: exclude invitations whose outcome window has not closed.
   # null currently disables this filter; set the extraction date for real data.
-  cutoff_date: null
+  cutoff_date: 2025-12-31   # VZP extract covers outcomes through 2025 (insurance check to 31.12.2025)
   outcome_window_months: 12
 
 # Source column name: canonical column name; see src/screening/data/schema.py.
@@ -22,6 +22,9 @@ features:
 
 split:
   test_year: 2024        # Out-of-time test; train on years < test_year
+  # Train only on invitations whose outcome was known when the test year started
+  # (honest backtest: drops the last outcome_window_months before test_year).
+  purge_months: 12
   n_folds: 5             # GroupKFold by client_id within the training set
 
 flaml:
@@ -38,7 +41,7 @@ optuna:
   max_estimators: 3000
   # Tune and select the champion on a random client subset, retaining all their rows.
   # Final fitting uses the full training set. null = all; try ~100000 for 1.3M rows.
-  tune_sample_clients: null
+  tune_sample_clients: 100000
 
 mlflow:
   tracking_uri: sqlite:///mlflow.db
@@ -48,11 +51,13 @@ evaluation:
   top_k: [0.05, 0.10, 0.20, 0.30]   # Highest-risk fractions for outreach budgets
 
 segments:
-  repeated_min_invitations: 3       # Repeated nonresponders
-  lapsed_min_screenings_5y: 2       # Previously regular, now overdue
+  recent_max_months: 6              # Screened this recently -> invitation is wasted
+  repeated_min_invitations: 3       # Repeated nonresponders (invitations before this one)
+  # VZP n_screenings_5y counts procedure codes (~2 per screening): 1 = at least one screening
+  lapsed_min_screenings_5y: 1       # Previously screened, now overdue
   lapsed_min_months: 24
   care_min_contacts: 6              # Healthcare use without prevention
-  low_contact_max_contacts: 1       # Little contact with healthcare
+  low_contact_max_contacts: 2       # Little contact with healthcare (contacts in 12 months)
 
 experiment:
   alpha: 0.05
@@ -87,6 +92,9 @@ interventions:
     cost_czk: 150.0
     uplift_pp:
       care_no_prevention: 6.0
+
+policy:
+  budget_czk: 1000000   # ASSUMPTION: outreach budget for one yearly invitation wave
 
 fairness:
   group_columns: [region, age_band]

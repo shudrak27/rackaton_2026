@@ -21,19 +21,25 @@ python -m screening power --p 0.10 --mde 0.02          # Sample size per A/B arm
 pytest -m "not slow"     # Fast tests; `pytest` also runs the end-to-end test
 ```
 
-## Когда придут реальные данные
+## Данные VZP
 
-1. Положить файл в `data/raw/` (папка в `.gitignore`, **данные не коммитим**).
-2. В [configs/config.yaml](configs/config.yaml): `data.path`, маппинг `columns`
-   (`реальное_имя: каноническое_имя`, канонические — в [schema.py](src/screening/data/schema.py)),
-   `data.cutoff_date` = дата выгрузки, `split.test_year`.
-3. `python -m screening profile` — пропуски, явка по годам/приглашениям, дубликаты и
-   **детектор утечек** (признак с AUC > `features.leakage_auc_warn` в одиночку). Все признаки
-   должны быть **на дату приглашения**; подозрительное — в `features.exclude`.
-4. Обязательные колонки: `client_id`, `invitation_date`, `attended_12m` (0/1 или ANO/NE).
-   Остальные опциональны — фичи и сегменты строятся только из того, что есть.
-5. Для 1,3 млн строк: `optuna.tune_sample_clients: 100000` — тюнинг и выбор чемпиона на
-   подвыборке клиенток, финальное обучение на всём train.
+1. Положить `Rakhaton2026.csv` в `data/raw/` (папка в `.gitignore`, **данные не коммитим**).
+   Конфиг уже указывает на него; формат VZP распознаётся автоматически
+   ([vzp.py](src/screening/data/vzp.py): переименование колонок, даты `dd.mm.yyyy`, флаги A/N → 1/0).
+2. `python -m screening profile` → `python -m screening train`.
+
+Что важно знать о данных (EDA, 1 344 556 приглашений, 508 527 клиенток, 2020–2024):
+
+- Таргет `SCREENING_12M_FLAG`, явка 19,3 %. `SCREENING_3M/6M_FLAG` — исходы ПОСЛЕ T0,
+  в модель не идут (схема исключает их как таргеты).
+- `PRIOR_INVITATION_COUNT` включает текущее приглашение → адаптер вычитает 1 (0 = первое).
+- `PRIOR_SCREEN_COUNT_5Y` считает коды процедур (~2 на скрининг), `NEVER_SCREENED_BEFORE_FLAG`
+  = «нет скрининга за 5 лет».
+- `INVITATION_SEQUENCE` сбрасывается после явки (серия неответов).
+- ~2,7 % приглашений уходят женщинам, прошедшим скрининг 0–6 мес. назад (явка ~2 %) —
+  сегмент `recently_screened`.
+- Окно 12 мес. закрыто для всех лет (`cutoff_date: 2025-12-31`). Бэктест честный:
+  `split.purge_months: 12` — train содержит только приглашения с известным на 1.1.2024 исходом.
 
 ## Пайплайн
 

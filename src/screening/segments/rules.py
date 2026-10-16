@@ -10,6 +10,7 @@ import pandas as pd
 from screening.data import schema as s
 
 INTERVENTIONS = {
+    "recently_screened": "nezasílat / odložit pozvánku (screening proběhl nedávno)",
     "first_invitation": "standardní pozvánka (kontrolní skupina / nízká intenzita)",
     "repeated_nonresponder": "jiný kanál, telefonická navigace, pomoc s objednáním",
     "lapsed_regular": "jednoduché připomenutí + konkrétní objednací krok",
@@ -32,14 +33,17 @@ def assign(df: pd.DataFrame, cfg: dict) -> pd.Series:
     months = _col(df, s.MONTHS_SINCE_LAST)
     contacts = _col(df, s.N_HEALTHCARE_CONTACTS)
     prevent = _col(df, s.N_PREVENTIVE_VISITS)
-    regs = _col(df, s.HAS_GP, 0) + _col(df, s.HAS_GYN, 0)
+    # unknown registration stays unknown (NaN), it is not evidence of having no doctor
+    regs = _col(df, s.HAS_GP).astype(float) + _col(df, s.HAS_GYN).astype(float)
 
     rules = [
+        ("recently_screened", months <= c["recent_max_months"]),
         ("first_invitation", prior_inv == 0),
-        ("repeated_nonresponder", (prior_inv >= c["repeated_min_invitations"]) & (screens == 0)),
         ("lapsed_regular", (screens >= c["lapsed_min_screenings_5y"]) & (months > c["lapsed_min_months"])),
-        ("care_no_prevention", (contacts >= c["care_min_contacts"]) & (prevent == 0)),
+        # behavioural barriers before the generic "repeated" rule: they say WHY, not only THAT
         ("low_contact", (contacts <= c["low_contact_max_contacts"]) | (regs == 0)),
+        ("care_no_prevention", (contacts >= c["care_min_contacts"]) & (prevent == 0)),
+        ("repeated_nonresponder", (prior_inv >= c["repeated_min_invitations"]) & (screens == 0)),
     ]
     seg = pd.Series("other", index=df.index)
     assigned = pd.Series(False, index=df.index)
