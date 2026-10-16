@@ -6,11 +6,16 @@ rate per risk decile) is the more telling view for choosing whom to target.
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import average_precision_score, brier_score_loss, log_loss, roc_auc_score
+from sklearn.metrics import (
+    average_precision_score,
+    brier_score_loss,
+    log_loss,
+    roc_auc_score,
+)
 
 
 def _top_k_mask(score: np.ndarray, k: float) -> np.ndarray:
-    n_top = max(int(round(len(score) * k)), 1)
+    n_top = max(round(len(score) * k), 1)
     mask = np.zeros(len(score), dtype=bool)
     mask[np.argsort(-score, kind="stable")[:n_top]] = True
     return mask

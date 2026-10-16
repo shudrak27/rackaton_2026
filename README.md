@@ -11,14 +11,14 @@ python -m venv .venv
 .venv\Scripts\activate          # Linux/macOS: source .venv/bin/activate
 pip install -e ".[dev]"
 
-python -m screening synth                              # синтетика -> data/raw/synthetic.parquet
-python -m screening profile                            # обзор данных + детектор утечек
+python -m screening synth                              # Synthetic data -> data/raw/synthetic.parquet
+python -m screening profile                            # Data overview and leakage check
 python -m screening train --time-budget 60 --n-trials 20
-python -m screening score --input data/raw/new.csv     # риск + сегмент + интервенция -> reports/scored.csv
+python -m screening score --input data/raw/new.csv     # Risk + segment + intervention -> reports/scored.csv
 mlflow ui --backend-store-uri sqlite:///mlflow.db      # http://127.0.0.1:5000
-python -m screening power --p 0.10 --mde 0.02          # размер группы для A/B
+python -m screening power --p 0.10 --mde 0.02          # Sample size per A/B arm
 
-pytest -m "not slow"     # быстрые тесты; `pytest` — плюс end-to-end прогон
+pytest -m "not slow"     # Fast tests; `pytest` also runs the end-to-end test
 ```
 
 ## Когда придут реальные данные

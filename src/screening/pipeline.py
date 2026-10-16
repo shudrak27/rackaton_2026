@@ -10,14 +10,15 @@ Everything is logged into one parent MLflow run; FLAML and every Optuna trial ar
 import logging
 
 import joblib
+import lightgbm as lgb
 import mlflow
 import mlflow.lightgbm
 import numpy as np
 import pandas as pd
-import lightgbm as lgb
 
 from screening.config import resolve
-from screening.data import load, schema as s, split
+from screening.data import load, split
+from screening.data import schema as s
 from screening.evaluation import explain, metrics
 from screening.experiment import power
 from screening.features import build

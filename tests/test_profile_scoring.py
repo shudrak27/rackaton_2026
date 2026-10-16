@@ -3,10 +3,10 @@ import numpy as np
 
 from screening.data import schema as s
 from screening.data.profile import leakage_suspects, profile
+from screening.data.split import group_folds
 from screening.evaluation.explain import importance
 from screening.features.build import build
 from screening.models.champion import choose
-from screening.data.split import group_folds
 from screening.scoring import make_bundle, score
 
 
