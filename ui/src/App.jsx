@@ -9,7 +9,10 @@ import { nPerGroup } from "./power.js";
 const RED = "#c8102e", GREY = "#8c8c8c", GREEN = "#2e7d32", LIGHT = "#d9d9d9";
 const pctTick = (v) => `${Math.round(v * 100)}%`;
 const metric = (d, name, col = "model") => d.test_metrics.find((r) => r.metric === name)?.[col];
-const withErr = (rows) => rows.map((r) => ({ ...r, group: String(r.group), err: [r.attendance - r.ci_low, r.ci_high - r.attendance] }));
+const GROUP_LABELS = { none_in_5y: "No screening in 5 y" };
+const withErr = (rows) => rows.map((r) => ({
+  ...r, group: GROUP_LABELS[r.group] ?? String(r.group), err: [r.attendance - r.ci_low, r.ci_high - r.attendance],
+}));
 
 function Kpi({ label, value, vs, hero }) {
   return (
