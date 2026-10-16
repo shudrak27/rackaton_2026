@@ -15,6 +15,8 @@ segments with a proposed intervention each, and designs the A/B test that would 
 
 - Overall attendance within 12 months: **19.3%** (1,344,556 invitations, 508,527 women, 2020–2024).
 - Model ROC-AUC **0.836** vs **0.785** for the rule "number of previous invitations" (random = 0.5).
+  Average precision for attendance (the 19% minority class): **0.571** vs **0.425** (random = 0.192).
+  AP on non-attendance is not reported: with 81% positives even a random score gets ~0.81.
 - In people: the 10% lowest-risk women attend at **68%** (rule: 51%) — a standard letter is enough for them;
   phone outreach to the 10% highest-risk women wastes **42% fewer** contacts on women who would attend anyway.
 - Attendance by risk decile: **68% → 1.7%**.

@@ -162,6 +162,19 @@ def page_who(d: dict) -> None:
             "Lowest risk → attendance, model": st.column_config.NumberColumn(format="percent"),
             "Lowest risk → attendance, rule": st.column_config.NumberColumn(format="percent")})
 
+    if d.get("ranking_quality"):
+        rq = pd.DataFrame(d["ranking_quality"])
+        rq["scorer"] = rq["scorer"].map({"random": "Random score", "rule": "Rule: number of invitations",
+                                         "model": "Model (LightGBM)"})
+        st.markdown("#### Ranking quality vs. a random score")
+        st.dataframe(rq.rename(columns={"scorer": "Scorer", "roc_auc": "ROC-AUC",
+                                        "ap_attendance": "Average precision (attendance)"}),
+                     hide_index=True, width="stretch",
+                     column_config={"ROC-AUC": st.column_config.NumberColumn(format="%.3f"),
+                                    "Average precision (attendance)": st.column_config.NumberColumn(format="%.3f")})
+        st.caption("Average precision is reported for attendance, the 19% minority class: a random score gets "
+                   "the attendance rate. On non-attendance (81% of invitations) even a random score gets ~0.81.")
+
     left, right = st.columns(2)
     roc = go.Figure()
     for key, name, color in (("model", "Model (LightGBM)", MODEL), ("baseline", "Rule: number of invitations", BASE)):

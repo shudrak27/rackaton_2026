@@ -24,6 +24,8 @@ For a randomly chosen non-attender and attender from the test wave, the model as
 
 It is simple, deployable and already captures the strongest behavioural pattern, reaching AUC 0.785. Beating this strong baseline shows that the additional history adds useful ranking information.
 
+**Follow-up: why is average precision so high even for the rule (0.93)?** Because non-attendance is 81% of invitations, and the random level of average precision equals the positive rate: a random score already gets 0.81. We therefore report average precision for attendance, the 19% minority class: random 0.19, rule 0.43, model 0.57. The rule is one legitimate feature (the invitation count before T0 grows by exactly one per invitation), not leakage; the real post-invitation flags (3M/6M) are excluded.
+
 ## 7. Why present people instead of only AUC?
 
 Operational teams allocate letters, SMS messages and calls to people. At a fixed 10% capacity, the current export identifies a 68% attendance low-risk group and reduces needless high-risk contacts from 779 to 450 compared with the rule.

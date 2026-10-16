@@ -11,11 +11,12 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import roc_curve
+from sklearn.metrics import roc_auc_score, roc_curve
 
 from screening.config import resolve
 from screening.data import load, split
 from screening.data import schema as s
+from screening.evaluation.metrics import ap_attendance
 from screening.features.build import build
 from screening.models.baseline import baseline_score
 from screening.segments import rules
@@ -88,6 +89,17 @@ def targeting_comparison(y: np.ndarray, model: np.ndarray, rule: np.ndarray,
     return rows
 
 
+def ranking_quality(y: np.ndarray, model: np.ndarray, rule: np.ndarray) -> list[dict]:
+    """ROC-AUC and average precision for attendance (the 19 % minority class) vs a random score.
+
+    AP on non-attendance is not shown: with ~81 % positives even a random score gets ~0.81."""
+    rows = [{"scorer": "random", "roc_auc": 0.5, "ap_attendance": float(1 - y.mean())}]
+    for name, score in (("rule", rule), ("model", model)):
+        rows.append({"scorer": name, "roc_auc": float(roc_auc_score(y, score)),
+                     "ap_attendance": float(ap_attendance(y, score))})
+    return rows
+
+
 def _records(path) -> list[dict]:
     return pd.read_csv(path).replace({np.nan: None}).to_dict("records") if path.exists() else []
 
@@ -150,6 +162,7 @@ def build_payload(cfg: dict) -> dict:
         "roc": {"model": _curve(y, risk), "baseline": _curve(y, base)},
         "gain": {"model": _gain(y, risk), "baseline": _gain(y, base)},
         "targeting": targeting_comparison(y, risk, base),
+        "ranking_quality": ranking_quality(y, risk, base),
         "deciles": _records(reports / "decile_table.csv"),
         "calibration": _records(reports / "calibration.csv"),
         "feature_importance": _records(reports / "feature_importance.csv")[:15],

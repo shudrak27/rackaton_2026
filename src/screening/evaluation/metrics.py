@@ -1,7 +1,9 @@
 """Metrics for a risk score where the positive class (non-attendance) is the MAJORITY (~81 %).
 
-Because of that, lift on non-attendance is capped at ~1/0.81. The decile table (attendance
-rate per risk decile) is the more telling view for choosing whom to target.
+Because of that, lift on non-attendance is capped at ~1/0.81, and average precision on
+non-attendance is ~0.81 even for a random score. Average precision is therefore reported for
+the MINORITY class, attendance (~19 %), together with its random level (= attendance rate).
+The decile table (attendance rate per risk decile) is the most telling view for targeting.
 """
 
 import numpy as np
@@ -21,10 +23,17 @@ def _top_k_mask(score: np.ndarray, k: float) -> np.ndarray:
     return mask
 
 
+def ap_attendance(y: np.ndarray, score: np.ndarray) -> float:
+    """Average precision for attendance (y = 1 means NON-attendance, score = risk of it)."""
+    return average_precision_score(1 - np.asarray(y), -np.asarray(score, dtype=float))
+
+
 def summary(y: np.ndarray, score: np.ndarray, top_k: list[float], is_proba: bool = True) -> dict:
     y = np.asarray(y)
     score = np.asarray(score, dtype=float)
-    out = {"roc_auc": roc_auc_score(y, score), "average_precision": average_precision_score(y, score)}
+    out = {"roc_auc": roc_auc_score(y, score),
+           "ap_attendance": ap_attendance(y, score),
+           "ap_attendance_random": 1 - y.mean()}
     if is_proba:
         out["brier"] = brier_score_loss(y, score)
         out["log_loss"] = log_loss(y, np.clip(score, 1e-6, 1 - 1e-6))

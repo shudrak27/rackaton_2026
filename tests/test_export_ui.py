@@ -28,3 +28,13 @@ def test_targeting_comparison_counts_people():
     rows = targeting_comparison(y, perfect, np.zeros(10), shares=(0.4,))
     r = rows[0]
     assert r["n"] == 4 and r["top_wasted_model"] == 0 and r["bottom_attendance_model"] == 1.0
+
+
+def test_ranking_quality_random_level_is_attendance_rate():
+    import numpy as np
+
+    from screening.export_ui import ranking_quality
+    y = np.array([1, 1, 1, 1, 0, 0, 1, 1, 1, 0])          # 1 = non-attendance, 30% attend
+    rows = {r["scorer"]: r for r in ranking_quality(y, y.astype(float), np.zeros(10))}
+    assert rows["random"]["ap_attendance"] == pytest.approx(0.3)
+    assert rows["model"]["ap_attendance"] == pytest.approx(1.0) and rows["model"]["roc_auc"] == 1.0
