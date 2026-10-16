@@ -1,0 +1,59 @@
+# Единый конфиг пайплайна. Когда придут реальные данные VZP, править в первую очередь
+# секции `data.path` и `columns` (маппинг реальных названий колонок на канонические).
+
+seed: 42
+
+data:
+  path: data/raw/synthetic.parquet      # csv или parquet
+  # Дата выгрузки. Приглашения, у которых 12-месячное окно ещё не закрылось, выкидываются.
+  # null -> берётся максимальная дата приглашения в данных.
+  cutoff_date: null
+  outcome_window_months: 12
+
+# Реальное_имя_колонки: каноническое_имя. Канонические имена описаны в src/screening/data/schema.py.
+# Пока данных нет — маппинг тождественный (синтетика уже в каноническом формате).
+columns: {}
+
+features:
+  # Колонки, которые нельзя давать модели (утечка таргета, идентификаторы, даты после приглашения).
+  exclude: []
+
+split:
+  test_year: 2024        # out-of-time тест: обучаемся на годах < test_year
+  n_folds: 5             # GroupKFold по client_id внутри train
+
+flaml:
+  enabled: true
+  time_budget: 300       # секунд
+  metric: roc_auc
+  estimator_list: [lgbm, xgboost, rf, extra_tree, lrl1]
+
+optuna:
+  n_trials: 50
+  timeout: null          # секунд, null = без ограничения
+  metric: roc_auc        # roc_auc | average_precision | neg_log_loss
+  early_stopping_rounds: 50
+  max_estimators: 3000
+
+mlflow:
+  tracking_uri: sqlite:///mlflow.db
+  experiment: vzp-screening-nonattendance
+
+evaluation:
+  top_k: [0.05, 0.10, 0.20, 0.30]   # доли клиенток с наибольшим риском (бюджет интервенции)
+
+segments:
+  repeated_min_invitations: 3       # «многократно не реагирующие»
+  lapsed_min_screenings_5y: 2       # «регулярная, но просрочила»
+  lapsed_min_months: 24
+  care_min_contacts: 6              # «в системе, но без профилактики»
+  low_contact_max_contacts: 1       # «мало контакта с медициной»
+
+experiment:
+  alpha: 0.05
+  power: 0.80
+  mde_pp: [1.0, 2.0, 3.0, 5.0]      # минимальный детектируемый эффект, п.п. явки
+
+paths:
+  reports: reports
+  models: models

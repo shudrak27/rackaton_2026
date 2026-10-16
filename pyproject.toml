@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "screening"
+version = "0.1.0"
+description = "Rakathon 2026 / VZP: predikce neúčasti na mamografickém screeningu"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "pandas",
+    "pyarrow",
+    "scipy",
+    "scikit-learn",
+    "lightgbm",
+    "flaml[automl]",
+    "optuna",
+    "mlflow",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "jupyter"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["slow: end-to-end pipeline run (deselect with -m 'not slow')"]

@@ -3,3 +3,14 @@ data/
 .env
 __pycache__/
 .ipynb_checkpoints/
+*.egg-info/
+.pytest_cache/
+
+# MLflow / outputs
+mlflow.db
+mlruns/
+mlartifacts/
+models/
+reports/
+catboost_info/
+*.log
