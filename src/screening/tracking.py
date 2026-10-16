@@ -1,9 +1,12 @@
+import os
+
 import mlflow
 
 from screening.config import PROJECT_ROOT
 
 
 def setup_mlflow(cfg: dict) -> None:
+    os.environ.setdefault("MLFLOW_DISABLE_AGENT_HINT", "1")
     uri = cfg["mlflow"]["tracking_uri"]
     if uri.startswith("sqlite:///") and not uri.startswith("sqlite:////"):
         # keep the DB in the project root no matter where the command is run from

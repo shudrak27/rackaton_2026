@@ -50,3 +50,5 @@ def test_pipeline_smoke(tmp_path, cfg, raw):
          "paths": {"reports": str(tmp_path / "reports"), "models": str(tmp_path / "models")}}
     res = train(c)
     assert res["model"]["roc_auc"] > 0.6
+    assert res["champion"] in ("optuna_lgbm", "flaml_lgbm")
+    assert (tmp_path / "models" / "model.joblib").exists()
