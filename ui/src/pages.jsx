@@ -27,21 +27,26 @@ const segmentRows = (d) => d.segments.map((r) => ({ ...r, attendance: 1 - r.non_
 
 // Short axis labels: long ones make Recharts hide neighbouring ticks.
 const GROUP_LABELS = { none_in_5y: "No screen in 5y", "61+ (window edge)": "61+*" };
+const CAPPED_GROUP_LABELS = {
+  prior_invitations: { "10": "10+" },
+  gyn_prevention_24m: { "3": "3+" },
+  other_screening_36m: { "4": "4+" },
+};
 // Groups that are "no information" rather than a value range: drawn in grey.
 const NO_DATA_GROUPS = new Set(["none_in_5y"]);
 const BREAKDOWN_NOTES = {
   months_since_last_screening: "Grey: no screening recorded in the 5-year history window (82% of invitations, no date to count from). " +
     "* 61+: edge of that window in the VZP data (193 invitations).",
-  prior_invitations: "0 = first invitation; 10 = ten or more previous invitations.",
+  prior_invitations: "0 = first invitation; 10+ = ten or more previous invitations.",
 };
 
-export function RateBars({ rows = [], color = INDIGO, horizontal = false, width, height }) {
-  const data = rows.map((r) => ({ ...r, key: String(r.group), group: GROUP_LABELS[r.group] ?? String(r.group),
+export function RateBars({ rows = [], color = INDIGO, horizontal = false, groupLabels = {}, width, height }) {
+  const data = rows.map((r) => ({ ...r, key: String(r.group), group: groupLabels[r.group] ?? GROUP_LABELS[r.group] ?? String(r.group),
     err: [Math.max(0, r.attendance - r.ci_low), Math.max(0, r.ci_high - r.attendance)] }));
   return <BarChart width={width} height={height} data={data} layout={horizontal ? "vertical" : "horizontal"}
-    margin={{ top: 8, right: 18, left: horizontal ? 5 : -12, bottom: 8 }} barCategoryGap="30%">
+    margin={{ top: 8, right: 18, left: horizontal ? 20 : -12, bottom: 8 }} barCategoryGap="30%">
     <CartesianGrid {...GRID} vertical={horizontal} horizontal={!horizontal} />
-    {horizontal ? <><XAxis {...AXIS} type="number" tickFormatter={pctTick} /><YAxis {...AXIS} type="category" dataKey="group" width={125} /></>
+    {horizontal ? <><XAxis {...AXIS} type="number" tickFormatter={pctTick} /><YAxis {...AXIS} type="category" dataKey="group" width={170} /></>
       : <><XAxis {...AXIS} dataKey="group" interval={0} /><YAxis {...AXIS} tickFormatter={pctTick} width={58} /></>}
     <Tooltip cursor={{ fill: "#f4f5ff" }} content={<ChartTooltip showCount />} />
     <Bar dataKey="attendance" name="Attendance" fill={color} radius={horizontal ? [0, 3, 3, 0] : [4, 4, 0, 0]} maxBarSize={42} isAnimationActive={false}>
@@ -69,7 +74,7 @@ function SegmentTable({ d, compact = false }) {
       <td><strong>{r.label}</strong></td>
       <td className="n">{num(r.n)}</td><td><div className="table-progress"><div className="progress-track"><i className="progress-fill" style={{ width: `${r.share * 100}%` }} /></div>{pct(r.share)}</div></td>
       <td className="n"><Badge tone={r.attendance >= d.meta.attendance_overall ? "teal" : "neutral"}>{pct(r.attendance)}</Badge></td>
-      <td className="intervention-cell"><div>{PLAYBOOKS[r.segment]?.title || r.intervention}</div><InterventionActions segment={r.segment} d={d} /></td>
+      <td className="intervention-cell">{PLAYBOOKS[r.segment]?.title || r.intervention}</td>
     </tr>)}</tbody>
   </Table>;
 }
@@ -108,8 +113,8 @@ export function Overview({ d, navigate }) {
     </div>
     <div className="grid2">
       <Panel title="Attendance by invitation history" subtitle="Observed attendance within 12 months" action={<Badge tone="neutral">{period(d)}</Badge>}>
-        <Chart label="Attendance by previous invitation count"><RateBars rows={d.attendance_by.prior_invitations} /></Chart>
-        <div className="chart-caption">Previous invitations · 0 = first invitation, 10 = 10 or more</div>
+        <Chart label="Attendance by previous invitation count"><RateBars rows={d.attendance_by.prior_invitations} groupLabels={CAPPED_GROUP_LABELS.prior_invitations} /></Chart>
+        <div className="chart-caption">Previous invitations · 0 = first invitation, 10+ = ten or more</div>
       </Panel>
       <Panel title="Attendance by risk decile" subtitle="Predicted risk groups, actual outcomes" action={<Badge tone="teal">TEST {d.meta.test_year}</Badge>}>
         <Chart label="Actual attendance in each model risk decile"><DecileChart d={d} /></Chart>
@@ -169,7 +174,6 @@ export function Who({ d }) {
           <td className="n">{fixed(r.roc_auc)}</td><td className="n">{fixed(r.ap_attendance)}</td></tr>)}</tbody></Table>
       <div className="panel-footer">Average precision uses the attendance class. Its random baseline is the test-year attendance rate.</div>
     </Panel>}
-    <Notice icon="shield"><strong>Evaluated on a future wave.</strong> These results use {d.meta.test_year} invitations held out from training. The score estimates non-attendance within 12 months.</Notice>
   </>;
 }
 
@@ -182,11 +186,10 @@ export function Why({ d }) {
   const regions = [...d.attendance_by.region].sort((a, b) => a.attendance - b.attendance);
   const shown = [...new Map([...regions.slice(0, k), ...regions.slice(-k)].map((r) => [r.group, r])).values()];
   return <>
-    <Notice><strong>Understand the signals.</strong> Feature importance explains the model’s associations. An experiment is needed to establish what changes attendance.</Notice>
-    <Panel title="What drives the prediction?" subtitle={isShap ? "Top features by mean absolute SHAP value" : "Top features by exported importance"} className="section-gap" action={<Badge>{isShap ? "SHAP" : "IMPORTANCE"}</Badge>}>
+    <Panel title="What drives the prediction?" subtitle={isShap ? "Mean absolute SHAP impact on predicted risk · associations, not causes" : "Exported feature importance · associations, not causes"} className="section-gap" action={<Badge>{isShap ? "SHAP METHOD" : "IMPORTANCE METHOD"}</Badge>}>
       <div className="legend-explainer"><LegendItem color={INDIGO}>Higher value → higher risk</LegendItem><LegendItem color={TEAL}>Higher value → lower risk</LegendItem><LegendItem color={GREY}>No directional summary</LegendItem></div>
-      <Chart height={430} label="Feature importance and direction of association"><BarChart data={fi} layout="vertical" margin={{ top: 0, right: 28, left: 0, bottom: 8 }}>
-        <CartesianGrid {...GRID} horizontal={false} vertical /><XAxis {...AXIS} type="number" /><YAxis {...AXIS} type="category" dataKey="label" width={195} tick={{ fontSize: 10 }} />
+      <Chart height={430} label="Feature importance and direction of association"><BarChart data={fi} layout="vertical" margin={{ top: 0, right: 28, left: 24, bottom: 8 }}>
+        <CartesianGrid {...GRID} horizontal={false} vertical /><XAxis {...AXIS} type="number" /><YAxis {...AXIS} type="category" dataKey="label" width={225} tick={{ fontSize: 11 }} />
         <Tooltip cursor={{ fill: "#f5f6fc" }} content={<ChartTooltip format={(v) => fixed(v)} />} />
         <Bar dataKey="importance" name={isShap ? "Mean |SHAP|" : "Importance"} radius={[0, 3, 3, 0]} maxBarSize={17} isAnimationActive={false}>{fi.map((r) => <Cell key={r.feature} fill={r.color} />)}</Bar>
       </BarChart></Chart>
@@ -194,7 +197,7 @@ export function Why({ d }) {
     <Panel title="Explore attendance patterns" subtitle={`Observed outcomes across ${period(d)}`} className="section-gap">
       <div className="controls panel-controls"><label className="field">Break down by<select value={key} onChange={(e) => setKey(e.target.value)}>
         {Object.entries(BREAKDOWNS).filter(([id]) => d.attendance_by[id]).map(([id, name]) => <option key={id} value={id}>{name}</option>)}</select></label></div>
-      <Chart height={290} label={`Attendance by ${BREAKDOWNS[key]}`}><RateBars rows={d.attendance_by[key]} /></Chart>
+      <Chart height={290} label={`Attendance by ${BREAKDOWNS[key]}`}><RateBars rows={d.attendance_by[key]} groupLabels={CAPPED_GROUP_LABELS[key]} /></Chart>
       <div className="chart-caption">Attendance within 12 months · whiskers show 95% confidence intervals.
         {BREAKDOWN_NOTES[key] && <><br />{BREAKDOWN_NOTES[key]}</>}</div>
     </Panel>
@@ -213,7 +216,6 @@ export function What({ d, navigate }) {
   const recentN = recent.reduce((s, r) => s + r.n, 0);
   const recentRate = recentN ? recent.reduce((s, r) => s + r.attendance * r.n, 0) / recentN : null;
   return <>
-    <Notice tone="amber"><strong>High risk does not guarantee a large treatment effect.</strong> Use these segments to define pilots, then scale the support that improves attendance.</Notice>
     <Panel title="Segment-level outreach" subtitle={`Exclusive operational groups · test ${d.meta.test_year}`} className="section-gap" action={<Badge>{d.segments.length} SEGMENTS</Badge>}>
       <SegmentTable d={d} />
     </Panel>
@@ -232,12 +234,10 @@ export function What({ d, navigate }) {
           * 61+: edge of the 5-year history window in the VZP data (193 invitations).</div>
       </Panel>
     </div>
-    <Panel title="A closer look at invitation timing" subtitle="Invitations sent within six months of a recorded screening" className="section-gap" action={<Badge tone="amber">PROCESS REVIEW</Badge>}>
-      <div className="process-grid"><div className="process-stat"><strong>{num(recentAverage(d))}</strong><p>invitations per year, on average<br />{pct(recentRate)} subsequent attendance</p></div>
-        <ul className="points"><li><strong>Observed:</strong> some invitations follow a recently recorded screening.</li>
-          <li><strong>Possible explanation:</strong> the mailing list may not include the latest claims. This is a hypothesis.</li>
-          <li><strong>Proposed action:</strong> review fresh claims before sending and check eligibility for postponement.</li>
-          <li><strong>Next step:</strong> validate the workflow before claiming avoidable costs.</li></ul></div>
+    <Panel title="Important notice" subtitle="Recent screening before a new invitation" className="section-gap process-review" action={<Badge tone="amber">PROCESS REVIEW</Badge>}>
+      <div className="process-grid"><div className="process-stat"><strong>{num(recentAverage(d))}</strong><p>invitations per year, on average<br />{pct(recentRate)} attended within 12 months</p></div>
+        <div className="process-explanation"><div><h3>What we found</h3><p>These women had a screening recorded within six months before their invitation. We do not yet know whether those invitations were unnecessary.</p></div>
+          <div className="process-suggestion"><h3>Suggested change</h3><p>Before mailing, check the latest screening records. Flag recent screenings for an eligibility review, then postpone an invitation only when programme rules allow.</p></div></div></div>
     </Panel>
     <div className="insight-strip"><span className="insight-icon"><Icon name="flask" /></span><div><h3>Turn an outreach idea into a measured result</h3><p>Plan the experiment around a segment, an outcome and a minimum detectable effect.</p></div>
       <button className="text-button" onClick={() => navigate("experiment")}>Plan an experiment <Icon name="arrow" size={15} /></button></div>

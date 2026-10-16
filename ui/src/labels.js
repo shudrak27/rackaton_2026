@@ -24,17 +24,17 @@ export const FEATURES = {
   first_invitation: "First invitation",
   recently_screened: "Screened in last 6 months",
   has_gyn: "Registered with gynaecologist",
-  has_gp: "Registered with GP",
+  has_gp: "Registered with general practitioner",
   insurance_years: "Years insured with VZP",
-  n_preventive_visits: "GP + GYN check-ups (24 m)",
+  n_preventive_visits: "General practitioner and gynaecologist check-ups (24 m)",
 };
 
 export const BREAKDOWNS = {
-  prior_invitations: "Previous invitations (10 = 10+)",
+  prior_invitations: "Previous invitations",
   age_band: "Age band",
   healthcare_contacts_12m: "Healthcare contacts in last 12 months",
-  gyn_prevention_24m: "Gynaecologist check-ups in last 24 months (3 = 3+)",
-  other_screening_36m: "Other cancer screenings in last 36 months (4 = 4+)",
+  gyn_prevention_24m: "Gynaecologist check-ups in last 24 months",
+  other_screening_36m: "Other cancer screenings in last 36 months",
   months_since_last_screening: "Months since last screening",
   year: "Invitation year",
 };

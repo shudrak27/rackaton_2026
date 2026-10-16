@@ -14,7 +14,7 @@ export const PLAYBOOKS = {
   },
   low_contact: {
     title: "Explanatory SMS + booking contact", icon: "message", status: "Pilot candidate", tone: "indigo", pilot: true,
-    audience: "Low contact with healthcare", definition: "At most two healthcare contacts in 12 months, or no recorded GP/GYN registration.",
+    audience: "Low contact with healthcare", definition: "At most two healthcare contacts in 12 months, or no recorded registration with a general practitioner or gynaecologist.",
     why: "The letter may miss this group. Test a second channel with a clear explanation and booking contact; the barrier is unknown.",
     steps: [["mail", "Invite", "Send the usual letter."], ["message", "Explain", "Send one plain-language SMS."], ["calendar", "Enable booking", "Include a verified booking contact."]],
     example: "Screening matters even without symptoms. Book or ask a question: [verified contact].",
@@ -24,9 +24,9 @@ export const PLAYBOOKS = {
   },
   care_no_prevention: {
     title: "Doctor recommendation + booking guidance", icon: "doctor", status: "Pilot candidate", tone: "indigo", pilot: true,
-    audience: "In care, no GP/GYN prevention", definition: "At least six care contacts in 12 months; no GP/GYN prevention visit in 24 months.",
-    why: "They use healthcare but lack recorded GP/GYN prevention. Test a recommendation during an existing care contact.",
-    steps: [["mail", "Invite", "Send the usual letter."], ["doctor", "Recommend", "A participating GP/GYN recommends screening."], ["calendar", "Enable booking", "Provide a centre contact."]],
+    audience: "In care, no general practitioner or gynaecologist check-ups", definition: "At least six care contacts in 12 months; no preventive visit with a general practitioner or gynaecologist in 24 months.",
+    why: "They use healthcare but have no recorded preventive visit with a general practitioner or gynaecologist. Test a recommendation during an existing care contact.",
+    steps: [["mail", "Invite", "Send the usual letter."], ["doctor", "Recommend", "A participating general practitioner or gynaecologist recommends screening."], ["calendar", "Enable booking", "Provide a centre contact."]],
     example: "You have a screening invitation. Would you like a centre contact to arrange it?",
     readiness: "Confirm a participating doctor and contact protocol. If practices are randomized, recalculate the sample size for clustering.",
     treatment: "Standard letter + a personal recommendation and booking guidance from a participating doctor.",
