@@ -18,7 +18,7 @@ SCORERS = {
 
 def _suggest(trial: optuna.Trial) -> dict:
     return {
-        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.2, log=True),
+        "learning_rate": trial.suggest_float("learning_rate", 0.02, 0.2, log=True),
         "num_leaves": trial.suggest_int("num_leaves", 4, 256, log=True),
         "min_child_samples": trial.suggest_int("min_child_samples", 10, 500, log=True),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.4, 1.0),

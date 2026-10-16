@@ -15,6 +15,7 @@ python -m screening synth                              # Synthetic data -> data/
 python -m screening profile                            # Data overview and leakage check
 python -m screening train --time-budget 60 --n-trials 20
 python -m screening score --input data/raw/new.csv     # Risk + segment + intervention -> reports/scored.csv
+python -m screening export-ui                          # UI/slide aggregates -> reports/ui/data.json
 mlflow ui --backend-store-uri sqlite:///mlflow.db      # http://127.0.0.1:5000
 python -m screening power --p 0.10 --mde 0.02          # Sample size per A/B arm
 
@@ -26,7 +27,9 @@ pytest -m "not slow"     # Fast tests; `pytest` also runs the end-to-end test
 1. Положить `Rakhaton2026.csv` в `data/raw/` (папка в `.gitignore`, **данные не коммитим**).
    Конфиг уже указывает на него; формат VZP распознаётся автоматически
    ([vzp.py](src/screening/data/vzp.py): переименование колонок, даты `dd.mm.yyyy`, флаги A/N → 1/0).
-2. `python -m screening profile` → `python -m screening train`.
+2. `python -m screening profile` → `python -m screening train` (~20 мин) → `python -m screening export-ui`.
+   Вероятности калибруются (isotonic) на последних 6 мес. train — `calibration:` в конфиге.
+   `reports/ui/data.json` содержит только агрегаты (группы < 20 скрыты), без идентификаторов.
 
 Что важно знать о данных (EDA, 1 344 556 приглашений, 508 527 клиенток, 2020–2024):
 

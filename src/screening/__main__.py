@@ -5,6 +5,7 @@
     train    full pipeline (FLAML -> Optuna -> champion -> evaluation -> segments), logged to MLflow
     score    risk + segment + intervention for new invitations, using models/model.joblib
     power    A/B sample size for a given baseline attendance and uplift
+    export-ui aggregates for the demo UI / slides -> reports/ui/data.json (run after train)
 """
 
 import argparse
@@ -38,6 +39,8 @@ def main() -> None:
     pc.add_argument("--input", required=True, help="csv/parquet with new invitations")
     pc.add_argument("--model", default="models/model.joblib")
     pc.add_argument("--out", default="reports/scored.csv")
+
+    sub.add_parser("export-ui")
 
     pp = sub.add_parser("power")
     pp.add_argument("--p", type=float, required=True, help="baseline attendance, e.g. 0.10")
@@ -103,6 +106,10 @@ def main() -> None:
         print("champion:", res["champion"])
         for name in ("model", "baseline"):
             print(name, {k: round(v, 4) for k, v in res[name].items() if "top" not in k})
+
+    elif args.cmd == "export-ui":
+        from screening.export_ui import export
+        print(f"UI data -> {export(cfg)}")
 
     elif args.cmd == "power":
         from screening.experiment.power import n_per_group
