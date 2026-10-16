@@ -171,11 +171,6 @@ h1 { margin: 0 0 6px; color: var(--ink); font-size: 26px; font-weight: 700; lett
 .field input[type=range] { width: 100%; height: 28px; margin: 0; accent-color: var(--accent); cursor: pointer; }
 
 /* ---------- experiment page ---------- */
-.experiment-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 0 22px 22px; }
-.experiment-step { display: flex; align-items: flex-start; gap: 12px; }
-.step-number { padding: 7px 9px; border-radius: 7px; background: var(--accent-soft); color: var(--accent-ink); font-size: 12px; font-weight: 600; }
-.experiment-step strong { display: block; padding-top: 3px; color: var(--ink); font-size: 14px; font-weight: 600; }
-.experiment-step p { margin: 5px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .calculator-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 20px 22px;
   border-top: 1px solid var(--line-soft); background: #fafbfd; }
 .calculator-results .badge { white-space: normal; line-height: 1.4; }
@@ -217,7 +212,6 @@ h1 { margin: 0 0 6px; color: var(--ink); font-size: 26px; font-weight: 700; lett
 @media (max-width: 1000px) {
   .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .overview-grid, .grid2 { grid-template-columns: 1fr; }
-  .experiment-steps { grid-template-columns: 1fr; }
   .topbar-context { display: none; }
 }
 @media (max-width: 760px) {

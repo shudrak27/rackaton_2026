@@ -248,47 +248,35 @@ export function Verify({ d }) {
   const seg = segmentRows(d).filter((r) => PILOT_SEGMENTS.includes(r.segment));
   const initial = seg.find((r) => r.segment === "lapsed_regular") || seg[0];
   const [segment, setSegment] = useState(initial.segment);
-  const row = seg.find((r) => r.segment === segment) || initial;
-  const [baselineOverride, setBaselineOverride] = useState(null);
-  const baseline = baselineOverride ?? +(row.attendance * 100).toFixed(2);
   const [mde, setMde] = useState(2);
-  const [power, setPower] = useState(.8);
-  const n = nPerGroup(baselineOverride === null ? row.attendance : Number(baselineOverride) / 100, mde / 100, .05, power);
+  const row = seg.find((r) => r.segment === segment) || initial;
+  const n = nPerGroup(row.attendance, mde / 100, .05, .8);
+  const fits = n != null && 2 * n <= row.n;
   const design = useMemo(() => {
     const by = {};
     for (const r of d.experiment_design.filter((r) => PILOT_SEGMENTS.includes(r.segment))) (by[r.segment] ??= {})[r.mde_pp] = r.n_per_arm;
     return by;
   }, [d]);
   const mdes = [...new Set(d.experiment_design.map((r) => r.mde_pp))].sort((a, b) => a - b);
-  function changeSegment(value) { setSegment(value); setBaselineOverride(null); }
   return <>
-    <Panel title="From prediction to evidence" subtitle="A randomized test of segment-specific support" className="section-gap" action={<Badge tone="amber">PLANNING</Badge>}>
-      <div className="experiment-steps">{[
-        ["01", "Assign the intervention", "Randomize women within segment × risk-quintile strata."],
-        ["02", "Measure attendance", "Compare standard invitations with additional support over 12 months."],
-        ["03", "Learn what works", "Analyze by assigned group. Use results to develop uplift models."],
-      ].map(([i, title, body]) => <div className="experiment-step" key={i}><span className="step-number">{i}</span><div><strong>{title}</strong><p>{body}</p></div></div>)}</div>
-    </Panel>
-    <Panel title="Sample size calculator" subtitle="Plan a two-arm trial for an absolute increase in attendance" className="section-gap" action={<Badge>1:1 ALLOCATION</Badge>}>
+    <Panel title="How many women does a pilot need?" subtitle="Control: standard letter · Treatment: the segment's support" className="section-gap">
       <div className="controls calculator-controls">
-        <label className="field">Target segment<select aria-label="Target segment" value={segment} onChange={(e) => changeSegment(e.target.value)}>{seg.map((r) => <option key={r.segment} value={r.segment}>{r.label}</option>)}</select></label>
-        <label className="field">Baseline attendance (%)<input type="number" min={.1} max={99.9} step={.01} value={baseline} onChange={(e) => setBaselineOverride(e.target.value)} /></label>
-        <label className="field">Minimum detectable effect: +{mde.toFixed(1)} pp<input type="range" min={.5} max={10} step={.5} value={mde} onChange={(e) => setMde(+e.target.value)} /></label>
-        <label className="field">Statistical power<select value={power} onChange={(e) => setPower(+e.target.value)}>{[.7, .8, .9].map((p) => <option key={p} value={p}>{pct(p, 0)}</option>)}</select></label>
+        <label className="field">Segment<select aria-label="Segment" value={segment} onChange={(e) => setSegment(e.target.value)}>{seg.map((r) => <option key={r.segment} value={r.segment}>{r.label}</option>)}</select></label>
+        <label className="field">Effect to detect: +{mde.toFixed(1)} pp<input type="range" min={.5} max={10} step={.5} value={mde} onChange={(e) => setMde(+e.target.value)} /></label>
       </div>
       <div className="planner-intervention"><span><Icon name={PLAYBOOKS[segment].icon} size={18} />{PLAYBOOKS[segment].title}</span><InterventionActions segment={segment} d={d} /></div>
-      {segment === "care_no_prevention" && <div className="panel-body"><Notice tone="amber">These sizes assume individual randomization. If practices are randomized to avoid spillover, recalculate for clustering before recruitment.</Notice></div>}
-      {n == null ? <p className="result-error" role="alert">Choose a positive baseline and effect whose sum is below 100%.</p> : <div className="calculator-results" aria-live="polite">
-        <div><span className="result-label">Required per arm</span><div className="result-number">{num(n)}</div><span className="result-note">Women in each group</span></div>
-        <div><span className="result-label">Total participants</span><div className="result-number">{num(n * 2)}</div><span className="result-note">Control + treatment</span></div>
-        <div><span className="result-label">Available in test-year segment</span><div className="result-number">{num(row.n)}</div><Badge tone={2 * n <= row.n ? "teal" : "amber"}>{2 * n <= row.n ? "Within annual segment size" : "Exceeds annual segment size"}</Badge></div>
+      {n == null ? <p className="result-error" role="alert">This effect is too large for the segment's baseline attendance.</p> : <div className="calculator-results" aria-live="polite">
+        <div><span className="result-label">Women per group</span><div className="result-number">{num(n)}</div><span className="result-note">baseline attendance {pct(row.attendance)}</span></div>
+        <div><span className="result-label">Total in the pilot</span><div className="result-number">{num(2 * n)}</div><span className="result-note">control + treatment</span></div>
+        <div><span className="result-label">Segment size in {d.meta.test_year}</span><div className="result-number">{num(row.n)}</div>
+          <Badge tone={fits ? "teal" : "amber"}>{fits ? "Fits in one yearly wave" : "Needs more than one year"}</Badge></div>
       </div>}
-      <div className="panel-footer">Two-sided α = 0.05 · The default historical baseline uses full precision. Segment size is an upper recruitment bound; effect size is a planning assumption. Only defined outreach pilots are listed.</div>
+      {segment === "care_no_prevention" && <div className="panel-body"><Notice tone="amber">If whole practices are randomized, recalculate for clustering.</Notice></div>}
+      <div className="panel-footer">1:1 randomization within segment × risk quintile · primary outcome: screening within 12 months (intention-to-treat) · power 80%, two-sided α = 0.05</div>
     </Panel>
-    <Panel title="Recruitment requirements by segment" subtitle="Women per arm · α = 0.05 · 80% power" className="section-gap" footer="Exported planning scenarios. The calculator above updates independently when you change its inputs.">
+    <Panel title="Women per group, by segment" subtitle="For each effect size to detect" className="section-gap">
       <Table label="Sample sizes by segment and detectable effect"><thead><tr><th>Segment</th>{mdes.map((m) => <th key={m} className="n">+{m} pp</th>)}</tr></thead>
         <tbody>{Object.entries(design).map(([id, values]) => <tr key={id}><td><strong>{SEGMENTS[id] || id}</strong></td>{mdes.map((m) => <td className="n" key={m}>{num(values[m])}</td>)}</tr>)}</tbody></Table>
     </Panel>
-    <Notice icon="clock"><strong>Keep the primary outcome fixed.</strong> Use 12-month attendance for intention-to-treat analysis. Three-month attendance is an early signal, not a replacement endpoint.</Notice>
   </>;
 }
