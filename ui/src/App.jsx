@@ -15,7 +15,7 @@ const PAGES = [
   { id: "segments", label: "Segments", block: "03 · What", icon: "people", component: What,
     title: "Segments and targeted support", description: "Operational segments, each with a proposed intervention." },
   { id: "experiment", label: "Experiment", block: "04 · How to verify", icon: "flask", component: Verify,
-    title: "Proving the effect", description: "Randomize, measure 12-month attendance, keep what works." },
+    title: "Proving the effect", description: null },
   { id: "business", label: "Business actions", block: null, icon: "target", component: Business,
     title: "Business actions", description: null },
 ];
