@@ -55,7 +55,7 @@ def main() -> None:
         df = generate(n_clients=args.n_clients, seed=cfg["seed"])
         df.to_parquet(out, index=False)
         print(f"{len(df)} rows -> {out}")
-        print("attendance overall: %.3f" % df["attended_12m"].mean())
+        print(f"attendance overall: {df['attended_12m'].mean():.3f}")
         print(df.groupby(df["n_prior_invitations"].clip(upper=5))["attended_12m"]
                 .agg(["size", "mean"]).rename_axis("prior_invitations (5 = 5+)"))
 

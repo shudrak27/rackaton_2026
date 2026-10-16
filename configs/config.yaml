@@ -1,43 +1,43 @@
-# Единый конфиг пайплайна. Когда придут реальные данные VZP, править в первую очередь
-# секции `data.path` и `columns` (маппинг реальных названий колонок на канонические).
+# Shared pipeline configuration. When real VZP data arrives, update `data.path`
+# and `columns` first (mapping source column names to canonical names).
 
 seed: 42
 
 data:
-  path: data/raw/synthetic.parquet      # csv или parquet
-  # Дата выгрузки. Приглашения, у которых 12-месячное окно ещё не закрылось, выкидываются.
-  # null -> берётся максимальная дата приглашения в данных.
+  path: data/raw/synthetic.parquet      # CSV or Parquet
+  # Extraction date: exclude invitations whose outcome window has not closed.
+  # null currently disables this filter; set the extraction date for real data.
   cutoff_date: null
   outcome_window_months: 12
 
-# Реальное_имя_колонки: каноническое_имя. Канонические имена описаны в src/screening/data/schema.py.
-# Пока данных нет — маппинг тождественный (синтетика уже в каноническом формате).
+# Source column name: canonical column name; see src/screening/data/schema.py.
+# Empty mapping preserves names: synthetic data already uses the canonical schema.
 columns: {}
 
 features:
-  # Колонки, которые нельзя давать модели (утечка таргета, идентификаторы, даты после приглашения).
+  # Exclude model inputs such as target leakage, identifiers and post-invitation dates.
   exclude: []
-  # `profile` предупреждает о признаках, которые в одиночку дают AUC выше порога (подозрение на утечку)
+  # `profile` flags individual features above this AUC threshold as leakage suspects.
   leakage_auc_warn: 0.95
 
 split:
-  test_year: 2024        # out-of-time тест: обучаемся на годах < test_year
-  n_folds: 5             # GroupKFold по client_id внутри train
+  test_year: 2024        # Out-of-time test; train on years < test_year
+  n_folds: 5             # GroupKFold by client_id within the training set
 
 flaml:
   enabled: true
-  time_budget: 300       # секунд
+  time_budget: 300       # Seconds
   metric: roc_auc
   estimator_list: [lgbm, xgboost, rf, extra_tree, lrl1]
 
 optuna:
   n_trials: 50
-  timeout: null          # секунд, null = без ограничения
+  timeout: null          # Seconds; null means no timeout
   metric: roc_auc        # roc_auc | average_precision | neg_log_loss
   early_stopping_rounds: 50
   max_estimators: 3000
-  # Тюнинг и выбор чемпиона на случайной подвыборке клиенток (все их строки), финальное
-  # обучение — на всём train. null = на всех. Для 1,3 млн строк разумно ~100000.
+  # Tune and select the champion on a random client subset, retaining all their rows.
+  # Final fitting uses the full training set. null = all; try ~100000 for 1.3M rows.
   tune_sample_clients: null
 
 mlflow:
@@ -45,26 +45,26 @@ mlflow:
   experiment: vzp-screening-nonattendance
 
 evaluation:
-  top_k: [0.05, 0.10, 0.20, 0.30]   # доли клиенток с наибольшим риском (бюджет интервенции)
+  top_k: [0.05, 0.10, 0.20, 0.30]   # Highest-risk fractions for outreach budgets
 
 segments:
-  repeated_min_invitations: 3       # «многократно не реагирующие»
-  lapsed_min_screenings_5y: 2       # «регулярная, но просрочила»
+  repeated_min_invitations: 3       # Repeated nonresponders
+  lapsed_min_screenings_5y: 2       # Previously regular, now overdue
   lapsed_min_months: 24
-  care_min_contacts: 6              # «в системе, но без профилактики»
-  low_contact_max_contacts: 1       # «мало контакта с медициной»
+  care_min_contacts: 6              # Healthcare use without prevention
+  low_contact_max_contacts: 1       # Little contact with healthcare
 
 experiment:
   alpha: 0.05
   power: 0.80
-  mde_pp: [1.0, 2.0, 3.0, 5.0]      # минимальный детектируемый эффект, п.п. явки
+  mde_pp: [1.0, 2.0, 3.0, 5.0]      # Minimum detectable attendance uplift, percentage points
 
 paths:
   reports: reports
   models: models
 
-# ASSUMPTION, заменить по результатам A/B: все стоимости и эффекты ниже — плейсхолдеры.
-# uplift_pp — абсолютный прирост ЯВКИ в процентных пунктах, не относительные проценты.
+# ASSUMPTION: all costs and effects below are placeholders; replace after A/B testing.
+# uplift_pp is absolute ATTENDANCE uplift in percentage points, not relative percent.
 interventions:
   sms:
     cost_czk: 2.0
