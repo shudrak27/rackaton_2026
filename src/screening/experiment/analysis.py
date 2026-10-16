@@ -10,7 +10,8 @@ from scipy.stats import norm
 
 
 def analyze(df: pd.DataFrame, arm_col: str, outcome_col: str,
-            control: str = "control", by: str | None = None) -> pd.DataFrame:
+            control: str = "control", by: str | None = None, *,
+            unit_col: str = "client_id") -> pd.DataFrame:
     """Each treatment versus control: attendance, effect in pp, Wald 95% CI and z-test.
 
     relative_effect is the fractional increase (0.25 means +25%), undefined when
@@ -18,10 +19,26 @@ def analyze(df: pd.DataFrame, arm_col: str, outcome_col: str,
     100] pp; p-values use the pooled null variance and are not multiplicity-adjusted.
     Subgroups missing either comparison arm have NaN effects, not fabricated zeros.
     Missing outcomes raise: resolve follow-up before an ITT analysis.
+    Supply one experiment and exactly one row per nonmissing randomization unit.
+    Repeated units are rejected even across arms or subgroups, never deduplicated.
+    If experiment_id is supplied, it must identify a single experiment.
     """
     columns = ([by] if by else []) + ["arm", "control", "n", "n_control",
                "attended", "attended_control", "attendance", "attendance_control",
                "difference_pp", "ci_low_pp", "ci_high_pp", "p_value", "relative_effect"]
+    required = [unit_col, arm_col, outcome_col] + ([by] if by else [])
+    missing = [column for column in required if column not in df.columns]
+    if missing:
+        raise ValueError(f"missing analysis columns: {missing}")
+    units = df[unit_col]
+    if (units.isna().any() or units.astype("string").str.strip().eq("").any()
+            or units.duplicated().any()):
+        raise ValueError(f"analyze one row per nonmissing, unique {unit_col}")
+    if "experiment_id" in df:
+        experiments = df["experiment_id"]
+        if (experiments.isna().any() or experiments.astype("string").str.strip().eq("").any()
+                or experiments.nunique() != 1):
+            raise ValueError("analyze one experiment_id at a time")
     if df[arm_col].isna().any() or not df[outcome_col].isin([0, 1]).all():
         raise ValueError("arms and binary attendance outcomes must be fully observed")
     if control not in df[arm_col].to_numpy():

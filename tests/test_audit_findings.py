@@ -75,7 +75,6 @@ def test_audit_scoring_output_can_feed_budget_allocation(cfg):
     assert len(allocate(scored, actions, 20)) == len(scored)
 
 
-@pytest.mark.xfail(strict=True, reason="A10: duplicate clients inflate ITT sample sizes")
 def test_audit_analysis_rejects_duplicate_randomization_units():
     df = pd.DataFrame({"client_id": [1, 1, 2, 2], "arm": ["control"] * 2 + ["sms"] * 2,
                        "attended": [0, 0, 1, 1]})
@@ -83,7 +82,6 @@ def test_audit_analysis_rejects_duplicate_randomization_units():
         analyze(df, "arm", "attended")
 
 
-@pytest.mark.xfail(strict=True, reason="A11: invalid design parameters are not validated")
 @pytest.mark.parametrize("kwargs", [
     {"mde": 0}, {"ratio": 0}, {"ratio": -1}, {"alpha": 1}, {"power": 0},
 ])

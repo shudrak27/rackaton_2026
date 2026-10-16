@@ -96,6 +96,13 @@ interventions:
 policy:
   budget_czk: 1000000   # ASSUMPTION: outreach budget for one yearly invitation wave
 
+eda:
+  # ASSUMPTION: illustrative all-in cost per letter, not a verified VZP tariff.
+  letter_cost_czk: 30.0
+  # Exploratory territory shortlist; fixed using development years, never 2024 outcomes.
+  regional_reference_end_year: 2022
+  regional_bottom_fraction: 0.20
+
 fairness:
   group_columns: [region, age_band]
   top_k: 0.20
