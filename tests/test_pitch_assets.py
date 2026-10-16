@@ -70,7 +70,7 @@ def test_pitch_figures_and_deck_are_reproducible_from_json(tmp_path):
     presentation = Presentation(deck)
     assert len(presentation.slides) == 12
     slide_text = "\n".join(shape.text for shape in presentation.slides[4].shapes if hasattr(shape, "text"))
-    assert "0.840" in slide_text and "450" not in slide_text
+    assert "0.840" in slide_text and "68%" in slide_text and "51%" in slide_text
 
 
 def test_missing_export_key_creates_explicit_todo(tmp_path):

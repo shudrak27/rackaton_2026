@@ -66,13 +66,13 @@ Target length: 5–7 minutes. All model results refer to the untouched 2024 test
 - Calibrated LightGBM reaches ROC-AUC 0.836; the invitation-count rule reaches 0.785.
 - In the lowest-risk 10%, model-selected attendance is 68% versus 51% for the rule.
 - Intensive outreach to the highest-risk 10% reaches 25.6 thousand women.
-- It needlessly contacts 450 likely attenders versus 779 for the rule: 42% fewer.
+- In the current export, it needlessly contacts 456 likely attenders versus 779 for the rule: 41% fewer.
 
 **Visual:** `model_vs_rule.png`, supported by `risk_deciles.png` (68% to 1.7% attendance).
 
 **Speaker notes:** The rule is a credible baseline because invitation history is already powerful. The model adds value by combining more pre-invitation history. The decision value is clearer in people: a safer standard-letter group and fewer intensive contacts spent on women who attend anyway.
 
-**Sources:** `data.json::test_metrics[metric=roc_auc]`, `targeting[share=0.1]`, `deciles`. The 42% reduction is `1 - top_wasted_model / top_wasted_rule`.
+**Sources:** `data.json::test_metrics[metric=roc_auc]`, `targeting[share=0.1]`, `deciles`. The 41% reduction is `1 - top_wasted_model / top_wasted_rule`; the generated deck always recalculates it from the current export.
 
 ## 6. The model learns behaviour and care history—not causes
 

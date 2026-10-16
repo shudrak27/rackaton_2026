@@ -119,9 +119,10 @@ def _attendance_by_invitations(payload: dict):
 
 def _risk_deciles(payload: dict):
     rows = payload.get("deciles", [])
-    title = "Risk ranking separates 68% attendance from 1.7%"
     if not rows:
-        return _todo(title, "deciles")
+        return _todo("Risk ranking separates attendance levels", "deciles")
+    title = (f"Risk ranking separates {rows[0]['attendance']:.0%} attendance "
+             f"from {rows[-1]['attendance']:.1%}")
     fig, ax = _new(title)
     deciles = [row["decile"] for row in rows]
     attendance = [row["attendance"] for row in rows]

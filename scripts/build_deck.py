@@ -51,6 +51,8 @@ def _facts(payload: dict) -> dict:
     recent_n = sum(row["n"] for row in recent) / len(recent) if recent else None
     recent_attendance = (sum(row["attendance"] * row["n"] for row in recent)
                          / sum(row["n"] for row in recent)) if recent else None
+    wasted_reduction = (1 - t10["top_wasted_model"] / t10["top_wasted_rule"]
+                        if t10 and t10.get("top_wasted_rule") else None)
     return {
         "invitations": meta.get("n_invitations"),
         "clients": meta.get("n_clients"),
@@ -69,6 +71,7 @@ def _facts(payload: dict) -> dict:
         "letter_attendance_rule": t10.get("bottom_attendance_rule") if t10 else None,
         "wasted_model": t10.get("top_wasted_model") if t10 else None,
         "wasted_rule": t10.get("top_wasted_rule") if t10 else None,
+        "wasted_reduction": wasted_reduction,
         "recent_n": recent_n,
         "recent_attendance": recent_attendance,
     }
@@ -220,7 +223,8 @@ def build_deck(payload: dict, figures: Path, output: Path) -> Path:
         f"Model ROC-AUC: {facts['auc']:.3f}" if facts["auc"] is not None else "Model ROC-AUC: [TODO].",
         f"Rule ROC-AUC: {facts['baseline_auc']:.3f}" if facts["baseline_auc"] is not None else "Rule ROC-AUC: [TODO].",
         f"Lowest-risk 10% attendance: {_pct(facts['letter_attendance_model'])} model vs {_pct(facts['letter_attendance_rule'])} rule.",
-        f"Top-risk outreach needlessly contacts {_num(facts['wasted_model'])} vs {_num(facts['wasted_rule'])} women.",
+        (f"Top-risk outreach: {_num(facts['wasted_model'])} vs {_num(facts['wasted_rule'])} needless contacts "
+         f"({_pct(facts['wasted_reduction'])} fewer)."),
     ], "model_vs_rule", "data.json::test_metrics[roc_auc]; targeting[share=0.1]", "AUC confirms ranking quality, "
        "but the operational translation matters more. The low-risk group can receive a standard letter, while intensive "
        "outreach is reserved with fewer needless contacts.", figures)
