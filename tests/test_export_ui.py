@@ -17,3 +17,13 @@ def test_rate_table_suppresses_small_groups():
     rows = rate_table(df, "g")
     assert [r["group"] for r in rows] == ["b"]
     assert rows[0]["n"] == MIN_CELL and rows[0]["attendance"] == 1
+
+
+def test_targeting_comparison_counts_people():
+    import numpy as np
+    from screening.export_ui import targeting_comparison
+    y = np.array([1, 1, 1, 1, 0, 0, 0, 0, 1, 0])          # 1 = non-attendance
+    perfect = y.astype(float)
+    rows = targeting_comparison(y, perfect, np.zeros(10), shares=(0.4,))
+    r = rows[0]
+    assert r["n"] == 4 and r["top_wasted_model"] == 0 and r["bottom_attendance_model"] == 1.0
