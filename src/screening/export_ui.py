@@ -134,7 +134,7 @@ def build_payload(cfg: dict) -> dict:
             breakdowns[col] = df[col].clip(upper=cap)
     if s.MONTHS_SINCE_LAST in df:
         since = pd.cut(df[s.MONTHS_SINCE_LAST], [-1, 0, 1, 6, 24, 36, 48, 60, 1000],
-                       labels=["0", "1", "2-6", "7-24", "25-36", "37-48", "49-60", "61+"])
+                       labels=["0", "1", "2-6", "7-24", "25-36", "37-48", "49-60", "61+ (window edge)"])
         breakdowns["months_since_last_screening"] = (
             since.cat.add_categories("none_in_5y").fillna("none_in_5y"))
 

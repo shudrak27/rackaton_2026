@@ -9,7 +9,10 @@ import { nPerGroup } from "./power.js";
 const RED = "#c8102e", GREY = "#8c8c8c", GREEN = "#2e7d32", LIGHT = "#d9d9d9";
 const pctTick = (v) => `${Math.round(v * 100)}%`;
 const metric = (d, name, col = "model") => d.test_metrics.find((r) => r.metric === name)?.[col];
-const withErr = (rows) => rows.map((r) => ({ ...r, group: String(r.group), err: [r.attendance - r.ci_low, r.ci_high - r.attendance] }));
+const GROUP_LABELS = { none_in_5y: "No screening in 5 y" };
+const withErr = (rows) => rows.map((r) => ({
+  ...r, group: GROUP_LABELS[r.group] ?? String(r.group), err: [r.attendance - r.ci_low, r.ci_high - r.attendance],
+}));
 
 function Kpi({ label, value, vs, hero }) {
   return (
@@ -32,12 +35,13 @@ function Card({ title, children, height = 320 }) {
   );
 }
 
-function RateBars({ rows, color = RED, horizontal = false }) {
+// ResponsiveContainer injects width/height into its direct child; forward them to the chart.
+export function RateBars({ rows, color = RED, horizontal = false, width, height }) {
   const data = withErr(rows);
   const tip = <Tooltip formatter={(v, k, p) => [`${pct(v)} (n = ${num(p.payload.n)})`, "Attendance"]} />;
   if (horizontal) {
     return (
-      <BarChart data={data} layout="vertical" margin={{ left: 40, right: 20 }}>
+      <BarChart width={width} height={height} data={data} layout="vertical" margin={{ left: 40, right: 20 }}>
         <CartesianGrid strokeDasharray="3 3" horizontal={false} />
         <XAxis type="number" tickFormatter={pctTick} />
         <YAxis type="category" dataKey="group" width={150} tick={{ fontSize: 11 }} />
@@ -47,7 +51,7 @@ function RateBars({ rows, color = RED, horizontal = false }) {
     );
   }
   return (
-    <BarChart data={data} margin={{ left: 0, right: 10 }}>
+    <BarChart width={width} height={height} data={data} margin={{ left: 0, right: 10 }}>
       <CartesianGrid strokeDasharray="3 3" vertical={false} />
       <XAxis dataKey="group" tick={{ fontSize: 12 }} />
       <YAxis tickFormatter={pctTick} />
@@ -99,14 +103,17 @@ function Overview({ d }) {
 
 function Who({ d }) {
   const t = d.targeting || [];
+  const rq = Object.fromEntries((d.ranking_quality || []).map((r) => [r.scorer, r]));
   return (
     <>
       <h2 className="lead">01 WHO — who is most likely not to attend</h2>
       <div className="kpis">
         <Kpi label="Attendance, lowest-risk decile" value={pct(d.deciles[0].attendance)} />
         <Kpi label="Attendance, highest-risk decile" value={pct(d.deciles.at(-1).attendance)} />
-        <Kpi label="ROC-AUC model" value={metric(d, "roc_auc").toFixed(3)} vs="random = 0.500" />
-        <Kpi label="ROC-AUC rule 'number of invitations'" value={metric(d, "roc_auc", "baseline").toFixed(3)} vs="VZP's strongest single signal" />
+        <Kpi label="ROC-AUC model" value={metric(d, "roc_auc").toFixed(3)}
+          vs={<>rule {metric(d, "roc_auc", "baseline").toFixed(3)} · random 0.500</>} />
+        {rq.model && <Kpi label="Average precision, attendance" value={rq.model.ap_attendance.toFixed(3)}
+          vs={<>rule {rq.rule.ap_attendance.toFixed(3)} · random {rq.random.ap_attendance.toFixed(3)}</>} />}
       </div>
       <div className="card">
         <h3>Model vs. rule in people (test 2024)</h3>
