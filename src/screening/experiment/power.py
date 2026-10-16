@@ -2,6 +2,7 @@
 Two-sided test of two proportions, primary outcome = screening within 12 months (ITT)."""
 
 import math
+from numbers import Real
 
 import pandas as pd
 from scipy.stats import norm
@@ -13,6 +14,17 @@ def n_per_group(p_control: float, mde: float, alpha: float = 0.05, power: float 
 
     p_control: attendance under the standard invitation, mde: absolute uplift (0.02 = +2 p.p.).
     """
+    parameters = {"p_control": p_control, "mde": mde, "alpha": alpha,
+                  "power": power, "ratio": ratio}
+    for name, value in parameters.items():
+        if isinstance(value, bool) or not isinstance(value, Real) or not math.isfinite(value):
+            raise ValueError(f"{name} must be a finite real number")
+    if mde <= 0 or mde ** 2 == 0:
+        raise ValueError("mde must be a positive, representable absolute attendance uplift")
+    if ratio <= 0:
+        raise ValueError("ratio must be positive (treatment / control)")
+    if not 0 < alpha < 1 or not 0 < power < 1:
+        raise ValueError("alpha and power must be in (0, 1)")
     p_t = p_control + mde
     if not 0 < p_control < 1 or not 0 < p_t < 1:
         raise ValueError("probabilities must be in (0, 1)")

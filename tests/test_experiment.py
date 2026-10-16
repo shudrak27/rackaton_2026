@@ -6,6 +6,7 @@ import pytest
 
 from screening.experiment.analysis import analyze, simulate_outcomes
 from screening.experiment.assign import assign_arms, balance_table
+from screening.experiment.power import n_per_group
 
 
 def test_allocation_quotas_missing_strata_and_reproducibility():
@@ -84,7 +85,7 @@ def test_simulated_five_pp_effect_is_recovered():
 
 
 def test_analysis_known_rates_and_itt_keeps_undelivered():
-    df = pd.DataFrame({"arm": ["control"] * 100 + ["sms"] * 100,
+    df = pd.DataFrame({"client_id": range(200), "arm": ["control"] * 100 + ["sms"] * 100,
                        "attended": [1] * 20 + [0] * 80 + [1] * 25 + [0] * 75,
                        "delivered": [False] * 200})
     result = analyze(df, "arm", "attended").iloc[0]
@@ -99,7 +100,8 @@ def test_analysis_known_rates_and_itt_keeps_undelivered():
 
 
 def test_analysis_subgroups_missing_arm_and_zero_control_rate():
-    df = pd.DataFrame({"arm": ["control", "sms", "control", "control", "sms"],
+    df = pd.DataFrame({"client_id": range(5),
+                       "arm": ["control", "sms", "control", "control", "sms"],
                        "attended": [0, 0, 1, 0, 1], "segment": ["a", "a", "b", None, None]})
     df["segment"] = pd.Categorical(df["segment"], categories=["a", "b", "unused"])
     result = analyze(df, "arm", "attended", by="segment")
@@ -113,12 +115,58 @@ def test_analysis_subgroups_missing_arm_and_zero_control_rate():
 @pytest.mark.parametrize("outcomes", [[0, None], [0, 2]])
 def test_analysis_rejects_unobserved_or_nonbinary_outcomes(outcomes):
     with pytest.raises(ValueError):
-        analyze(pd.DataFrame({"arm": ["control", "sms"], "y": outcomes}), "arm", "y")
+        analyze(pd.DataFrame({"client_id": [1, 2], "arm": ["control", "sms"], "y": outcomes}),
+                "arm", "y")
 
 
 def test_analysis_requires_control():
     with pytest.raises(ValueError, match="control"):
-        analyze(pd.DataFrame({"arm": ["sms"], "y": [1]}), "arm", "y")
+        analyze(pd.DataFrame({"client_id": [1], "arm": ["sms"], "y": [1]}), "arm", "y")
+
+
+@pytest.mark.parametrize("units", [[1, 1], [1, None], ["", "b"], [" ", "b"]])
+def test_analysis_rejects_invalid_units_across_arms_and_subgroups(units):
+    df = pd.DataFrame({"client_id": units, "arm": ["control", "sms"],
+                       "y": [0, 1], "segment": ["a", "b"]})
+    with pytest.raises(ValueError, match="client_id"):
+        analyze(df, "arm", "y", by="segment")
+
+
+def test_analysis_requires_unit_key_and_supports_explicit_name():
+    df = pd.DataFrame({"PERSON_ID": ["a", "b"], "arm": ["control", "sms"], "y": [0, 1]})
+    with pytest.raises(ValueError, match="client_id"):
+        analyze(df, "arm", "y")
+    assert analyze(df, "arm", "y", unit_col="PERSON_ID").iloc[0]["n"] == 1
+
+
+def test_analysis_rejects_mixed_experiments_without_silently_pooling():
+    df = pd.DataFrame({"client_id": [1, 2], "experiment_id": ["pilot", "rollout"],
+                       "arm": ["control", "sms"], "y": [0, 1]})
+    with pytest.raises(ValueError, match="one experiment_id"):
+        analyze(df, "arm", "y")
+    assert len(analyze(df.assign(experiment_id="pilot"), "arm", "y")) == 1
+
+
+@pytest.mark.parametrize("name", ["p_control", "mde", "alpha", "power", "ratio"])
+@pytest.mark.parametrize("value", [np.nan, np.inf, -np.inf, True, "0.1", None])
+def test_power_rejects_nonfinite_and_nonnumeric_parameters(name, value):
+    parameters = {"p_control": 0.1, "mde": 0.02, name: value}
+    with pytest.raises(ValueError, match=name):
+        n_per_group(**parameters)
+
+
+@pytest.mark.parametrize("kwargs", [
+    {"mde": -0.01}, {"mde": 0.9}, {"p_control": 0}, {"p_control": 1},
+    {"alpha": 0}, {"alpha": -0.1}, {"power": 1}, {"power": 1.1},
+])
+def test_power_rejects_out_of_domain_parameters(kwargs):
+    with pytest.raises(ValueError):
+        n_per_group(**{"p_control": 0.1, "mde": 0.02, **kwargs})
+
+
+def test_power_preserves_valid_calculation_and_unequal_allocation():
+    assert n_per_group(0.1, 0.02) == 3839
+    assert n_per_group(0.1, 0.02, ratio=2) < n_per_group(0.1, 0.02)
 
 
 def test_simulator_probability_bounds_and_explicit_arm_effect():
