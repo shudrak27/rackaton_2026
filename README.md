@@ -1,122 +1,138 @@
-# Rakathon 2026 — kdo nedorazí na mamografický screening (VZP)
+# Rakathon 2026 — who will not attend mammography screening (VZP)
 
-Предсказываем риск того, что адресно приглашённая клиентка **не пройдёт** маммографический
-скрининг в течение 12 месяцев после приглашения; объясняем факторы, сегментируем, предлагаем
-интервенции и считаем размер A/B-теста.
+VZP sends addressed invitations to mammography screening. This project predicts the risk that an invited
+woman will **not** be screened within 12 months, explains the drivers, groups women into actionable
+segments with a proposed intervention each, and designs the A/B test that would prove the effect.
 
-## Быстрый старт
+| Challenge block | What we deliver |
+|---|---|
+| **01 WHO** — predict risk | Calibrated LightGBM risk score, honest out-of-time test on 2024 |
+| **02 WHY** — understand drivers | SHAP drivers, attendance breakdowns with confidence intervals, 75 regions |
+| **03 WHAT** — propose support | 7 rule-based segments → intervention, "wasted invitations" finding, budget illustration |
+| **04 HOW TO VERIFY** — measure effect | Stratified randomisation, ITT analysis, sample-size calculator, full A/B design |
+
+## Key results (test year 2024, 256,466 invitations, never seen in training)
+
+- Overall attendance within 12 months: **19.3%** (1,344,556 invitations, 508,527 women, 2020–2024).
+- Model ROC-AUC **0.836** vs **0.785** for the rule "number of previous invitations" (random = 0.5).
+  Average precision for attendance (the 19% minority class): **0.571** vs **0.425** (random = 0.192).
+  AP on non-attendance is not reported: with 81% positives even a random score gets ~0.81.
+- In people: the 10% lowest-risk women attend at **68%** (rule: 51%) — a standard letter is enough for them;
+  phone outreach to the 10% highest-risk women wastes **42% fewer** contacts on women who would attend anyway.
+- Attendance by risk decile: **68% → 1.7%**.
+- **Quick win:** ~**7,300 invitations per year** go to women screened 0–6 months earlier (attendance ~2%).
+  Most of them responded late to the previous year's letter; the yearly cycle likely does not yet see the
+  fresh claim (reporting lag — a hypothesis to confirm with VZP).
+
+## Quick start
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate          # Linux/macOS: source .venv/bin/activate
-pip install -e ".[dev]"
-
-python -m screening synth                              # Synthetic data -> data/raw/synthetic.parquet
-python -m screening profile                            # Data overview and leakage check
-python -m screening train --time-budget 60 --n-trials 20
-python -m screening score --input data/raw/new.csv     # Risk + segment + intervention -> reports/scored.csv
-python -m screening export-ui                          # UI/slide aggregates -> reports/ui/data.json
-streamlit run app/dashboard.py                         # demo dashboard (pip install -e ".[ui]")
-cd ui && npm install && npm run dev                    # React version of the dashboard (http://localhost:5173)
-mlflow ui --backend-store-uri sqlite:///mlflow.db      # http://127.0.0.1:5000
-python -m screening power --p 0.10 --mde 0.02          # Sample size per A/B arm
-
-pytest -m "not slow"     # Fast tests; `pytest` also runs the end-to-end test
+.venv\Scripts\activate               # Linux/macOS: source .venv/bin/activate
+pip install -e ".[dev,ui]"
 ```
 
-## Данные VZP
+Put the VZP export at `data/raw/Rakhaton2026.csv` (git-ignored — **never commit data**), then:
 
-1. Положить `Rakhaton2026.csv` в `data/raw/` (папка в `.gitignore`, **данные не коммитим**).
-   Конфиг уже указывает на него; формат VZP распознаётся автоматически
-   ([vzp.py](src/screening/data/vzp.py): переименование колонок, даты `dd.mm.yyyy`, флаги A/N → 1/0).
-2. `python -m screening profile` → `python -m screening train` (~20 мин) → `python -m screening export-ui`.
-   Вероятности калибруются (isotonic) на последних 6 мес. train — `calibration:` в конфиге.
-   `reports/ui/data.json` содержит только агрегаты (группы < 20 скрыты), без идентификаторов.
-
-Что важно знать о данных (EDA, 1 344 556 приглашений, 508 527 клиенток, 2020–2024):
-
-**Ограничение выборки:** согласно описанию выгрузки, включены только клиентки,
-непрерывно застрахованные в VZP с 2015 по 2025 год. Качество модели оценивается именно
-на этой группе. Переносимость результатов на клиенток, присоединившихся позже или
-имевших перерывы в страховании, отдельно не проверена. Это ограничение текущей оценки,
-а не автоматический запрет применять модель к другим группам.
-
-- Таргет `SCREENING_12M_FLAG`, явка 19,3 %. `SCREENING_3M/6M_FLAG` — исходы ПОСЛЕ T0,
-  в модель не идут (схема исключает их как таргеты).
-- `PRIOR_INVITATION_COUNT` включает текущее приглашение → адаптер вычитает 1 (0 = первое).
-- `PRIOR_SCREEN_COUNT_5Y` считает коды процедур (~2 на скрининг), `NEVER_SCREENED_BEFORE_FLAG`
-  = «нет скрининга за 5 лет».
-- `INVITATION_SEQUENCE` сбрасывается после явки (серия неответов).
-- ~2,7 % приглашений уходят женщинам, прошедшим скрининг 0–6 мес. назад (явка ~2 %) —
-  сегмент `recently_screened`.
-- Окно 12 мес. закрыто для всех лет (`cutoff_date: 2025-12-31`). Бэктест честный:
-  `split.purge_months: 12` — train содержит только приглашения с известным на 1.1.2024 исходом.
-
-## Пайплайн
-
-```
-load ─► features ─► out-of-time split (train < test_year, test = test_year)
-                     │
-                     ├─► FLAML AutoML (GroupKFold по client_id) — выбор семейства моделей
-                     │        └─ лучший конфиг LightGBM ─► warm-start для Optuna
-                     ├─► Optuna: тюнинг LightGBM, early stopping, MedianPruner
-                     ├─► чемпион: FLAML-лучшая vs Optuna-LightGBM на одних и тех же фолдах
-                     └─► финальная модель ─► тест vs правило-baseline
-                                               ├─ decile / calibration tables
-                                               ├─ SHAP (LightGBM) / permutation (иначе)
-                                               ├─ сегменты + интервенции
-                                               └─ размер A/B по сегментам
+```bash
+python -m screening profile          # data overview + leakage check        -> reports/profile_*.csv
+python -m screening train            # full pipeline, ~20 min                -> reports/, models/, MLflow
+python -m screening export-ui        # aggregates for dashboards and slides  -> reports/ui/data.json
 ```
 
-Всё логируется в MLflow: родительский run `train`, вложенные — `flaml` и каждый
-`optuna_trial_N`. CSV-отчёты дублируются в `reports/`, модель — в `models/model.joblib`
-(бандл: модель + список признаков + уровни категорий; его читает `score`).
+Demo dashboards (both read only `reports/ui/data.json` — aggregates, no row-level data):
 
-Таргет модели — `non_attendance = 1 − attended_12m` (положительный класс — неявка, ~81 %).
+```bash
+cd ui && npm install && npm run dev  # React dashboard   -> http://localhost:5173  (Node.js 20+)
+streamlit run app/dashboard.py       # Streamlit version -> http://localhost:8501
+```
 
-## Структура
+Other commands:
 
-| Модуль | Блок задания | Что делает |
-|---|---|---|
-| `data/load.py`, `data/split.py` | — | загрузка, маппинг колонок, обрезка незакрытого окна, temporal split + GroupKFold |
-| `data/synthetic.py` | — | синтетика, откалиброванная под слайд 4 (≈19 % / 45 % / ≈3 %) |
-| `features/build.py` | 01 KDO | производные признаки (только из имеющихся колонок) |
-| `models/baseline.py` | 01 KDO | правило «число прошлых приглашений» — модель должна его побить |
-| `data/profile.py` | — | обзор данных, single-feature AUC для поиска утечек |
-| `models/flaml_search.py`, `models/optuna_tune.py` | 01 KDO | FLAML → Optuna |
-| `models/champion.py` | 01 KDO | выбор финальной модели по CV на одинаковых фолдах (тест не используется) |
-| `scoring.py` | 03 CO | скоринг новых приглашений: риск, дециль, сегмент, интервенция |
-| `evaluation/metrics.py` | 01 KDO | AUC, PR-AUC, Brier, precision/lift@top-k, децили, калибровка |
-| `evaluation/explain.py` | 02 PROČ | SHAP (LightGBM) или permutation-важности + направление влияния |
-| `segments/rules.py` | 02–03 | сегменты-гипотезы со слайда 8 + интервенции |
-| `experiment/power.py` | 04 JAK OVĚŘIT | размер выборки для A/B (две пропорции, ITT) |
+```bash
+python -m screening score --input data/raw/new.csv   # risk + decile + segment + intervention per invitation
+python -m screening power --p 0.10 --mde 0.02        # women per A/B arm
+python -m screening synth                            # synthetic data (no real data needed)
+mlflow ui --backend-store-uri sqlite:///mlflow.db    # experiment tracking, http://127.0.0.1:5000
+python -m screening.viz.figures                      # English PNG charts from data.json -> reports/figures/
+python scripts/build_deck.py                         # backup PPTX deck from data.json   -> reports/pitch/
+pytest                                               # all tests (`-m "not slow"` skips the end-to-end run)
+```
 
-## Важные оговорки
+## Pipeline
 
-- **Высокий риск ≠ высокий эффект интервенции.** Модель ранжирует риск; кому интервенция
-  *помогает*, покажет только эксперимент (дальше — uplift-модель на его результатах).
-- SHAP показывает ассоциации, не причины.
-- Одна клиентка встречается в нескольких годах — случайный split завышает метрики.
+```
+VZP CSV ─► adapter (data/vzp.py) ─► features ─► out-of-time split
+                                                  train: invitations with outcome known by 1 Jan 2024
+                                                  test:  2024
+   ├─► FLAML AutoML (grouped CV by woman) — picks the model family, warm-starts Optuna
+   ├─► Optuna — tunes LightGBM (early stopping, pruning, 15 min budget)
+   ├─► champion: FLAML best vs Optuna LightGBM on identical folds (test year never used)
+   ├─► isotonic calibration on the last 6 months of train
+   └─► test 2024 vs rule baseline ─► deciles, calibration, SHAP, segments, fairness,
+                                     A/B sizes, budget plan, scored invitations
+```
 
-## Анализ реальных данных и план A/B
+Everything is logged to MLflow (one parent run, nested runs for FLAML and each Optuna trial). Reports go to
+`reports/`, the model bundle (model + features + category levels + decile thresholds) to `models/model.joblib`.
+The modelling target is `non_attendance = 1 − attended_12m`.
 
-[notebooks/01_eda.ipynb](notebooks/01_eda.ipynb) воспроизводит EDA на полном CSV:
-явка по истории приглашений, возрасту и профилактике, рейтинг 75 территорий с ДИ,
-исходы 90/180/365 дней и сценарная стоимость писем после недавнего скрининга.
-Выполнить все ячейки после `pip install -e ".[dev]"`; PNG будут в `reports/figures/`,
-агрегаты и SHA-256 источника — в `reports/eda/`. Для другого локального пути используется
-переменная `SCREENING_EDA_DATA`. Ноутбук в Git хранится без результатов выполнения.
+## Data notes (VZP export, version 29 Sep 2026)
 
-После ноутбука `python notebooks/write_reports.py` обновляет:
+- Target: `SCREENING_12M_FLAG`. `SCREENING_3M/6M_FLAG` are measured **after** the invitation and are never
+  model inputs (single-feature AUC 0.69 / 0.83 — a generic leakage detector would not catch them).
+- `PRIOR_INVITATION_COUNT` includes the current invitation; the adapter subtracts 1 (0 = first invitation).
+- `PRIOR_SCREEN_COUNT_5Y` counts procedure codes (~2 per screening); `NEVER_SCREENED_BEFORE_FLAG` means
+  "no screening in the 5-year window".
+- `INVITATION_SEQUENCE` resets after attendance (a streak of non-responses).
+- The 12-month window is closed for all years (`cutoff_date: 2025-12-31`).
+- Cohort: women continuously insured with VZP in 2015–2025. Results are evaluated on this group only.
 
-- [Сегменты на реальных данных](docs/segments-real-data.md): пересекающиеся гипотезы
-  и отдельные непересекающиеся группы для планирования эксперимента.
-- [Дизайн A/B](docs/experiment-design.md): размеры групп, страты, ITT, сроки и остановка.
+## Project structure
 
-`eda.letter_cost_czk` — плейсхолдер, не тариф VZP. Стоимость писем после недавнего
-скрининга не равна доказанной экономии. Региональный список фиксируется по 2020–2022
-годам; территория сама по себе не доказывает барьер доступности.
+```
+rackaton_2026/
+├── README.md
+├── pyproject.toml                  package + extras: dev (tests, notebook, charts, pptx), ui (streamlit, plotly)
+├── configs/config.yaml             single config: data, split, FLAML/Optuna, calibration, segments,
+│                                   interventions (assumed effects), budget, fairness
+├── src/screening/                  Python package
+│   ├── __main__.py                 CLI: synth | profile | train | score | export-ui | power
+│   ├── config.py, tracking.py      config loading, MLflow setup
+│   ├── pipeline.py                 end-to-end training run
+│   ├── scoring.py                  scoring of new invitations with the saved model bundle
+│   ├── export_ui.py                aggregates-only JSON for dashboards and slides
+│   ├── data/                       vzp.py (VZP adapter), schema.py, load.py, split.py,
+│   │                               profile.py (leakage check), synthetic.py (test data)
+│   ├── features/build.py           derived features
+│   ├── models/                     baseline, flaml_search, optuna_tune, champion, calibration
+│   ├── evaluation/                 metrics, explain (SHAP / permutation), fairness, real_data (EDA tables)
+│   ├── segments/rules.py           segment rules + interventions
+│   ├── experiment/                 power (sample size), assign (stratified randomisation), analysis (ITT)
+│   ├── policy/budget.py            greedy budget allocation under assumed effects
+│   └── viz/figures.py              English PNG charts from data.json
+├── app/dashboard.py                Streamlit dashboard
+├── ui/                             React dashboard (Vite + React + Recharts), see ui/README.md
+├── notebooks/
+│   ├── 01_eda.ipynb                exploratory analysis on the real data (committed without outputs)
+│   └── write_reports.py            regenerates the two docs below from EDA tables
+├── scripts/build_deck.py           backup pitch deck (PPTX) from data.json
+├── docs/
+│   ├── pitch.md                    pitch script with speaker notes
+│   ├── demo-script.md              one-minute dashboard demo
+│   ├── qa-prep.md                  expected jury questions and answers
+│   ├── segments-real-data.md       segment definitions and sizes on real data
+│   └── experiment-design.md        A/B test design
+├── tests/                          pytest suite (unit, regression, end-to-end, dashboard)
+└── data/, reports/, models/, mlflow.db   local only, git-ignored
+```
 
-Для `experiment.analysis.analyze` обязательна одна строка на уникальный непустой
-`client_id` (другое имя задаётся через `unit_col`) и один эксперимент за вызов.
-Повторные клиентки отклоняются; основной исход — явка, а не риск/факт неявки.
+## Caveats
+
+- **High risk ≠ high effect.** The model ranks risk; only the experiment shows whom an intervention helps
+  (next step: an uplift model trained on its results).
+- SHAP shows associations, not causes. Regional differences are not adjusted for age or invitation history.
+- Intervention costs and effects in the config (`interventions:`) are placeholders until the A/B test.
+- One woman appears in several years, so random splits would inflate metrics; we use an out-of-time test.
+- The Windows path of this repo contains non-ASCII characters; `threadpoolctl` breaks on such paths, so the
+  code avoids sklearn/joblib parallelism and logs LightGBM boosters natively to MLflow.

@@ -3,7 +3,7 @@ import {
   Bar, BarChart, CartesianGrid, Cell, ErrorBar, Legend, Line, LineChart, ReferenceLine,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
-import { BREAKDOWNS, FEATURES, INTERVENTIONS, SEGMENTS, num, pct } from "./labels.js";
+import { BREAKDOWNS, FEATURES, SEGMENTS, num, pct } from "./labels.js";
 import { nPerGroup } from "./power.js";
 
 const RED = "#c8102e", GREY = "#8c8c8c", GREEN = "#2e7d32", LIGHT = "#d9d9d9";
@@ -121,6 +121,23 @@ function Who({ d }) {
           </tbody>
         </table>
       </div>
+      {d.ranking_quality && (
+        <div className="card">
+          <h3>Ranking quality vs. a random score</h3>
+          <table className="tbl">
+            <thead><tr><th>Scorer</th><th className="n">ROC-AUC</th><th className="n">Average precision (attendance)</th></tr></thead>
+            <tbody>{d.ranking_quality.map((r) => (
+              <tr key={r.scorer}>
+                <td>{{ random: "Random score", rule: "Rule: number of invitations", model: "Model (LightGBM)" }[r.scorer]}</td>
+                <td className="n">{r.roc_auc.toFixed(3)}</td>
+                <td className="n">{r.scorer === "model" ? <span className="ok">{r.ap_attendance.toFixed(3)}</span> : r.ap_attendance.toFixed(3)}</td>
+              </tr>))}
+            </tbody>
+          </table>
+          <p className="note">Average precision is reported for attendance, the 19% minority class: a random score gets the
+            attendance rate. On non-attendance (81% of invitations) even a random score gets ~0.81.</p>
+        </div>
+      )}
       <div className="grid2">
         <Card title="ROC curve — test year 2024">
           <LineChart margin={{ right: 10 }}>
@@ -219,7 +236,7 @@ function What({ d }) {
               <td className="n">{num(r.n)}</td>
               <td><div className="bar" style={{ width: `${(r.share / maxShare) * 100}%` }} title={pct(r.share)} /></td>
               <td className="n">{pct(r.attendance)}</td>
-              <td>{INTERVENTIONS[r.segment] || r.intervention}</td>
+              <td>{r.intervention}</td>
             </tr>))}
           </tbody>
         </table>

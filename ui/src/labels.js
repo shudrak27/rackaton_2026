@@ -10,16 +10,6 @@ export const SEGMENTS = {
   recently_screened: "Recently screened",
 };
 
-export const INTERVENTIONS = {
-  first_invitation: "Standard letter (control / low intensity)",
-  lapsed_regular: "Simple reminder + concrete booking step",
-  other: "Standard letter + SMS reminder",
-  repeated_nonresponder: "Different channel, phone navigation, booking help",
-  care_no_prevention: "Involve GP or gynaecologist",
-  low_contact: "Multichannel outreach + 'screening matters without symptoms'",
-  recently_screened: "Do not send / postpone the invitation",
-};
-
 export const FEATURES = {
   n_prior_invitations: "Previous invitations",
   invitation_sequence: "Invitations since last screening",

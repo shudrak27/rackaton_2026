@@ -10,15 +10,15 @@ import pandas as pd
 from screening.data import schema as s
 
 INTERVENTIONS = {
-    "recently_screened": "nezasílat / odložit pozvánku (screening proběhl nedávno)",
-    "first_invitation": "standardní pozvánka (kontrolní skupina / nízká intenzita)",
-    "repeated_nonresponder": "jiný kanál, telefonická navigace, pomoc s objednáním",
-    "lapsed_regular": "jednoduché připomenutí + konkrétní objednací krok",
-    "care_no_prevention": "zapojení praktika nebo gynekologa",
-    "low_contact": "vícekanálové oslovení + screening je důležitý i bez příznaků",
-    "other": "standardní pozvánka + SMS připomenutí",
+    "recently_screened": "Do not send / postpone the invitation (screened recently)",
+    "first_invitation": "Standard letter (control / low intensity)",
+    "repeated_nonresponder": "Different channel, phone navigation, booking help",
+    "lapsed_regular": "Simple reminder + concrete booking step",
+    "care_no_prevention": "Involve GP or gynaecologist",
+    "low_contact": "Multichannel outreach + 'screening matters without symptoms'",
+    "other": "Standard letter + SMS reminder",
 }
-# Regional barrier ("navigace na dostupná pracoviště") needs external data on screening
+# Regional barrier ("navigation to available screening centres") needs external data on screening
 # centre locations; add it as a rule once a distance/accessibility column exists.
 
 

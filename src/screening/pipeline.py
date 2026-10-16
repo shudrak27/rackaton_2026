@@ -138,11 +138,11 @@ def train(cfg: dict) -> dict:
         _save(metrics.decile_table(y_te, proba), "decile_table", reports_dir)
         _save(metrics.calibration_table(y_te, proba), "calibration", reports_dir)
 
-        # PROČ: drivers (of the base model: calibration is a monotone transform)
+        # WHY: drivers (of the base model: calibration is a monotone transform)
         _save(explain.importance(base_model, X_te, y_te, seed=cfg["seed"]),
               "feature_importance", reports_dir)
 
-        # CO + JAK OVĚŘIT: segments and experiment sizing
+        # WHAT + HOW TO VERIFY: segments and experiment sizing
         seg = rules.assign(test_df, cfg)
         seg_report = rules.report(seg, y_te, proba)
         _save(seg_report, "segments", reports_dir)

@@ -1,17 +1,21 @@
 import json
 
-from PIL import Image
-from pptx import Presentation
+import pytest
 
-from screening.viz.figures import BUILDERS, load_payload, make_figures
-from scripts.build_deck import build_deck
+pytest.importorskip("matplotlib")
+pytest.importorskip("pptx")  # optional: pip install -e ".[dev]"
+
+from PIL import Image  # noqa: E402
+from pptx import Presentation  # noqa: E402
+
+from screening.viz.figures import BUILDERS, load_payload, make_figures  # noqa: E402
+from scripts.build_deck import build_deck  # noqa: E402
 
 
 def _payload():
-    rate = lambda group, attendance, n=100: {
-        "group": group, "n": n, "attendance": attendance,
-        "ci_low": attendance - 0.01, "ci_high": attendance + 0.01,
-    }
+    def rate(group, attendance, n=100):
+        return {"group": group, "n": n, "attendance": attendance,
+                "ci_low": attendance - 0.01, "ci_high": attendance + 0.01}
     segments = [
         {"segment": "first_invitation", "n": 600, "share": 0.6,
          "non_attendance": 0.4, "mean_predicted_risk": 0.4},

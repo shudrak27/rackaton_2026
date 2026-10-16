@@ -44,8 +44,12 @@ def test_champion_picks_better_model(prepared, cfg):
     df, feats = build(prepared, cfg)
     X, y = df[feats], df[s.TARGET]
     folds = group_folds(df, 3)
-    good = lambda: lgb.LGBMClassifier(n_estimators=50, verbose=-1)
-    weak = lambda: lgb.LGBMClassifier(n_estimators=1, num_leaves=2, verbose=-1)
+    def good():
+        return lgb.LGBMClassifier(n_estimators=50, verbose=-1)
+
+    def weak():
+        return lgb.LGBMClassifier(n_estimators=1, num_leaves=2, verbose=-1)
+
     name, scores = choose({"good": good, "weak": weak}, X, y, folds, "roc_auc")
     assert name == "good" and scores["good"] > scores["weak"]
 

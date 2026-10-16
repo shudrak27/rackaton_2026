@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "screening"
 version = "0.1.0"
-description = "Rakathon 2026 / VZP: predikce neúčasti na mamografickém screeningu"
+description = "Rakathon 2026 / VZP: predicting non-attendance at mammography screening"
 requires-python = ">=3.10"
 dependencies = [
     "numpy",
@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "jupyter", "matplotlib", "python-pptx"]
+dev = ["pytest", "ruff", "jupyter", "matplotlib", "python-pptx"]
 ui = ["streamlit", "plotly"]
 
 [tool.setuptools.packages.find]
@@ -30,3 +30,17 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = ["slow: end-to-end pipeline run (deselect with -m 'not slow')"]
+
+[tool.ruff]
+line-length = 120
+extend-exclude = ["ui"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP", "I"]
+ignore = ["UP007", "UP045"]
+
+[tool.ruff.lint.per-file-ignores]
+# prose: slide texts and report templates
+"scripts/build_deck.py" = ["E501"]
+"notebooks/*" = ["E501"]
+"src/screening/evaluation/real_data.py" = ["E501"]  # chart captions

@@ -1,148 +1,139 @@
-# Проект A/B-теста на реальных сегментах VZP
+# A/B test design on real VZP segments
 
-План от 2026-10-16. Это дизайн будущего эксперимента, не его результаты и не разрешение
-рассылать сообщения. Базовые ставки и ориентиры набора взяты из 2024 года:
-одна строка = одна клиентка. Когорта данных — непрерывное страхование VZP в 2015–2025;
-применимость этих ставок к будущему набору, включая новых клиенток, нужно проверить.
+This is the design of a future experiment, not its results and not permission to send messages.
+Baseline rates and recruitment references come from 2024: one row = one woman. The data cohort is
+continuous VZP insurance in 2015–2025; whether these rates apply to future recruitment, including new
+clients, must be checked.
 
-## Предлагаемый первый пилот
+## Proposed first pilot
 
-Один заранее выбранный первичный эксперимент в `lapsed_regular`: стандартное приглашение
-против стандартного приглашения плюс одно дополнительное напоминание с понятным шагом записи.
-Плановая дата напоминания — день 14 после приглашения; это гипотеза, не вывод о лучшем дне
-из EDA. Канал SMS допустим только после подтверждения доступности контактов и согласования
-владельцем программы. Контактов для отправки в нашем CSV нет.
+One pre-specified primary experiment in `lapsed_regular`: standard invitation versus standard invitation
+plus one additional reminder with a clear booking step. The planned reminder day is day 14 after the
+invitation; this is a hypothesis, not an EDA finding about the best day. SMS is allowed only after the
+availability of contacts is confirmed and the programme owner agrees. Our CSV contains no contacts.
 
-Единица рандомизации — клиентка, одна индексная дата приглашения и один experiment_id.
-Нельзя включать одну клиентку дважды, в разные плечи или одновременно в несколько пилотов.
-Для существующего клиента сохраняется первоначальное назначение, а не проводится новая жеребьёвка.
-До включения проверяются актуальные критерии приглашения и принадлежность сегменту.
-`recently_screened` не включается в пилот усиления приглашений до отдельной проверки.
+The randomisation unit is the woman, with one index invitation date and one experiment_id.
+A woman must never be included twice, in different arms, or in several pilots at once.
+An existing participant keeps her original assignment; she is not re-randomised.
+Current invitation criteria and segment membership are checked before inclusion.
+`recently_screened` is not included in any pilot that intensifies invitations without a separate review.
 
-Для этого пилота базовая явка — 33.36%, целевой различимый
-абсолютный эффект — +2 п.п. (не +2% относительно базы). Требуется **8 848
-клиенток в каждом плече**, всего **17 696**. В годовом сегменте было
-27 888 клиенток; необходимый охват около
-63.45%. Это не обещание такого числа доступных участниц
-с пригодным контактом в следующем году и не прогноз эффекта SMS.
+For this pilot the baseline attendance is 33.36% and the target detectable
+absolute effect is +2 pp (not +2% relative). It requires **8,848 women per arm**,
+**17,696** in total. The yearly segment had 27,888 women;
+the required coverage is about 63.45%. This is not a promise that this
+many eligible women with a usable contact will be available next year, nor a forecast of the SMS effect.
 
-## Рандомизация и фиксация плана
+## Randomisation and pre-registration
 
-Распределение 1:1 внутри `segment × risk_quintile`, реализуемое `experiment.assign.assign_arms`.
-Перед рандомизацией заморозить модель, преобразования, правила сегментов и границы квинтилей
-по согласованной референсной выборке. Риск — вероятность НЕявки, исход — ЯВКА.
-Одинаковые риски не надо произвольно разводить по разным квинтилям: при совпадающих границах
-использовать меньше групп. Малые страты объединять по заранее заданному правилу соседних
-уровней риска, не по будущим исходам. При единственном пилоте сегмент фиксирован, остаются
-страты по квинтилю. При нескольких сегментах используется полное произведение.
+1:1 allocation within `segment × risk_quintile`, implemented by `experiment.assign.assign_arms`.
+Before randomisation, freeze the model, transformations, segment rules and quintile boundaries on an
+agreed reference sample. Risk is the probability of NON-attendance; the outcome is ATTENDANCE.
+Identical risks should not be split arbitrarily between quintiles: with tied boundaries use fewer groups.
+Small strata are merged by a pre-specified rule over neighbouring risk levels, never by future outcomes.
+With a single pilot the segment is fixed and only the quintile strata remain; with several segments the
+full product is used.
 
-Истинных прогнозов замороженной модели в EDA нет; квинтили и назначения не выдумываются.
-После получения скоринга нужен проверяемый список уникальных client_id, segment,
-risk_quintile, invitation_date. До отправки сохранить seed, порядок входных строк,
-версию модели, версию правил и назначенное плечо. Повторный запуск на изменённом составе
-не должен менять уже выданные назначения. Для последовательного набора потребуются
-сохраняемые блоки рандомизации; текущая функция подходит для заранее зафиксированной волны.
+The EDA has no predictions of the frozen model; quintiles and assignments are not invented.
+After scoring, a verifiable list of unique client_id, segment, risk_quintile, invitation_date is needed.
+Before sending, store the seed, input row order, model version, rule version and assigned arm. Rerunning
+on a changed population must not change assignments already issued. Sequential recruitment needs
+persistent randomisation blocks; the current function suits a wave fixed in advance.
 
-В таблице баланса проверить возрастные группы, территории, историю приглашений и
-доступные контакты с медициной; `balance_table` показывает SMD. Дисбаланс не является
-поводом перебирать seed до удобного результата. Содержание интервенции фиксируется заранее.
+Check balance on age groups, territories, invitation history and contacts with healthcare;
+`balance_table` reports standardised mean differences. Imbalance is not a reason to try seeds until the
+result looks convenient. The content of the intervention is fixed in advance.
 
-## Исходы и анализ
+## Outcomes and analysis
 
-Первичный исход: SCREENING_12M_FLAG, то есть факт скрининга в течение 365 дней от индексного
-приглашения. Вторичный: SCREENING_3M_FLAG за 90 дней. 6M можно показывать описательно.
-В исходных данных явка к 90/180/365 дням — 7.12% /
-12.54% / 19.30%. Флаги накопленные;
-они не определяют точную дату реакции или оптимальную дату напоминания.
+Primary outcome: SCREENING_12M_FLAG, i.e. a screening within 365 days of the index invitation.
+Secondary: SCREENING_3M_FLAG within 90 days. 6M may be shown descriptively.
+In the source data attendance at 90/180/365 days is 7.12% /
+12.54% / 19.30%. Flags are cumulative; they do not
+give the exact response date or the optimal reminder date.
 
-Первичный эффект — разность долей явки treatment−control в процентных пунктах,
-двусторонний 95% ДИ и тест при alpha=0.05. Анализ ITT сохраняет всех
-рандомизированных клиенток независимо от доставки SMS, ответа и фактического участия.
-Отсутствие зарегистрированного скрининга можно считать 0 только при полном наблюдении;
-потеря страхового покрытия или неполная выгрузка не превращаются автоматически в неявку.
-Неизвестные исходы требуют документированной стратегии и анализа чувствительности,
-а не удаления из знаменателя для красивого результата.
+The primary effect is the difference in attendance treatment − control in percentage points, with a
+two-sided 95% CI and a test at alpha=0.05. ITT analysis keeps all randomised women regardless of
+SMS delivery, response or actual participation. A missing recorded screening may be treated as 0 only
+under complete follow-up; loss of insurance or an incomplete extract is not automatically non-attendance.
+Unknown outcomes need a documented strategy and a sensitivity analysis, not removal from the denominator.
 
-`experiment.analysis.analyze` требует уникальный непустой client_id (или явный unit_col),
-отклоняет повторные записи и смешанные experiment_id. На вход подаётся явка 0/1,
-а не `scored_test.y`, которое означает неявку. Недозвоны и недоставку не отфильтровывать.
-Объединённый ITT-контраст в одном сегменте является основным; результаты по квинтилям
-исследовательские и не означают, что каждый квинтиль отдельно имеет достаточную мощность.
-Текущие Wald-интервалы и z-тест — приближение для больших выборок; для редких событий,
-нулевых ячеек и малых подгрупп нужен отдельный устойчивый метод до интерпретации результатов.
+`experiment.analysis.analyze` requires a unique non-empty client_id (or an explicit unit_col), rejects
+repeated records and mixed experiment_ids. Its input is attendance 0/1, not `scored_test.y`, which means
+non-attendance. Unreachable women and undelivered messages are not filtered out. The pooled ITT contrast
+within one segment is primary; results by quintile are exploratory and do not mean each quintile is
+powered on its own. The current Wald intervals and z-test are large-sample approximations; rare events,
+zero cells and small subgroups need a separate robust method before interpretation.
 
-## Размеры групп и осуществимость
+## Group sizes and feasibility
 
-Расчёт через `experiment.power.n_per_group`: power=80%, двусторонняя
-alpha=0.05, два независимых плеча 1:1, MDE абсолютный. Формула существующего
-модуля не менялась; исправлена валидация параметров. Это нормальное приближение для
-планирования, без поправок на неполное наблюдение и изменение базовой явки.
+Computed with `experiment.power.n_per_group`: power=80%, two-sided alpha=0.05, two
+independent arms 1:1, absolute MDE. This is a normal approximation for planning, without corrections for
+incomplete follow-up or changing baseline attendance.
 
-| Сегмент | Явка контроля, ориентир | MDE, п.п. | В каждую группу | Всего | Годовой ориентир клиенток | Вмещается при 100% наборе |
+| Segment | Control attendance (reference) | MDE, pp | Per arm | Total | Yearly women (reference) | Fits at 100% recruitment |
 | --- | --- | --- | --- | --- | --- | --- |
-| lapsed_regular | 33.36% | 1 | 35 153 | 70 306 | 27 888 | нет |
-| lapsed_regular | 33.36% | 2 | 8 848 | 17 696 | 27 888 | да |
-| lapsed_regular | 33.36% | 3 | 3 957 | 7 914 | 27 888 | да |
-| lapsed_regular | 33.36% | 5 | 1 441 | 2 882 | 27 888 | да |
-| low_contact | 4.51% | 1 | 7 470 | 14 940 | 36 257 | да |
-| low_contact | 4.51% | 2 | 2 041 | 4 082 | 36 257 | да |
-| low_contact | 4.51% | 3 | 982 | 1 964 | 36 257 | да |
-| low_contact | 4.51% | 5 | 406 | 812 | 36 257 | да |
-| care_no_prevention | 7.29% | 1 | 11 279 | 22 558 | 39 893 | да |
-| care_no_prevention | 7.29% | 2 | 2 982 | 5 964 | 39 893 | да |
-| care_no_prevention | 7.29% | 3 | 1 396 | 2 792 | 39 893 | да |
-| care_no_prevention | 7.29% | 5 | 551 | 1 102 | 39 893 | да |
-| repeated_nonresponder | 9.61% | 1 | 14 256 | 28 512 | 87 453 | да |
-| repeated_nonresponder | 9.61% | 2 | 3 717 | 7 434 | 87 453 | да |
-| repeated_nonresponder | 9.61% | 3 | 1 718 | 3 436 | 87 453 | да |
-| repeated_nonresponder | 9.61% | 5 | 665 | 1 330 | 87 453 | да |
-| regional | 31.69% | 1 | 34 263 | 68 526 | 5 566 | нет |
-| regional | 31.69% | 2 | 8 632 | 17 264 | 5 566 | нет |
-| regional | 31.69% | 3 | 3 864 | 7 728 | 5 566 | нет |
-| regional | 31.69% | 5 | 1 409 | 2 818 | 5 566 | да |
+| lapsed_regular | 33.36% | 1 | 35,153 | 70,306 | 27,888 | no |
+| lapsed_regular | 33.36% | 2 | 8,848 | 17,696 | 27,888 | yes |
+| lapsed_regular | 33.36% | 3 | 3,957 | 7,914 | 27,888 | yes |
+| lapsed_regular | 33.36% | 5 | 1,441 | 2,882 | 27,888 | yes |
+| low_contact | 4.51% | 1 | 7,470 | 14,940 | 36,257 | yes |
+| low_contact | 4.51% | 2 | 2,041 | 4,082 | 36,257 | yes |
+| low_contact | 4.51% | 3 | 982 | 1,964 | 36,257 | yes |
+| low_contact | 4.51% | 5 | 406 | 812 | 36,257 | yes |
+| care_no_prevention | 7.29% | 1 | 11,279 | 22,558 | 39,893 | yes |
+| care_no_prevention | 7.29% | 2 | 2,982 | 5,964 | 39,893 | yes |
+| care_no_prevention | 7.29% | 3 | 1,396 | 2,792 | 39,893 | yes |
+| care_no_prevention | 7.29% | 5 | 551 | 1,102 | 39,893 | yes |
+| repeated_nonresponder | 9.61% | 1 | 14,256 | 28,512 | 87,453 | yes |
+| repeated_nonresponder | 9.61% | 2 | 3,717 | 7,434 | 87,453 | yes |
+| repeated_nonresponder | 9.61% | 3 | 1,718 | 3,436 | 87,453 | yes |
+| repeated_nonresponder | 9.61% | 5 | 665 | 1,330 | 87,453 | yes |
+| regional | 31.69% | 1 | 34,263 | 68,526 | 5,566 | no |
+| regional | 31.69% | 2 | 8,632 | 17,264 | 5,566 | no |
+| regional | 31.69% | 3 | 3,864 | 7,728 | 5,566 | no |
+| regional | 31.69% | 5 | 1,409 | 2,818 | 5,566 | yes |
 
-Группы взяты из непересекающегося планового разбиения в [описании сегментов](segments-real-data.md).
-Для одних и тех же клиенток нельзя одновременно использовать пересекающиеся таблицы гипотез.
-Пять строк сегментов — альтернативы/отдельные пилоты, не общий контроль для пяти сравнений.
-Необходимость отбора по пригодному каналу и актуальным условиям снизит доступную численность.
-Для доли пригодных к набору q годовой ориентир равен q × available_clients; для доли
-наблюдаемых исходов r начальный ориентир набора — ceil(n/r) на плечо. Такая поправка
-не устраняет смещение из-за пропущенных исходов; r и механизм пропусков нужно обосновать.
+Groups come from the non-overlapping planning split in the [segment description](segments-real-data.md).
+Overlapping hypothesis tables must not be used for the same women at the same time. The five segment rows
+are alternatives / separate pilots, not one shared control for five comparisons. Selecting on a usable
+channel and current conditions will reduce the available numbers. For an eligible share q the yearly
+reference is q × available_clients; for an observed-outcome share r the initial recruitment target is
+ceil(n / r) per arm. This correction does not remove bias from missing outcomes; r and the missingness
+mechanism must be justified.
 
-Если одновременно объявлять пять подтверждающих эффектов одной семьёй, простой
-консервативный вариант — Bonferroni: alpha=0.05/5=0.01 на сравнение. Например:
+If five confirmatory effects are claimed as one family, a simple conservative option is Bonferroni:
+alpha = 0.05 / 5 = 0.01 per comparison. For example:
 
-| Сегмент | В каждую группу при MDE=2 п.п., alpha=0.01 |
+| Segment | Per arm at MDE = 2 pp, alpha = 0.01 |
 | --- | --- |
-| lapsed_regular | 13 165 |
-| low_contact | 3 036 |
-| care_no_prevention | 4 436 |
-| repeated_nonresponder | 5 531 |
-| regional | 12 844 |
+| lapsed_regular | 13,165 |
+| low_contact | 3,036 |
+| care_no_prevention | 4,436 |
+| repeated_nonresponder | 5,531 |
+| regional | 12,844 |
 
-Эти увеличенные размеры заменяют, а не дополняют размеры при alpha=0.05. Для первого
-пилота выше выбран один первичный эффект; вторичный 90-дневный анализ не является
-самостоятельным подтверждающим заявлением об эффективности без плана множественности.
+These larger sizes replace, not add to, the sizes at alpha = 0.05. The first pilot above has one primary
+effect; the secondary 90-day analysis is not a standalone confirmatory claim without a multiplicity plan.
 
-## Сроки и правила остановки
+## Timeline and stopping rules
 
-Плановый набор одной волны — до 12 месяцев; за каждой клиенткой наблюдаем 365 дней.
-Финальный анализ — после окончания окна последней участницы и согласованной задержки
-поступления услуг. Например, при годе набора и условных 90 днях задержки это около
-27 месяцев от начала набора. Задержка 90 дней — допущение для календаря, её подтверждает VZP.
-Аналогично ранний 90-дневный исход требует завершённого наблюдения и поступления данных.
+Recruitment for one wave: up to 12 months; each woman is followed for 365 days. The final analysis comes
+after the window of the last participant closes plus the agreed claims reporting delay. For example, with
+one year of recruitment and an assumed 90-day delay this is about 27 months from the start. The 90-day
+delay is a calendar assumption to be confirmed by VZP. The early 90-day outcome likewise needs complete
+follow-up and data arrival.
 
-Набор заканчивается при достижении заранее рассчитанного числа или заранее установленной
-даты; недобор фиксируется как ограничение мощности. Один финальный анализ первичного исхода.
-Ежедневное чтение p-value и остановка при первом p<0.05 не допускаются. Ранний анализ
-эффективности возможен только после отдельного заранее определённого последовательного дизайна.
-Операционные причины паузы: ошибки назначения, непригодные контакты, сбой регистрации исходов,
-жалобы/нежелательные последствия или решение владельца программы. Уже назначенных участниц
-сохраняют в ITT и продолжают доступное наблюдение. Правила безопасности фиксируются до старта.
+Recruitment ends when the pre-computed size or a pre-set date is reached; under-recruitment is recorded
+as a power limitation. One final analysis of the primary outcome. Reading p-values daily and stopping at
+the first p < 0.05 is not allowed. Early efficacy analysis is possible only with a separately
+pre-specified sequential design. Operational reasons for a pause: assignment errors, unusable contacts,
+outcome recording failures, complaints/adverse effects or the decision of the programme owner. Women
+already assigned stay in the ITT analysis and remain followed. Safety rules are fixed before the start.
 
-## Воспроизведение и ограничения
+## Reproduction and limitations
 
-Выполнить `notebooks/01_eda.ipynb`, затем `python notebooks/write_reports.py`.
-Полная таблица: `reports/eda/experiment_sizes.csv`; источник и конфигурация зафиксированы
-в `reports/eda/manifest.json`. Письма, SMS и звонки этим кодом не отправляются.
-Региональная доступность, эффективность каналов и индивидуальный uplift пока не установлены.
+Run `notebooks/01_eda.ipynb`, then `python notebooks/write_reports.py`.
+Full table: `reports/eda/experiment_sizes.csv`; source and configuration are recorded in
+`reports/eda/manifest.json`. This code does not send letters, SMS or calls.
+Regional accessibility, channel effectiveness and individual uplift are not established yet.
