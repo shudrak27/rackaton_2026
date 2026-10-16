@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ErrorBar, Legend, Line, LineChart,
-  Pie, PieChart, Tooltip, XAxis, YAxis,
+  Tooltip, XAxis, YAxis,
 } from "recharts";
 import { BREAKDOWNS, FEATURES, SEGMENTS, num, pct } from "./labels.js";
 import { nPerGroup } from "./power.js";
@@ -23,16 +23,27 @@ const recentAverage = (d) => d.recently_screened_per_year.length
   ? d.recently_screened_per_year.reduce((s, r) => s + r.n, 0) / d.recently_screened_per_year.length : null;
 const segmentRows = (d) => d.segments.map((r) => ({ ...r, attendance: 1 - r.non_attendance, label: SEGMENTS[r.segment] || r.segment }));
 
+// Short axis labels: long ones make Recharts hide neighbouring ticks.
+const GROUP_LABELS = { none_in_5y: "No screen in 5y", "61+ (window edge)": "61+*" };
+// Groups that are "no information" rather than a value range: drawn in grey.
+const NO_DATA_GROUPS = new Set(["none_in_5y"]);
+const BREAKDOWN_NOTES = {
+  months_since_last_screening: "Grey: no screening recorded in the 5-year history window (82% of invitations, no date to count from). " +
+    "* 61+: edge of that window in the VZP data (193 invitations).",
+  prior_invitations: "0 = first invitation; 10 = ten or more previous invitations.",
+};
+
 export function RateBars({ rows = [], color = INDIGO, horizontal = false, width, height }) {
-  const data = rows.map((r) => ({ ...r, group: r.group === "none_in_5y" ? "No screen in 5y" : String(r.group),
+  const data = rows.map((r) => ({ ...r, key: String(r.group), group: GROUP_LABELS[r.group] ?? String(r.group),
     err: [Math.max(0, r.attendance - r.ci_low), Math.max(0, r.ci_high - r.attendance)] }));
   return <BarChart width={width} height={height} data={data} layout={horizontal ? "vertical" : "horizontal"}
     margin={{ top: 8, right: 18, left: horizontal ? 5 : -12, bottom: 8 }} barCategoryGap="30%">
     <CartesianGrid {...GRID} vertical={horizontal} horizontal={!horizontal} />
     {horizontal ? <><XAxis {...AXIS} type="number" tickFormatter={pctTick} /><YAxis {...AXIS} type="category" dataKey="group" width={125} /></>
-      : <><XAxis {...AXIS} dataKey="group" /><YAxis {...AXIS} tickFormatter={pctTick} width={58} /></>}
+      : <><XAxis {...AXIS} dataKey="group" interval={0} /><YAxis {...AXIS} tickFormatter={pctTick} width={58} /></>}
     <Tooltip cursor={{ fill: "#f4f5ff" }} content={<ChartTooltip showCount />} />
     <Bar dataKey="attendance" name="Attendance" fill={color} radius={horizontal ? [0, 3, 3, 0] : [4, 4, 0, 0]} maxBarSize={42} isAnimationActive={false}>
+      {data.map((r) => <Cell key={r.key} fill={NO_DATA_GROUPS.has(r.key) ? GREY : color} />)}
       <ErrorBar dataKey="err" width={3} stroke="#a6adc4" direction={horizontal ? "x" : "y"} />
     </Bar>
   </BarChart>;
@@ -53,8 +64,8 @@ function SegmentTable({ d, compact = false }) {
   return <Table label="Screening segments">
     <thead><tr><th>Segment</th><th className="n">Women</th><th>Share</th><th className="n">Attendance</th><th>{compact ? "Outreach approach" : "Proposed intervention"}</th></tr></thead>
     <tbody>{rows.map((r) => <tr key={r.segment}>
-      <td><span className="segment-name"><span className="segment-marker" style={{ color: segmentColor(r.segment) }}><Icon name="people" size={14} /></span><strong>{r.label}</strong></span></td>
-      <td className="n">{num(r.n)}</td><td><div className="table-progress"><div className="progress-track"><i className="progress-fill" style={{ width: `${r.share * 100}%`, background: segmentColor(r.segment) }} /></div>{pct(r.share)}</div></td>
+      <td><strong>{r.label}</strong></td>
+      <td className="n">{num(r.n)}</td><td><div className="table-progress"><div className="progress-track"><i className="progress-fill" style={{ width: `${r.share * 100}%` }} /></div>{pct(r.share)}</div></td>
       <td className="n"><Badge tone={r.attendance >= d.meta.attendance_overall ? "teal" : "neutral"}>{pct(r.attendance)}</Badge></td>
       <td className="intervention-cell">{r.intervention}</td>
     </tr>)}</tbody>
@@ -65,39 +76,27 @@ export function Overview({ d, navigate }) {
   const t10 = d.targeting?.find((r) => Math.abs(r.share - .1) < 1e-9);
   const reduction = t10?.top_wasted_rule ? 1 - t10.top_wasted_model / t10.top_wasted_rule : null;
   const first = d.deciles[0], last = d.deciles.at(-1);
-  const share = [{ name: "Attended", value: d.meta.attendance_overall, fill: TEAL },
-    { name: "Did not attend", value: 1 - d.meta.attendance_overall, fill: "#e8eafd" }];
   return <>
     <div className="kpis">
-      <Kpi label="Total invitations" value={num(d.meta.n_invitations)} detail={`${num(d.meta.n_clients)} women in the cohort`} foot={`Invitation history · ${period(d)}`} tone="amber" icon="mail" />
-      <Kpi label="Attendance rate" value={pct(d.meta.attendance_overall)} detail="Screened within 12 months" foot="Observed across all invitation years" tone="coral" icon="calendar" />
-      <Kpi label="Lowest-risk 10% · attendance" value={pct(t10?.bottom_attendance_model, 0)} detail={`Compared with ${pct(t10?.bottom_attendance_rule, 0)} using the rule`} foot={`Model-selected group · ${d.meta.test_year}`} tone="teal" icon="people" />
-      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`Invitation-count rule: ${fixed(metric(d, "roc_auc", "baseline"))}`} foot="Evaluated on the held-out test year" icon="chart" />
+      <Kpi label="Total invitations" value={num(d.meta.n_invitations)} detail={`${num(d.meta.n_clients)} women · ${period(d)}`} tone="amber" icon="mail" />
+      <Kpi label="Attendance rate" value={pct(d.meta.attendance_overall)} detail="within 12 months of the letter" tone="coral" icon="calendar" />
+      <Kpi label="Lowest-risk 10% · attendance" value={pct(t10?.bottom_attendance_model, 0)} detail={`rule: ${pct(t10?.bottom_attendance_rule, 0)} · a letter is enough`} tone="teal" icon="people" highlight />
+      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`rule: ${fixed(metric(d, "roc_auc", "baseline"))} · random: 0.500`} icon="chart" />
     </div>
     <div className="overview-grid">
-      <Panel title="A clearer picture of risk" subtitle="Observed attendance across risk deciles" className="risk-highlight" action={<Badge>TEST {d.meta.test_year}</Badge>}
-        footer="Equal-sized groups, ordered by predicted non-attendance.">
+      <Panel title="A clearer picture of risk" subtitle="Attendance by model risk decile" className="risk-highlight" action={<Badge>TEST {d.meta.test_year}</Badge>}>
         <div className="risk-range"><div><strong>{pct(first?.attendance)}</strong><small>Lowest-risk decile</small></div><Icon name="arrow" /><div><strong>{pct(last?.attendance)}</strong><small>Highest-risk decile</small></div></div>
         <Chart height={122} label="Attendance decreases across model risk deciles">
           <AreaChart data={d.deciles} margin={{ top: 12, right: 0, left: 0, bottom: 0 }}>
-            <defs><linearGradient id="riskFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#fff" stopOpacity={.24} /><stop offset="100%" stopColor="#fff" stopOpacity={0} /></linearGradient></defs>
+            <defs><linearGradient id="riskFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={INDIGO} stopOpacity={.22} /><stop offset="100%" stopColor={INDIGO} stopOpacity={0} /></linearGradient></defs>
             <Tooltip content={<ChartTooltip labelFormat={(v) => `Risk decile ${d.deciles[v]?.decile ?? v}`} />} />
-            <Area type="monotone" dataKey="attendance" name="Observed attendance" stroke="#c8cdff" strokeWidth={2} fill="url(#riskFill)" isAnimationActive={false} />
+            <Area type="monotone" dataKey="attendance" name="Observed attendance" stroke={INDIGO} strokeWidth={2} fill="url(#riskFill)" isAnimationActive={false} />
           </AreaChart>
         </Chart>
       </Panel>
-      <Panel title="Attendance snapshot" subtitle={`All invitations · ${period(d)}`}>
-        <div className="donut-wrap"><Chart height={164} label="Share attending within twelve months">
-          <PieChart><Pie data={share} dataKey="value" innerRadius={57} outerRadius={72} startAngle={90} endAngle={-270} stroke="none" paddingAngle={2} isAnimationActive={false} />
-            <Tooltip content={<ChartTooltip labelFormat={() => "Within 12 months"} />} /></PieChart>
-        </Chart><div className="donut-center"><strong>{pct(d.meta.attendance_overall)}</strong><small>attendance</small></div></div>
-        <div className="donut-stats"><div><LegendItem color={TEAL}>Attended</LegendItem><strong>{pct(d.meta.attendance_overall)}</strong></div>
-          <div><LegendItem color="#c4c9ef">Did not attend</LegendItem><strong>{pct(1 - d.meta.attendance_overall)}</strong></div></div>
-      </Panel>
-      <Panel title="Outreach precision" subtitle="Highest-risk 10% · model vs. rule" action={<Icon name="target" size={18} />}
-        footer="Historical attenders in the selected group; outreach effects need a trial.">
+      <Panel title="Outreach precision" subtitle="Calling the highest-risk 10%" action={<Icon name="target" size={18} />}>
         <div className="precision-body"><div className="precision-summary"><div className="precision-value">{pct(reduction, 0)} fewer</div>
-          <p className="precision-description">contacts with observed attenders</p></div>
+          <p className="precision-description">calls to women who would attend anyway</p></div>
           {[{ name: "Model", value: t10?.top_wasted_model, color: INDIGO }, { name: "Invitation-count rule", value: t10?.top_wasted_rule, color: GREY }].map((r) => <div className="progress-row" key={r.name}>
             <div className="progress-label"><span>{r.name}</span><strong>{num(r.value)}</strong></div>
             <div className="progress-track"><i className="progress-fill" style={{ width: `${t10?.top_wasted_rule ? 100 * r.value / t10.top_wasted_rule : 0}%`, background: r.color }} /></div>
@@ -130,10 +129,10 @@ export function Who({ d }) {
   const rq = Object.fromEntries((d.ranking_quality || []).map((r) => [r.scorer, r]));
   return <>
     <div className="kpis">
-      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`Rule baseline: ${fixed(metric(d, "roc_auc", "baseline"))}`} foot="Ranking non-attendance risk" icon="chart" />
-      <Kpi label="Average precision" value={fixed(rq.model?.ap_attendance)} detail={`Attendance · rule: ${fixed(rq.rule?.ap_attendance)}`} foot="Evaluated for the attendance class" tone="amber" icon="target" />
-      <Kpi label="Lowest-risk decile" value={pct(d.deciles[0]?.attendance)} detail="Observed attendance within 12 months" foot="10% with the lowest predicted risk" tone="teal" icon="people" />
-      <Kpi label="Highest-risk decile" value={pct(d.deciles.at(-1)?.attendance)} detail="Observed attendance within 12 months" foot="10% with the highest predicted risk" tone="coral" icon="people" />
+      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`Rule baseline: ${fixed(metric(d, "roc_auc", "baseline"))}`} icon="chart" />
+      <Kpi label="Average precision" value={fixed(rq.model?.ap_attendance)} detail={`Attendance · rule: ${fixed(rq.rule?.ap_attendance)}`} tone="amber" icon="target" />
+      <Kpi label="Lowest-risk decile" value={pct(d.deciles[0]?.attendance)} detail="Observed attendance within 12 months" tone="teal" icon="people" />
+      <Kpi label="Highest-risk decile" value={pct(d.deciles.at(-1)?.attendance)} detail="Observed attendance within 12 months" tone="coral" icon="people" />
     </div>
     <div className="grid2">
       <Panel title="Model discrimination" subtitle={`ROC curve · held-out ${d.meta.test_year} invitations`}>
@@ -194,7 +193,8 @@ export function Why({ d }) {
       <div className="controls panel-controls"><label className="field">Break down by<select value={key} onChange={(e) => setKey(e.target.value)}>
         {Object.entries(BREAKDOWNS).filter(([id]) => d.attendance_by[id]).map(([id, name]) => <option key={id} value={id}>{name}</option>)}</select></label></div>
       <Chart height={290} label={`Attendance by ${BREAKDOWNS[key]}`}><RateBars rows={d.attendance_by[key]} /></Chart>
-      <div className="chart-caption">Attendance within 12 months · whiskers show the intervals provided in the aggregate export.</div>
+      <div className="chart-caption">Attendance within 12 months · whiskers show 95% confidence intervals.
+        {BREAKDOWN_NOTES[key] && <><br />{BREAKDOWN_NOTES[key]}</>}</div>
     </Panel>
     <Panel title="Regional variation" subtitle="Territorial offices with the lowest and highest attendance" className="section-gap" action={<Badge tone="neutral">{regions.length} OFFICES</Badge>}>
       <div className="controls panel-controls"><label className="field">Offices at each end: {k}<input type="range" min={5} max={20} value={k} onChange={(e) => setK(+e.target.value)} /></label></div>
@@ -226,7 +226,8 @@ export function What({ d, navigate }) {
       </Panel>
       <Panel title="Time since the last screening" subtitle="Attendance after a new invitation">
         <Chart height={300} label="Attendance by months since last screening"><RateBars rows={since} color={TEAL} /></Chart>
-        <div className="chart-caption">Months since the previous screening, measured at invitation.</div>
+        <div className="chart-caption">Months since the previous screening, measured at invitation.
+          * 61+: edge of the 5-year history window in the VZP data (193 invitations).</div>
       </Panel>
     </div>
     <Panel title="A closer look at invitation timing" subtitle="Invitations sent within six months of a recorded screening" className="section-gap" action={<Badge tone="amber">PROCESS REVIEW</Badge>}>

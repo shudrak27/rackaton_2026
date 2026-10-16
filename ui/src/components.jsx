@@ -32,12 +32,11 @@ export function Icon({ name, size = 20, ...props }) {
     strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name] || paths.chart}</svg>;
 }
 
-export function Kpi({ label, value, detail, foot, tone = "indigo", icon = "chart" }) {
-  return <article className={`kpi tone-${tone}`}>
+export function Kpi({ label, value, detail, tone = "indigo", icon = "chart", highlight = false }) {
+  return <article className={`kpi tone-${tone}${highlight ? " kpi-highlight" : ""}`}>
     <div className="kpi-main"><div><p className="kpi-label">{label}</p><div className="kpi-value">{value}</div></div>
-      <span className="kpi-icon"><Icon name={icon} size={24} /></span></div>
-    <p className="kpi-detail">{detail}</p>
-    <div className="kpi-footer"><span>{foot}</span><Icon name="arrow" size={15} /></div>
+      <span className="kpi-icon"><Icon name={icon} size={22} /></span></div>
+    {detail && <p className="kpi-detail">{detail}</p>}
   </article>;
 }
 
