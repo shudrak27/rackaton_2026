@@ -21,6 +21,7 @@ def test_rate_table_suppresses_small_groups():
 
 def test_targeting_comparison_counts_people():
     import numpy as np
+
     from screening.export_ui import targeting_comparison
     y = np.array([1, 1, 1, 1, 0, 0, 0, 0, 1, 0])          # 1 = non-attendance
     perfect = y.astype(float)

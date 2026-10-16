@@ -1,102 +1,101 @@
-# Сегменты на реальных данных VZP
+# Segments on real VZP data
 
-Расчёт подготовлен для этапа от 2026-10-16 на всей предоставленной выгрузке: 1 344 556 приглашений,
-508 527 клиенток, 2020–2024 годы. Одна строка — приглашение; одна клиентка встречается
-до 5 раз. В 2024 году одна строка соответствует одной уникальной клиентке.
+Computed on the full delivered extract: 1,344,556 invitations, 508,527 women,
+2020–2024. One row is one invitation; one woman appears up to 5 times.
+In 2024 one row corresponds to one unique woman.
 
-Ограничение: когорта отобрана по непрерывному страхованию VZP в 2015–2025 годах.
-Переносимость на другие группы не проверена. Исход — SCREENING_12M_FLAG=A за 365 дней.
-Флаги 3M/6M/12M не используются при определении индивидуальных поведенческих сегментов.
+Limitation: the cohort was selected for continuous VZP insurance in 2015–2025; transferability to
+other groups is untested. Outcome: SCREENING_12M_FLAG = A within 365 days. The 3M/6M/12M flags are
+not used to define individual behavioural segments.
 
-## Гипотезы для обсуждения с владельцем программы
+## Hypotheses for discussion with the programme owner
 
-| Сегмент | Определение по исходным колонкам |
+| Segment | Definition on delivered columns |
 | --- | --- |
-| lapsed_regular | PRIOR_SCREEN_COUNT_5Y ≥ 1 и MONTHS_SINCE_LAST_SCREEN > 24 |
-| low_contact | HEALTHCARE_CONTACT_12M_CNT ≤ 2 ИЛИ оба GP_REGISTERED и GYN_REGISTERED_FLAG = N |
-| care_no_prevention | HEALTHCARE_CONTACT_12M_CNT ≥ 6 и GP_PREVENTION_24M_CNT + GYN_PREVENTION_24M_CNT = 0 |
-| repeated_nonresponder | PRIOR_INVITATION_COUNT − 1 ≥ 3 и PRIOR_SCREEN_COUNT_5Y = 0 |
-| regional | VZP_TERRITORIAL_AREA входит в 20% территорий с наименьшей явкой в 2020–2022 |
+| lapsed_regular | PRIOR_SCREEN_COUNT_5Y ≥ 1 and MONTHS_SINCE_LAST_SCREEN > 24 |
+| low_contact | HEALTHCARE_CONTACT_12M_CNT ≤ 2 OR both GP_REGISTERED and GYN_REGISTERED_FLAG = N |
+| care_no_prevention | HEALTHCARE_CONTACT_12M_CNT ≥ 6 and GP_PREVENTION_24M_CNT + GYN_PREVENTION_24M_CNT = 0 |
+| repeated_nonresponder | PRIOR_INVITATION_COUNT − 1 ≥ 3 and PRIOR_SCREEN_COUNT_5Y = 0 |
+| regional | VZP_TERRITORIAL_AREA is among the 20% of territories with the lowest attendance in 2020–2022 |
 
-| Гипотеза | Приглашений 2020–2024 | Клиенток 2020–2024 | Явка 2020–2024 | Клиенток 2024 | Явка 2024 |
+| Hypothesis | Invitations 2020–2024 | Women 2020–2024 | Attendance 2020–2024 | Women 2024 | Attendance 2024 |
 | --- | --- | --- | --- | --- | --- |
-| lapsed_regular | 204 426 | 138 948 | 34.42% | 32 533 | 35.60% |
-| low_contact | 195 408 | 94 656 | 6.17% | 41 668 | 6.62% |
-| care_no_prevention | 300 113 | 160 907 | 10.98% | 48 262 | 10.40% |
-| repeated_nonresponder | 764 026 | 230 325 | 6.99% | 155 178 | 7.64% |
-| regional | 363 000 | 131 844 | 17.14% | 69 927 | 17.44% |
+| lapsed_regular | 204,426 | 138,948 | 34.42% | 32,533 | 35.60% |
+| low_contact | 195,408 | 94,656 | 6.17% | 41,668 | 6.62% |
+| care_no_prevention | 300,113 | 160,907 | 10.98% | 48,262 | 10.40% |
+| repeated_nonresponder | 764,026 | 230,325 | 6.99% | 155,178 | 7.64% |
+| regional | 363,000 | 131,844 | 17.14% | 69,927 | 17.44% |
 
-Эти пять гипотез **пересекаются**: строки и клиенток между ними складывать нельзя.
-Ставки за пять лет взвешены по приглашениям, а не по уникальным женщинам.
-В CSV `hypotheses_all_years.csv` интервалы учитывают кластеризацию по PERSON_ID;
-годовые интервалы Wilson доступны в `hypotheses_reporting_year.csv`.
+These five hypotheses **overlap**: rows and women must not be added up across them.
+Five-year rates are weighted by invitations, not by unique women. In `hypotheses_all_years.csv`
+the intervals account for clustering by PERSON_ID; yearly Wilson intervals are in
+`hypotheses_reporting_year.csv`.
 
-`lapsed_regular` означает наличие истории и перерыв, но не доказывает регулярность.
-Мы не делим процедурные коды на два. `care_no_prevention` означает отсутствие только
-профосмотров GP/GYN за 24 месяца; стоматология и другие скрининги этим определением
-не исключаются. `repeated_nonresponder` — прокси, не доказательство отказа на каждое письмо.
-Ноль процедур за пять лет не равен отсутствию скрининга за всю жизнь.
+`lapsed_regular` means screening history plus a gap; it does not prove regularity. Procedure codes are
+not divided by two. `care_no_prevention` means no GP/GYN check-ups in 24 months only; dental and other
+screenings are not excluded by this definition. `repeated_nonresponder` is a proxy, not proof of a
+refusal of every letter. Zero procedures in five years is not the same as never screened.
 
-## Региональная гипотеза
+## Regional hypothesis
 
-Список из 15 территорий выбран один раз по 2020–2022 годам, затем
-применён к 2024 году. Порог 20% — исследовательское допущение, не медицинская граница.
-При равных ставках порядок фиксируется названием территории.
+The list of 15 territories was chosen once on 2020–2022 and then applied
+to 2024. The 20% threshold is a research assumption, not a medical boundary.
+Ties are ordered by territory name.
 
 KARVINÁ; OLOMOUC; OSTRAVA; CHEB; KLADNO; MĚLNÍK; ÚSTÍ NAD LABEM; MLADÁ BOLESLAV; ROKYCANY; PRACHATICE; JINDŘICHŮV HRADEC; PROSTĚJOV; ŠUMPERK; PRAHA-HL.MĚSTO; TRUTNOV.
 
-Это территории VZP, не точные города проживания и не измерение доступности.
-Рейтинг по явке без поправки на возраст и историю приглашений не доказывает региональный барьер.
-Полный рейтинг всех 75 территорий за 2024 с численностью и 95% Wilson ДИ сохраняется
-в `reports/eda/regions_reporting_year.csv`, график — в `reports/figures/regions_ranking.png`.
-Интервалы точечные: поправки на 75 сравнений и неопределённость места в рейтинге нет.
-Выбранные территории не переопределяются по исходам 2024 года.
+These are VZP territorial offices, not exact places of residence and not a measure of accessibility.
+A crude attendance ranking without adjustment for age and invitation history does not prove a regional
+barrier. The full ranking of all 75 territories for 2024 with counts and 95% Wilson CIs is saved in
+`reports/eda/regions_reporting_year.csv`, the chart in `reports/figures/regions_ranking.png`.
+Intervals are pointwise: no correction for 75 comparisons or rank uncertainty.
+The selected territories are not redefined using 2024 outcomes.
 
-## Непересекающиеся группы для планирования A/B
+## Non-overlapping groups for A/B planning
 
-Используется текущая последовательность правил ядра:
+The current production rule order is used:
 `recently_screened → first_invitation → lapsed_regular → low_contact → care_no_prevention
-→ repeated_nonresponder → other`. Только для планирования к оставшемуся `other` применяется
-региональный список, образуя `regional`; правила `segments/rules.py` не изменены.
+→ repeated_nonresponder → other`. For planning only, the regional list is applied to the remaining
+`other`, forming `regional`; the rules in `segments/rules.py` are unchanged.
 
-| Сегмент | Уникальных клиенток 2024 | Явка | 95% Wilson ДИ |
+| Segment | Unique women 2024 | Attendance | 95% Wilson CI |
 | --- | --- | --- | --- |
-| recently_screened | 7 590 | 2.37% | 2.05%–2.74% |
-| first_invitation | 37 463 | 55.09% | 54.58%–55.59% |
-| lapsed_regular | 27 888 | 33.36% | 32.81%–33.92% |
-| low_contact | 36 257 | 4.51% | 4.30%–4.73% |
-| care_no_prevention | 39 893 | 7.29% | 7.04%–7.55% |
-| repeated_nonresponder | 87 453 | 9.61% | 9.41%–9.80% |
-| regional | 5 566 | 31.69% | 30.48%–32.93% |
-| other | 14 356 | 30.88% | 30.13%–31.64% |
+| recently_screened | 7,590 | 2.37% | 2.05%–2.74% |
+| first_invitation | 37,463 | 55.09% | 54.58%–55.59% |
+| lapsed_regular | 27,888 | 33.36% | 32.81%–33.92% |
+| low_contact | 36,257 | 4.51% | 4.30%–4.73% |
+| care_no_prevention | 39,893 | 7.29% | 7.04%–7.55% |
+| repeated_nonresponder | 87,453 | 9.61% | 9.41%–9.80% |
+| regional | 5,566 | 31.69% | 30.48%–32.93% |
+| other | 14,356 | 30.88% | 30.13%–31.64% |
 
-Сумма — 256 466 уникальных клиенток. Региональная остаточная группа
-может иметь сравнительно высокую явку: от неё уже отделены другие поведенческие сегменты.
-Её название не следует читать как доказательство низкой индивидуальной вероятности явки.
+Total: 256,466 unique women. The regional residual group can have relatively
+high attendance because the behavioural segments were already removed from it. Its name must not be read
+as evidence of a low individual probability of attendance.
 
-Ядро определяет первое приглашение через PRIOR_INVITATION_COUNT−1=0. EDA отдельно сохраняет
-поставленный FIRST_INVITATION; расхождение в 58 строках всей выгрузки не исправляется молча.
-Пороги взяты из конфигурации лида, а не подобраны по качеству модели на тестовом году.
-Годовые исходы здесь используются для описания и планирования будущего эксперимента.
+The core defines a first invitation as PRIOR_INVITATION_COUNT − 1 = 0. The EDA keeps the delivered
+FIRST_INVITATION separately; the disagreement in 58 rows of
+the extract is not silently corrected. Thresholds come from the project config and were not tuned on the
+test year. Yearly outcomes are used here for description and planning of a future experiment.
 
-## Приглашения вскоре после скрининга
+## Invitations shortly after a screening
 
-| Год | Писем при 0–1 мес. | Писем при 0–6 мес. | Явка 0–6 мес. | Сценарная стоимость 0–6 мес., CZK |
+| Year | Letters at 0–1 months | Letters at 0–6 months | Attendance 0–6 months | Scenario cost 0–6 months, CZK |
 | --- | --- | --- | --- | --- |
-| 2020 | 5 972 | 6 084 | 2.17% | 182 520 |
-| 2021 | 8 111 | 8 413 | 2.31% | 252 390 |
-| 2022 | 7 321 | 7 478 | 2.26% | 224 340 |
-| 2023 | 6 766 | 6 830 | 2.62% | 204 900 |
-| 2024 | 7 503 | 7 590 | 2.37% | 227 700 |
+| 2020 | 5,972 | 6,084 | 2.17% | 182,520 |
+| 2021 | 8,111 | 8,413 | 2.31% | 252,390 |
+| 2022 | 7,321 | 7,478 | 2.26% | 224,340 |
+| 2023 | 6,766 | 6,830 | 2.62% | 204,900 |
+| 2024 | 7,503 | 7,590 | 2.37% | 227,700 |
 
-Стоимость одного письма: **30 CZK — плейсхолдер**
-`eda.letter_cost_czk`, не подтверждённый тариф VZP. Окно 0–1 входит в 0–6; затраты не суммируются.
-Это валовая сценарная стоимость писем, не доказанная экономия. До отмены/переноса приглашения
-нужно проверить смысл кодов, дату процедуры, актуальные критерии приглашения и решение
-владельца программы. Анализ не запускает отмену приглашений.
+Cost per letter: **30 CZK — placeholder** `eda.letter_cost_czk`, not a
+confirmed VZP tariff. The 0–1 window is contained in 0–6; costs must not be added up. This is a gross
+scenario cost of letters, not proven savings. Before cancelling or postponing invitations, the code
+meaning, procedure date, current invitation criteria and the decision of the programme owner must be
+checked. This analysis does not cancel any invitations.
 
-## Воспроизведение
+## Reproduction
 
-Выполнить `notebooks/01_eda.ipynb`, затем `python notebooks/write_reports.py`.
-Расчёты: `screening.evaluation.real_data`. Все CSV и PNG локальны и исключены из Git.
-Ноутбук коммитится без outputs. SHA-256 исходного CSV: `a75c5aa9f56d1d1526bf5ded005828c3c7318beee5ec89f477a7e24cda02033a`.
+Run `notebooks/01_eda.ipynb`, then `python notebooks/write_reports.py`.
+Computations: `screening.evaluation.real_data`. All CSVs and PNGs are local and excluded from Git.
+The notebook is committed without outputs. SHA-256 of the source CSV: `a75c5aa9f56d1d1526bf5ded005828c3c7318beee5ec89f477a7e24cda02033a`.

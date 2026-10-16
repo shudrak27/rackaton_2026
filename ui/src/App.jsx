@@ -3,7 +3,7 @@ import {
   Bar, BarChart, CartesianGrid, Cell, ErrorBar, Legend, Line, LineChart, ReferenceLine,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
-import { BREAKDOWNS, FEATURES, INTERVENTIONS, SEGMENTS, num, pct } from "./labels.js";
+import { BREAKDOWNS, FEATURES, SEGMENTS, num, pct } from "./labels.js";
 import { nPerGroup } from "./power.js";
 
 const RED = "#c8102e", GREY = "#8c8c8c", GREEN = "#2e7d32", LIGHT = "#d9d9d9";
@@ -219,7 +219,7 @@ function What({ d }) {
               <td className="n">{num(r.n)}</td>
               <td><div className="bar" style={{ width: `${(r.share / maxShare) * 100}%` }} title={pct(r.share)} /></td>
               <td className="n">{pct(r.attendance)}</td>
-              <td>{INTERVENTIONS[r.segment] || r.intervention}</td>
+              <td>{r.intervention}</td>
             </tr>))}
           </tbody>
         </table>

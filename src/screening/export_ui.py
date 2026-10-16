@@ -14,7 +14,8 @@ import pandas as pd
 from sklearn.metrics import roc_curve
 
 from screening.config import resolve
-from screening.data import load, schema as s, split
+from screening.data import load, split
+from screening.data import schema as s
 from screening.features.build import build
 from screening.models.baseline import baseline_score
 from screening.segments import rules

@@ -22,7 +22,7 @@ def table(headers, rows):
 
 
 def count(value):
-    return f"{int(value):,}".replace(",", " ")
+    return f"{int(value):,}"
 
 
 def rate(value):
@@ -49,236 +49,226 @@ def main():
     reference_end = manifest["eda"]["regional_reference_end_year"]
     fraction = manifest["eda"]["regional_bottom_fraction"]
     definitions = {
-        "lapsed_regular": f"PRIOR_SCREEN_COUNT_5Y ≥ {c['lapsed_min_screenings_5y']} и MONTHS_SINCE_LAST_SCREEN > {c['lapsed_min_months']}",
-        "low_contact": f"HEALTHCARE_CONTACT_12M_CNT ≤ {c['low_contact_max_contacts']} ИЛИ оба GP_REGISTERED и GYN_REGISTERED_FLAG = N",
-        "care_no_prevention": f"HEALTHCARE_CONTACT_12M_CNT ≥ {c['care_min_contacts']} и GP_PREVENTION_24M_CNT + GYN_PREVENTION_24M_CNT = 0",
-        "repeated_nonresponder": f"PRIOR_INVITATION_COUNT − 1 ≥ {c['repeated_min_invitations']} и PRIOR_SCREEN_COUNT_5Y = 0",
-        "regional": f"VZP_TERRITORIAL_AREA входит в {fraction:.0%} территорий с наименьшей явкой в {first_year}–{reference_end}",
+        "lapsed_regular": f"PRIOR_SCREEN_COUNT_5Y ≥ {c['lapsed_min_screenings_5y']} and MONTHS_SINCE_LAST_SCREEN > {c['lapsed_min_months']}",
+        "low_contact": f"HEALTHCARE_CONTACT_12M_CNT ≤ {c['low_contact_max_contacts']} OR both GP_REGISTERED and GYN_REGISTERED_FLAG = N",
+        "care_no_prevention": f"HEALTHCARE_CONTACT_12M_CNT ≥ {c['care_min_contacts']} and GP_PREVENTION_24M_CNT + GYN_PREVENTION_24M_CNT = 0",
+        "repeated_nonresponder": f"PRIOR_INVITATION_COUNT − 1 ≥ {c['repeated_min_invitations']} and PRIOR_SCREEN_COUNT_5Y = 0",
+        "regional": f"VZP_TERRITORIAL_AREA is among the {fraction:.0%} of territories with the lowest attendance in {first_year}–{reference_end}",
     }
-    definitions_table = table(["Сегмент", "Определение по исходным колонкам"], definitions.items())
+    definitions_table = table(["Segment", "Definition on delivered columns"], definitions.items())
     hypothesis_table = table(
-        ["Гипотеза", f"Приглашений {period}", f"Клиенток {period}", f"Явка {period}", f"Клиенток {year}", f"Явка {year}"],
+        ["Hypothesis", f"Invitations {period}", f"Women {period}", f"Attendance {period}", f"Women {year}", f"Attendance {year}"],
         [[name, count(pooled.loc[name, "n"]), count(pooled.loc[name, "clients"]),
           rate(pooled.loc[name, "attendance"]), count(annual.loc[name, "clients"]),
           rate(annual.loc[name, "attendance"])] for name in definitions])
     exclusive_table = table(
-        ["Сегмент", f"Уникальных клиенток {year}", "Явка", "95% Wilson ДИ"],
+        ["Segment", f"Unique women {year}", "Attendance", "95% Wilson CI"],
         [[r.segment, count(r.clients), rate(r.attendance), f"{rate(r.ci_low)}–{rate(r.ci_high)}"]
          for r in exclusive.itertuples()])
     recent = read("recent_screening_cost")
-    recent_table = table(["Год", "Писем при 0–1 мес.", "Писем при 0–6 мес.", "Явка 0–6 мес.", "Сценарная стоимость 0–6 мес., CZK"],
+    recent_table = table(["Year", "Letters at 0–1 months", "Letters at 0–6 months", "Attendance 0–6 months", "Scenario cost 0–6 months, CZK"],
                           [[int(y), count(part.loc[part.months_max.eq(1), "n"].iloc[0]),
                             count(part.loc[part.months_max.eq(6), "n"].iloc[0]),
                             rate(part.loc[part.months_max.eq(6), "attendance"].iloc[0]),
                             count(part.loc[part.months_max.eq(6), "scenario_gross_cost_czk"].iloc[0])]
                            for y, part in recent.groupby("year")])
-    segments_doc = f"""# Сегменты на реальных данных VZP
+    segments_doc = f"""# Segments on real VZP data
 
-Расчёт подготовлен для этапа от 2026-10-16 на всей предоставленной выгрузке: {count(overview.n)} приглашений,
-{count(overview.clients)} клиенток, {period} годы. Одна строка — приглашение; одна клиентка встречается
-до {int(overview.max_invitations_per_client)} раз. В {year} году одна строка соответствует одной уникальной клиентке.
+Computed on the full delivered extract: {count(overview.n)} invitations, {count(overview.clients)} women,
+{period}. One row is one invitation; one woman appears up to {int(overview.max_invitations_per_client)} times.
+In {year} one row corresponds to one unique woman.
 
-Ограничение: когорта отобрана по непрерывному страхованию VZP в 2015–2025 годах.
-Переносимость на другие группы не проверена. Исход — SCREENING_12M_FLAG=A за 365 дней.
-Флаги 3M/6M/12M не используются при определении индивидуальных поведенческих сегментов.
+Limitation: the cohort was selected for continuous VZP insurance in 2015–2025; transferability to
+other groups is untested. Outcome: SCREENING_12M_FLAG = A within 365 days. The 3M/6M/12M flags are
+not used to define individual behavioural segments.
 
-## Гипотезы для обсуждения с владельцем программы
+## Hypotheses for discussion with the programme owner
 
 {definitions_table}
 
 {hypothesis_table}
 
-Эти пять гипотез **пересекаются**: строки и клиенток между ними складывать нельзя.
-Ставки за пять лет взвешены по приглашениям, а не по уникальным женщинам.
-В CSV `hypotheses_all_years.csv` интервалы учитывают кластеризацию по PERSON_ID;
-годовые интервалы Wilson доступны в `hypotheses_reporting_year.csv`.
+These five hypotheses **overlap**: rows and women must not be added up across them.
+Five-year rates are weighted by invitations, not by unique women. In `hypotheses_all_years.csv`
+the intervals account for clustering by PERSON_ID; yearly Wilson intervals are in
+`hypotheses_reporting_year.csv`.
 
-`lapsed_regular` означает наличие истории и перерыв, но не доказывает регулярность.
-Мы не делим процедурные коды на два. `care_no_prevention` означает отсутствие только
-профосмотров GP/GYN за 24 месяца; стоматология и другие скрининги этим определением
-не исключаются. `repeated_nonresponder` — прокси, не доказательство отказа на каждое письмо.
-Ноль процедур за пять лет не равен отсутствию скрининга за всю жизнь.
+`lapsed_regular` means screening history plus a gap; it does not prove regularity. Procedure codes are
+not divided by two. `care_no_prevention` means no GP/GYN check-ups in 24 months only; dental and other
+screenings are not excluded by this definition. `repeated_nonresponder` is a proxy, not proof of a
+refusal of every letter. Zero procedures in five years is not the same as never screened.
 
-## Региональная гипотеза
+## Regional hypothesis
 
-Список из {len(selected)} территорий выбран один раз по {first_year}–{reference_end} годам, затем
-применён к {year} году. Порог {fraction:.0%} — исследовательское допущение, не медицинская граница.
-При равных ставках порядок фиксируется названием территории.
+The list of {len(selected)} territories was chosen once on {first_year}–{reference_end} and then applied
+to {year}. The {fraction:.0%} threshold is a research assumption, not a medical boundary.
+Ties are ordered by territory name.
 
 {'; '.join(selected)}.
 
-Это территории VZP, не точные города проживания и не измерение доступности.
-Рейтинг по явке без поправки на возраст и историю приглашений не доказывает региональный барьер.
-Полный рейтинг всех 75 территорий за {year} с численностью и 95% Wilson ДИ сохраняется
-в `reports/eda/regions_reporting_year.csv`, график — в `reports/figures/regions_ranking.png`.
-Интервалы точечные: поправки на 75 сравнений и неопределённость места в рейтинге нет.
-Выбранные территории не переопределяются по исходам {year} года.
+These are VZP territorial offices, not exact places of residence and not a measure of accessibility.
+A crude attendance ranking without adjustment for age and invitation history does not prove a regional
+barrier. The full ranking of all 75 territories for {year} with counts and 95% Wilson CIs is saved in
+`reports/eda/regions_reporting_year.csv`, the chart in `reports/figures/regions_ranking.png`.
+Intervals are pointwise: no correction for 75 comparisons or rank uncertainty.
+The selected territories are not redefined using {year} outcomes.
 
-## Непересекающиеся группы для планирования A/B
+## Non-overlapping groups for A/B planning
 
-Используется текущая последовательность правил ядра:
+The current production rule order is used:
 `recently_screened → first_invitation → lapsed_regular → low_contact → care_no_prevention
-→ repeated_nonresponder → other`. Только для планирования к оставшемуся `other` применяется
-региональный список, образуя `regional`; правила `segments/rules.py` не изменены.
+→ repeated_nonresponder → other`. For planning only, the regional list is applied to the remaining
+`other`, forming `regional`; the rules in `segments/rules.py` are unchanged.
 
 {exclusive_table}
 
-Сумма — {count(exclusive.clients.sum())} уникальных клиенток. Региональная остаточная группа
-может иметь сравнительно высокую явку: от неё уже отделены другие поведенческие сегменты.
-Её название не следует читать как доказательство низкой индивидуальной вероятности явки.
+Total: {count(exclusive.clients.sum())} unique women. The regional residual group can have relatively
+high attendance because the behavioural segments were already removed from it. Its name must not be read
+as evidence of a low individual probability of attendance.
 
-Ядро определяет первое приглашение через PRIOR_INVITATION_COUNT−1=0. EDA отдельно сохраняет
-поставленный FIRST_INVITATION; расхождение в {count(overview.first_flag_counter_disagreements)} строках всей выгрузки не исправляется молча.
-Пороги взяты из конфигурации лида, а не подобраны по качеству модели на тестовом году.
-Годовые исходы здесь используются для описания и планирования будущего эксперимента.
+The core defines a first invitation as PRIOR_INVITATION_COUNT − 1 = 0. The EDA keeps the delivered
+FIRST_INVITATION separately; the disagreement in {count(overview.first_flag_counter_disagreements)} rows of
+the extract is not silently corrected. Thresholds come from the project config and were not tuned on the
+test year. Yearly outcomes are used here for description and planning of a future experiment.
 
-## Приглашения вскоре после скрининга
+## Invitations shortly after a screening
 
 {recent_table}
 
-Стоимость одного письма: **{manifest['eda']['letter_cost_czk']:g} CZK — плейсхолдер**
-`eda.letter_cost_czk`, не подтверждённый тариф VZP. Окно 0–1 входит в 0–6; затраты не суммируются.
-Это валовая сценарная стоимость писем, не доказанная экономия. До отмены/переноса приглашения
-нужно проверить смысл кодов, дату процедуры, актуальные критерии приглашения и решение
-владельца программы. Анализ не запускает отмену приглашений.
+Cost per letter: **{manifest['eda']['letter_cost_czk']:g} CZK — placeholder** `eda.letter_cost_czk`, not a
+confirmed VZP tariff. The 0–1 window is contained in 0–6; costs must not be added up. This is a gross
+scenario cost of letters, not proven savings. Before cancelling or postponing invitations, the code
+meaning, procedure date, current invitation criteria and the decision of the programme owner must be
+checked. This analysis does not cancel any invitations.
 
-## Воспроизведение
+## Reproduction
 
-Выполнить `notebooks/01_eda.ipynb`, затем `python notebooks/write_reports.py`.
-Расчёты: `screening.evaluation.real_data`. Все CSV и PNG локальны и исключены из Git.
-Ноутбук коммитится без outputs. SHA-256 исходного CSV: `{manifest['sha256']}`.
+Run `notebooks/01_eda.ipynb`, then `python notebooks/write_reports.py`.
+Computations: `screening.evaluation.real_data`. All CSVs and PNGs are local and excluded from Git.
+The notebook is committed without outputs. SHA-256 of the source CSV: `{manifest['sha256']}`.
 """
     size_table = table(
-        ["Сегмент", "Явка контроля, ориентир", "MDE, п.п.", "В каждую группу", "Всего", "Годовой ориентир клиенток", "Вмещается при 100% наборе"],
+        ["Segment", "Control attendance (reference)", "MDE, pp", "Per arm", "Total", "Yearly women (reference)", "Fits at 100% recruitment"],
         [[r.segment, rate(r.baseline_attendance), f"{r.mde_pp:g}", count(r.n_control),
-          count(r.n_total), count(r.available_clients), "да" if r.feasible_at_full_recruitment else "нет"]
+          count(r.n_total), count(r.available_clients), "yes" if r.feasible_at_full_recruitment else "no"]
          for r in sizes.itertuples()])
     primary = sizes.loc[sizes.segment.eq("lapsed_regular") & sizes.mde_pp.eq(2)].iloc[0]
-    adjusted = table(["Сегмент", "В каждую группу при MDE=2 п.п., alpha=0.01"],
+    adjusted = table(["Segment", "Per arm at MDE = 2 pp, alpha = 0.01"],
                      [[r.segment, count(n_per_group(r.baseline_attendance, 0.02, alpha=0.01, power=ec['power']))]
                       for r in sizes.loc[sizes.mde_pp.eq(2)].itertuples()])
     timing = read("response_timing").set_index("horizon")
-    experiment_doc = f"""# Проект A/B-теста на реальных сегментах VZP
+    experiment_doc = f"""# A/B test design on real VZP segments
 
-План от 2026-10-16. Это дизайн будущего эксперимента, не его результаты и не разрешение
-рассылать сообщения. Базовые ставки и ориентиры набора взяты из {year} года:
-одна строка = одна клиентка. Когорта данных — непрерывное страхование VZP в 2015–2025;
-применимость этих ставок к будущему набору, включая новых клиенток, нужно проверить.
+This is the design of a future experiment, not its results and not permission to send messages.
+Baseline rates and recruitment references come from {year}: one row = one woman. The data cohort is
+continuous VZP insurance in 2015–2025; whether these rates apply to future recruitment, including new
+clients, must be checked.
 
-## Предлагаемый первый пилот
+## Proposed first pilot
 
-Один заранее выбранный первичный эксперимент в `lapsed_regular`: стандартное приглашение
-против стандартного приглашения плюс одно дополнительное напоминание с понятным шагом записи.
-Плановая дата напоминания — день 14 после приглашения; это гипотеза, не вывод о лучшем дне
-из EDA. Канал SMS допустим только после подтверждения доступности контактов и согласования
-владельцем программы. Контактов для отправки в нашем CSV нет.
+One pre-specified primary experiment in `lapsed_regular`: standard invitation versus standard invitation
+plus one additional reminder with a clear booking step. The planned reminder day is day 14 after the
+invitation; this is a hypothesis, not an EDA finding about the best day. SMS is allowed only after the
+availability of contacts is confirmed and the programme owner agrees. Our CSV contains no contacts.
 
-Единица рандомизации — клиентка, одна индексная дата приглашения и один experiment_id.
-Нельзя включать одну клиентку дважды, в разные плечи или одновременно в несколько пилотов.
-Для существующего клиента сохраняется первоначальное назначение, а не проводится новая жеребьёвка.
-До включения проверяются актуальные критерии приглашения и принадлежность сегменту.
-`recently_screened` не включается в пилот усиления приглашений до отдельной проверки.
+The randomisation unit is the woman, with one index invitation date and one experiment_id.
+A woman must never be included twice, in different arms, or in several pilots at once.
+An existing participant keeps her original assignment; she is not re-randomised.
+Current invitation criteria and segment membership are checked before inclusion.
+`recently_screened` is not included in any pilot that intensifies invitations without a separate review.
 
-Для этого пилота базовая явка — {rate(primary.baseline_attendance)}, целевой различимый
-абсолютный эффект — +2 п.п. (не +2% относительно базы). Требуется **{count(primary.n_control)}
-клиенток в каждом плече**, всего **{count(primary.n_total)}**. В годовом сегменте было
-{count(primary.available_clients)} клиенток; необходимый охват около
-{rate(primary.required_recruitment_share)}. Это не обещание такого числа доступных участниц
-с пригодным контактом в следующем году и не прогноз эффекта SMS.
+For this pilot the baseline attendance is {rate(primary.baseline_attendance)} and the target detectable
+absolute effect is +2 pp (not +2% relative). It requires **{count(primary.n_control)} women per arm**,
+**{count(primary.n_total)}** in total. The yearly segment had {count(primary.available_clients)} women;
+the required coverage is about {rate(primary.required_recruitment_share)}. This is not a promise that this
+many eligible women with a usable contact will be available next year, nor a forecast of the SMS effect.
 
-## Рандомизация и фиксация плана
+## Randomisation and pre-registration
 
-Распределение 1:1 внутри `segment × risk_quintile`, реализуемое `experiment.assign.assign_arms`.
-Перед рандомизацией заморозить модель, преобразования, правила сегментов и границы квинтилей
-по согласованной референсной выборке. Риск — вероятность НЕявки, исход — ЯВКА.
-Одинаковые риски не надо произвольно разводить по разным квинтилям: при совпадающих границах
-использовать меньше групп. Малые страты объединять по заранее заданному правилу соседних
-уровней риска, не по будущим исходам. При единственном пилоте сегмент фиксирован, остаются
-страты по квинтилю. При нескольких сегментах используется полное произведение.
+1:1 allocation within `segment × risk_quintile`, implemented by `experiment.assign.assign_arms`.
+Before randomisation, freeze the model, transformations, segment rules and quintile boundaries on an
+agreed reference sample. Risk is the probability of NON-attendance; the outcome is ATTENDANCE.
+Identical risks should not be split arbitrarily between quintiles: with tied boundaries use fewer groups.
+Small strata are merged by a pre-specified rule over neighbouring risk levels, never by future outcomes.
+With a single pilot the segment is fixed and only the quintile strata remain; with several segments the
+full product is used.
 
-Истинных прогнозов замороженной модели в EDA нет; квинтили и назначения не выдумываются.
-После получения скоринга нужен проверяемый список уникальных client_id, segment,
-risk_quintile, invitation_date. До отправки сохранить seed, порядок входных строк,
-версию модели, версию правил и назначенное плечо. Повторный запуск на изменённом составе
-не должен менять уже выданные назначения. Для последовательного набора потребуются
-сохраняемые блоки рандомизации; текущая функция подходит для заранее зафиксированной волны.
+The EDA has no predictions of the frozen model; quintiles and assignments are not invented.
+After scoring, a verifiable list of unique client_id, segment, risk_quintile, invitation_date is needed.
+Before sending, store the seed, input row order, model version, rule version and assigned arm. Rerunning
+on a changed population must not change assignments already issued. Sequential recruitment needs
+persistent randomisation blocks; the current function suits a wave fixed in advance.
 
-В таблице баланса проверить возрастные группы, территории, историю приглашений и
-доступные контакты с медициной; `balance_table` показывает SMD. Дисбаланс не является
-поводом перебирать seed до удобного результата. Содержание интервенции фиксируется заранее.
+Check balance on age groups, territories, invitation history and contacts with healthcare;
+`balance_table` reports standardised mean differences. Imbalance is not a reason to try seeds until the
+result looks convenient. The content of the intervention is fixed in advance.
 
-## Исходы и анализ
+## Outcomes and analysis
 
-Первичный исход: SCREENING_12M_FLAG, то есть факт скрининга в течение 365 дней от индексного
-приглашения. Вторичный: SCREENING_3M_FLAG за 90 дней. 6M можно показывать описательно.
-В исходных данных явка к 90/180/365 дням — {rate(timing.loc[3, 'attendance'])} /
-{rate(timing.loc[6, 'attendance'])} / {rate(timing.loc[12, 'attendance'])}. Флаги накопленные;
-они не определяют точную дату реакции или оптимальную дату напоминания.
+Primary outcome: SCREENING_12M_FLAG, i.e. a screening within 365 days of the index invitation.
+Secondary: SCREENING_3M_FLAG within 90 days. 6M may be shown descriptively.
+In the source data attendance at 90/180/365 days is {rate(timing.loc[3, 'attendance'])} /
+{rate(timing.loc[6, 'attendance'])} / {rate(timing.loc[12, 'attendance'])}. Flags are cumulative; they do not
+give the exact response date or the optimal reminder date.
 
-Первичный эффект — разность долей явки treatment−control в процентных пунктах,
-двусторонний 95% ДИ и тест при alpha={ec['alpha']:g}. Анализ ITT сохраняет всех
-рандомизированных клиенток независимо от доставки SMS, ответа и фактического участия.
-Отсутствие зарегистрированного скрининга можно считать 0 только при полном наблюдении;
-потеря страхового покрытия или неполная выгрузка не превращаются автоматически в неявку.
-Неизвестные исходы требуют документированной стратегии и анализа чувствительности,
-а не удаления из знаменателя для красивого результата.
+The primary effect is the difference in attendance treatment − control in percentage points, with a
+two-sided 95% CI and a test at alpha={ec['alpha']:g}. ITT analysis keeps all randomised women regardless of
+SMS delivery, response or actual participation. A missing recorded screening may be treated as 0 only
+under complete follow-up; loss of insurance or an incomplete extract is not automatically non-attendance.
+Unknown outcomes need a documented strategy and a sensitivity analysis, not removal from the denominator.
 
-`experiment.analysis.analyze` требует уникальный непустой client_id (или явный unit_col),
-отклоняет повторные записи и смешанные experiment_id. На вход подаётся явка 0/1,
-а не `scored_test.y`, которое означает неявку. Недозвоны и недоставку не отфильтровывать.
-Объединённый ITT-контраст в одном сегменте является основным; результаты по квинтилям
-исследовательские и не означают, что каждый квинтиль отдельно имеет достаточную мощность.
-Текущие Wald-интервалы и z-тест — приближение для больших выборок; для редких событий,
-нулевых ячеек и малых подгрупп нужен отдельный устойчивый метод до интерпретации результатов.
+`experiment.analysis.analyze` requires a unique non-empty client_id (or an explicit unit_col), rejects
+repeated records and mixed experiment_ids. Its input is attendance 0/1, not `scored_test.y`, which means
+non-attendance. Unreachable women and undelivered messages are not filtered out. The pooled ITT contrast
+within one segment is primary; results by quintile are exploratory and do not mean each quintile is
+powered on its own. The current Wald intervals and z-test are large-sample approximations; rare events,
+zero cells and small subgroups need a separate robust method before interpretation.
 
-## Размеры групп и осуществимость
+## Group sizes and feasibility
 
-Расчёт через `experiment.power.n_per_group`: power={ec['power']:.0%}, двусторонняя
-alpha={ec['alpha']:g}, два независимых плеча 1:1, MDE абсолютный. Формула существующего
-модуля не менялась; исправлена валидация параметров. Это нормальное приближение для
-планирования, без поправок на неполное наблюдение и изменение базовой явки.
+Computed with `experiment.power.n_per_group`: power={ec['power']:.0%}, two-sided alpha={ec['alpha']:g}, two
+independent arms 1:1, absolute MDE. This is a normal approximation for planning, without corrections for
+incomplete follow-up or changing baseline attendance.
 
 {size_table}
 
-Группы взяты из непересекающегося планового разбиения в [описании сегментов](segments-real-data.md).
-Для одних и тех же клиенток нельзя одновременно использовать пересекающиеся таблицы гипотез.
-Пять строк сегментов — альтернативы/отдельные пилоты, не общий контроль для пяти сравнений.
-Необходимость отбора по пригодному каналу и актуальным условиям снизит доступную численность.
-Для доли пригодных к набору q годовой ориентир равен q × available_clients; для доли
-наблюдаемых исходов r начальный ориентир набора — ceil(n/r) на плечо. Такая поправка
-не устраняет смещение из-за пропущенных исходов; r и механизм пропусков нужно обосновать.
+Groups come from the non-overlapping planning split in the [segment description](segments-real-data.md).
+Overlapping hypothesis tables must not be used for the same women at the same time. The five segment rows
+are alternatives / separate pilots, not one shared control for five comparisons. Selecting on a usable
+channel and current conditions will reduce the available numbers. For an eligible share q the yearly
+reference is q × available_clients; for an observed-outcome share r the initial recruitment target is
+ceil(n / r) per arm. This correction does not remove bias from missing outcomes; r and the missingness
+mechanism must be justified.
 
-Если одновременно объявлять пять подтверждающих эффектов одной семьёй, простой
-консервативный вариант — Bonferroni: alpha=0.05/5=0.01 на сравнение. Например:
+If five confirmatory effects are claimed as one family, a simple conservative option is Bonferroni:
+alpha = 0.05 / 5 = 0.01 per comparison. For example:
 
 {adjusted}
 
-Эти увеличенные размеры заменяют, а не дополняют размеры при alpha=0.05. Для первого
-пилота выше выбран один первичный эффект; вторичный 90-дневный анализ не является
-самостоятельным подтверждающим заявлением об эффективности без плана множественности.
+These larger sizes replace, not add to, the sizes at alpha = 0.05. The first pilot above has one primary
+effect; the secondary 90-day analysis is not a standalone confirmatory claim without a multiplicity plan.
 
-## Сроки и правила остановки
+## Timeline and stopping rules
 
-Плановый набор одной волны — до 12 месяцев; за каждой клиенткой наблюдаем 365 дней.
-Финальный анализ — после окончания окна последней участницы и согласованной задержки
-поступления услуг. Например, при годе набора и условных 90 днях задержки это около
-27 месяцев от начала набора. Задержка 90 дней — допущение для календаря, её подтверждает VZP.
-Аналогично ранний 90-дневный исход требует завершённого наблюдения и поступления данных.
+Recruitment for one wave: up to 12 months; each woman is followed for 365 days. The final analysis comes
+after the window of the last participant closes plus the agreed claims reporting delay. For example, with
+one year of recruitment and an assumed 90-day delay this is about 27 months from the start. The 90-day
+delay is a calendar assumption to be confirmed by VZP. The early 90-day outcome likewise needs complete
+follow-up and data arrival.
 
-Набор заканчивается при достижении заранее рассчитанного числа или заранее установленной
-даты; недобор фиксируется как ограничение мощности. Один финальный анализ первичного исхода.
-Ежедневное чтение p-value и остановка при первом p<0.05 не допускаются. Ранний анализ
-эффективности возможен только после отдельного заранее определённого последовательного дизайна.
-Операционные причины паузы: ошибки назначения, непригодные контакты, сбой регистрации исходов,
-жалобы/нежелательные последствия или решение владельца программы. Уже назначенных участниц
-сохраняют в ITT и продолжают доступное наблюдение. Правила безопасности фиксируются до старта.
+Recruitment ends when the pre-computed size or a pre-set date is reached; under-recruitment is recorded
+as a power limitation. One final analysis of the primary outcome. Reading p-values daily and stopping at
+the first p < 0.05 is not allowed. Early efficacy analysis is possible only with a separately
+pre-specified sequential design. Operational reasons for a pause: assignment errors, unusable contacts,
+outcome recording failures, complaints/adverse effects or the decision of the programme owner. Women
+already assigned stay in the ITT analysis and remain followed. Safety rules are fixed before the start.
 
-## Воспроизведение и ограничения
+## Reproduction and limitations
 
-Выполнить `notebooks/01_eda.ipynb`, затем `python notebooks/write_reports.py`.
-Полная таблица: `reports/eda/experiment_sizes.csv`; источник и конфигурация зафиксированы
-в `reports/eda/manifest.json`. Письма, SMS и звонки этим кодом не отправляются.
-Региональная доступность, эффективность каналов и индивидуальный uplift пока не установлены.
+Run `notebooks/01_eda.ipynb`, then `python notebooks/write_reports.py`.
+Full table: `reports/eda/experiment_sizes.csv`; source and configuration are recorded in
+`reports/eda/manifest.json`. This code does not send letters, SMS or calls.
+Regional accessibility, channel effectiveness and individual uplift are not established yet.
 """
     (ROOT / "docs/segments-real-data.md").write_text(segments_doc, encoding="utf-8")
     (ROOT / "docs/experiment-design.md").write_text(experiment_doc, encoding="utf-8")

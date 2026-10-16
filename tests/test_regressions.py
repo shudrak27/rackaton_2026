@@ -1,7 +1,6 @@
-"""Executable evidence for audit findings; strict xfails become actionable regression tests.
+"""Regression tests for bugs found in the code review (data validation, scoring, segments, A/B).
 
-Each test expresses the desired contract, not the current faulty behavior. Remove the
-corresponding xfail marker when fixing a finding. Unexpected passes require review.
+Each test pins the contract that was violated before the fix.
 """
 
 import numpy as np

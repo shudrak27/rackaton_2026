@@ -1,6 +1,7 @@
 # One-minute dashboard demo
 
-Open with `streamlit run app/dashboard.py` and keep `reports/ui/data.json` fixed for the presentation.
+Open the React dashboard with `cd ui && npm run dev` (http://localhost:5173) and keep `reports/ui/data.json`
+fixed for the presentation. The Streamlit version (`streamlit run app/dashboard.py`) has the same tabs and is the backup.
 
 | Time | Click | Say |
 |---:|---|---|
@@ -12,7 +13,7 @@ Open with `streamlit run app/dashboard.py` and keep `reports/ui/data.json` fixed
 
 ## Before the demo
 
-- Run `python -m screening export-ui`, then start Streamlit from the repository root.
+- Run `python -m screening export-ui`, then start the React dashboard: `cd ui && npm run dev`.
 - Open every tab once so charts are cached.
 - Set browser zoom so no key chart requires scrolling.
 - Keep the exact JSON used for the deck; do not regenerate between pitch and demo.
@@ -28,5 +29,5 @@ Use the generated deck and open these static files in order:
 4. `reports/figures/segment_map.png` — 03 WHAT.
 5. `reports/figures/ab_group_sizes.png` — 04 HOW TO VERIFY.
 
-Before presenting, capture full-window screenshots of the five loaded tabs as `reports/pitch/screenshots/overview.png`, `who.png`, `why.png`, `what.png` and `verify.png`. These files remain local because `reports/` is ignored. If Streamlit fails, show the screenshots first; use the static figures if the screenshots are unavailable.
+Before presenting, capture full-window screenshots of the five loaded tabs as `reports/pitch/screenshots/overview.png`, `who.png`, `why.png`, `what.png` and `verify.png`. These files remain local because `reports/` is ignored. If the React dashboard fails, switch to Streamlit (`streamlit run app/dashboard.py`), then to the screenshots, then to the static figures.
 

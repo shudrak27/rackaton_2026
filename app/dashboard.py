@@ -29,15 +29,6 @@ SEGMENTS = {
     "low_contact": "Low contact with healthcare",
     "recently_screened": "Recently screened",
 }
-INTERVENTIONS = {
-    "first_invitation": "Standard letter (control / low intensity)",
-    "lapsed_regular": "Simple reminder + concrete booking step",
-    "other": "Standard letter + SMS reminder",
-    "repeated_nonresponder": "Different channel, phone navigation, booking help",
-    "care_no_prevention": "Involve GP or gynaecologist",
-    "low_contact": "Multichannel outreach + 'screening matters without symptoms'",
-    "recently_screened": "Do not send / postpone the invitation",
-}
 FEATURES = {
     "n_prior_invitations": "Previous invitations",
     "invitation_sequence": "Invitations since last screening",
@@ -242,7 +233,7 @@ def page_what(d: dict) -> None:
     st.markdown("### 03 WHAT — segments and targeted support")
     seg = pd.DataFrame(d["segments"])
     seg["Segment"] = seg["segment"].map(SEGMENTS).fillna(seg["segment"])
-    seg["Intervention"] = seg["segment"].map(INTERVENTIONS).fillna(seg["intervention"])
+    seg["Intervention"] = seg["intervention"]
     seg["attendance"] = 1 - seg["non_attendance"]
     fig = px.scatter(seg, x="share", y="attendance", size="n", text="Segment", size_max=60,
                      color_discrete_sequence=[MODEL])
@@ -278,7 +269,8 @@ def page_what(d: dict) -> None:
     right.markdown(
         "- their attendance is **~2%**\n"
         "- half of them were invited a year earlier and **94% of those attended**, but late (after 11–12 months)\n"
-        "- the yearly invitation cycle probably does not see the fresh screening yet (claims reporting lag) — hypothesis\n"
+        "- the yearly invitation cycle probably does not see the fresh screening yet "
+        "(claims reporting lag) — hypothesis\n"
         "- **proposal:** check claims right before sending / postpone the repeat invitation")
 
     b = d.get("budget")
@@ -309,7 +301,8 @@ def page_verify(d: dict) -> None:
     choice = c[0].selectbox("Segment", seg["label"].tolist(),
                             index=int((seg["segment"] == "repeated_nonresponder").idxmax()))
     row = seg[seg["label"] == choice].iloc[0]
-    p0 = c[1].number_input("Baseline attendance", 0.001, 0.999, float(round(row["attendance"], 3)), 0.005, format="%.3f")
+    p0 = c[1].number_input("Baseline attendance", 0.001, 0.999, float(round(row["attendance"], 3)), 0.005,
+                           format="%.3f")
     mde = c[2].slider("Expected effect (pp)", 0.5, 10.0, 2.0, 0.5)
     power = c[3].select_slider("Statistical power", [0.7, 0.8, 0.9], 0.8)
     try:
@@ -345,7 +338,7 @@ def main() -> None:
                f"aggregates only (groups < {d['meta']['min_cell']} hidden) · "
                f"generated {d['meta']['generated_at']}")
     tabs = st.tabs(["Overview", "01 WHO", "02 WHY", "03 WHAT", "04 HOW TO VERIFY"])
-    for tab, page in zip(tabs, (page_overview, page_who, page_why, page_what, page_verify)):
+    for tab, page in zip(tabs, (page_overview, page_who, page_why, page_what, page_verify), strict=True):
         with tab:
             page(d)
 

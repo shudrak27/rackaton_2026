@@ -26,7 +26,7 @@ It is simple, deployable and already captures the strongest behavioural pattern,
 
 ## 7. Why present people instead of only AUC?
 
-Operational teams allocate letters, SMS messages and calls to people. At a fixed 10% capacity, the current export identifies a 68% attendance low-risk group and reduces needless high-risk contacts from 779 to 456 compared with the rule.
+Operational teams allocate letters, SMS messages and calls to people. At a fixed 10% capacity, the current export identifies a 68% attendance low-risk group and reduces needless high-risk contacts from 779 to 450 compared with the rule.
 
 ## 8. Are the probabilities calibrated?
 
