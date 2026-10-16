@@ -145,8 +145,14 @@ def page_who(d: dict) -> None:
     c[0].metric("Attendance, lowest-risk decile", pct(dec.iloc[0]["attendance"]))
     c[1].metric("Attendance, highest-risk decile", pct(dec.iloc[-1]["attendance"]))
     c[2].metric("ROC-AUC model", f"{metric(d, 'roc_auc'):.3f}",
-                help="Random = 0.5. The rule is already strong because invitation history is VZP's best signal.")
-    c[3].metric("ROC-AUC rule 'number of invitations'", f"{metric(d, 'roc_auc', 'baseline'):.3f}")
+                delta=f"rule {metric(d, 'roc_auc', 'baseline'):.3f} · random 0.500", delta_color="off",
+                help="The rule (number of previous invitations) is strong: invitation history is VZP's best signal.")
+    rq = {r["scorer"]: r for r in d.get("ranking_quality", [])}
+    if rq:
+        c[3].metric("Average precision, attendance", f"{rq['model']['ap_attendance']:.3f}",
+                    delta=f"rule {rq['rule']['ap_attendance']:.3f} · random {rq['random']['ap_attendance']:.3f}",
+                    delta_color="off",
+                    help="AP for attendance (19% minority class). On non-attendance even a random score gets ~0.81.")
 
     if d.get("targeting"):
         tg = pd.DataFrame(d["targeting"])

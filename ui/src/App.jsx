@@ -99,14 +99,17 @@ function Overview({ d }) {
 
 function Who({ d }) {
   const t = d.targeting || [];
+  const rq = Object.fromEntries((d.ranking_quality || []).map((r) => [r.scorer, r]));
   return (
     <>
       <h2 className="lead">01 WHO — who is most likely not to attend</h2>
       <div className="kpis">
         <Kpi label="Attendance, lowest-risk decile" value={pct(d.deciles[0].attendance)} />
         <Kpi label="Attendance, highest-risk decile" value={pct(d.deciles.at(-1).attendance)} />
-        <Kpi label="ROC-AUC model" value={metric(d, "roc_auc").toFixed(3)} vs="random = 0.500" />
-        <Kpi label="ROC-AUC rule 'number of invitations'" value={metric(d, "roc_auc", "baseline").toFixed(3)} vs="VZP's strongest single signal" />
+        <Kpi label="ROC-AUC model" value={metric(d, "roc_auc").toFixed(3)}
+          vs={<>rule {metric(d, "roc_auc", "baseline").toFixed(3)} · random 0.500</>} />
+        {rq.model && <Kpi label="Average precision, attendance" value={rq.model.ap_attendance.toFixed(3)}
+          vs={<>rule {rq.rule.ap_attendance.toFixed(3)} · random {rq.random.ap_attendance.toFixed(3)}</>} />}
       </div>
       <div className="card">
         <h3>Model vs. rule in people (test 2024)</h3>
