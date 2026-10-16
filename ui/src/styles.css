@@ -336,3 +336,6 @@ h1 { margin: 0 0 6px; color: var(--ink); font-size: 26px; font-weight: 700; lett
   .intervention-dialog-footer { padding: 13px 17px; }
   .planner-intervention { flex-wrap: wrap; }
 }
+
+/* panel without heading: give the first row its top spacing */
+.calculator-panel { padding-top: 20px; }

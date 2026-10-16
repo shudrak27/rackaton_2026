@@ -259,7 +259,7 @@ export function Verify({ d }) {
   }, [d]);
   const mdes = [...new Set(d.experiment_design.map((r) => r.mde_pp))].sort((a, b) => a - b);
   return <>
-    <Panel title="Pilot size" className="section-gap">
+    <Panel className="section-gap calculator-panel">
       <div className="controls calculator-controls">
         <label className="field">Segment<select aria-label="Segment" value={segment} onChange={(e) => setSegment(e.target.value)}>{seg.map((r) => <option key={r.segment} value={r.segment}>{r.label}</option>)}</select></label>
         <label className="field">Effect to detect: +{mde.toFixed(1)} pp<input type="range" min={.5} max={10} step={.5} value={mde} onChange={(e) => setMde(+e.target.value)} /></label>
@@ -272,9 +272,8 @@ export function Verify({ d }) {
           <Badge tone={fits ? "teal" : "amber"}>{fits ? "Fits in one year" : "Needs over a year"}</Badge></div>
       </div>}
       {segment === "care_no_prevention" && <div className="panel-body"><Notice tone="amber">Randomizing whole practices needs a larger sample.</Notice></div>}
-      <div className="panel-footer">1:1 randomization · outcome: screened within 12 months · power 80%, α = 0.05</div>
     </Panel>
-    <Panel title="Women per group by segment" className="section-gap">
+    <Panel title="Women per group" subtitle="80% power · α = 0.05" className="section-gap">
       <Table label="Sample sizes by segment and detectable effect"><thead><tr><th>Segment</th>{mdes.map((m) => <th key={m} className="n">+{m} pp</th>)}</tr></thead>
         <tbody>{Object.entries(design).map(([id, values]) => <tr key={id}><td><strong>{SEGMENTS[id] || id}</strong></td>{mdes.map((m) => <td className="n" key={m}>{num(values[m])}</td>)}</tr>)}</tbody></Table>
     </Panel>
