@@ -62,3 +62,32 @@ experiment:
 paths:
   reports: reports
   models: models
+
+# ASSUMPTION, заменить по результатам A/B: все стоимости и эффекты ниже — плейсхолдеры.
+# uplift_pp — абсолютный прирост ЯВКИ в процентных пунктах, не относительные проценты.
+interventions:
+  sms:
+    cost_czk: 2.0
+    uplift_pp:
+      first_invitation: 1.0
+      repeated_nonresponder: 0.5
+      lapsed_regular: 3.0
+      care_no_prevention: 1.0
+      low_contact: 0.5
+      other: 1.0
+  call:
+    cost_czk: 100.0
+    uplift_pp:
+      repeated_nonresponder: 3.0
+      lapsed_regular: 5.0
+      care_no_prevention: 4.0
+      low_contact: 2.0
+      other: 2.0
+  physician:
+    cost_czk: 150.0
+    uplift_pp:
+      care_no_prevention: 6.0
+
+fairness:
+  group_columns: [region, age_band]
+  top_k: 0.20
