@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ErrorBar, Legend, Line, LineChart,
-  Pie, PieChart, Tooltip, XAxis, YAxis,
+  Tooltip, XAxis, YAxis,
 } from "recharts";
 import { BREAKDOWNS, FEATURES, SEGMENTS, num, pct } from "./labels.js";
 import { nPerGroup } from "./power.js";
@@ -53,8 +53,8 @@ function SegmentTable({ d, compact = false }) {
   return <Table label="Screening segments">
     <thead><tr><th>Segment</th><th className="n">Women</th><th>Share</th><th className="n">Attendance</th><th>{compact ? "Outreach approach" : "Proposed intervention"}</th></tr></thead>
     <tbody>{rows.map((r) => <tr key={r.segment}>
-      <td><span className="segment-name"><span className="segment-marker" style={{ color: segmentColor(r.segment) }}><Icon name="people" size={14} /></span><strong>{r.label}</strong></span></td>
-      <td className="n">{num(r.n)}</td><td><div className="table-progress"><div className="progress-track"><i className="progress-fill" style={{ width: `${r.share * 100}%`, background: segmentColor(r.segment) }} /></div>{pct(r.share)}</div></td>
+      <td><strong>{r.label}</strong></td>
+      <td className="n">{num(r.n)}</td><td><div className="table-progress"><div className="progress-track"><i className="progress-fill" style={{ width: `${r.share * 100}%` }} /></div>{pct(r.share)}</div></td>
       <td className="n"><Badge tone={r.attendance >= d.meta.attendance_overall ? "teal" : "neutral"}>{pct(r.attendance)}</Badge></td>
       <td className="intervention-cell">{r.intervention}</td>
     </tr>)}</tbody>
@@ -65,13 +65,11 @@ export function Overview({ d, navigate }) {
   const t10 = d.targeting?.find((r) => Math.abs(r.share - .1) < 1e-9);
   const reduction = t10?.top_wasted_rule ? 1 - t10.top_wasted_model / t10.top_wasted_rule : null;
   const first = d.deciles[0], last = d.deciles.at(-1);
-  const share = [{ name: "Attended", value: d.meta.attendance_overall, fill: TEAL },
-    { name: "Did not attend", value: 1 - d.meta.attendance_overall, fill: "#e8eafd" }];
   return <>
     <div className="kpis">
       <Kpi label="Total invitations" value={num(d.meta.n_invitations)} detail={`${num(d.meta.n_clients)} women in the cohort`} foot={`Invitation history · ${period(d)}`} tone="amber" icon="mail" />
       <Kpi label="Attendance rate" value={pct(d.meta.attendance_overall)} detail="Screened within 12 months" foot="Observed across all invitation years" tone="coral" icon="calendar" />
-      <Kpi label="Lowest-risk 10% · attendance" value={pct(t10?.bottom_attendance_model, 0)} detail={`Compared with ${pct(t10?.bottom_attendance_rule, 0)} using the rule`} foot={`Model-selected group · ${d.meta.test_year}`} tone="teal" icon="people" />
+      <Kpi label="Lowest-risk 10% · attendance" value={pct(t10?.bottom_attendance_model, 0)} detail={`Compared with ${pct(t10?.bottom_attendance_rule, 0)} using the rule`} foot={`A standard letter is enough · ${d.meta.test_year}`} tone="teal" icon="people" highlight />
       <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`Invitation-count rule: ${fixed(metric(d, "roc_auc", "baseline"))}`} foot="Evaluated on the held-out test year" icon="chart" />
     </div>
     <div className="overview-grid">
@@ -80,19 +78,11 @@ export function Overview({ d, navigate }) {
         <div className="risk-range"><div><strong>{pct(first?.attendance)}</strong><small>Lowest-risk decile</small></div><Icon name="arrow" /><div><strong>{pct(last?.attendance)}</strong><small>Highest-risk decile</small></div></div>
         <Chart height={122} label="Attendance decreases across model risk deciles">
           <AreaChart data={d.deciles} margin={{ top: 12, right: 0, left: 0, bottom: 0 }}>
-            <defs><linearGradient id="riskFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#fff" stopOpacity={.24} /><stop offset="100%" stopColor="#fff" stopOpacity={0} /></linearGradient></defs>
+            <defs><linearGradient id="riskFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={INDIGO} stopOpacity={.22} /><stop offset="100%" stopColor={INDIGO} stopOpacity={0} /></linearGradient></defs>
             <Tooltip content={<ChartTooltip labelFormat={(v) => `Risk decile ${d.deciles[v]?.decile ?? v}`} />} />
-            <Area type="monotone" dataKey="attendance" name="Observed attendance" stroke="#c8cdff" strokeWidth={2} fill="url(#riskFill)" isAnimationActive={false} />
+            <Area type="monotone" dataKey="attendance" name="Observed attendance" stroke={INDIGO} strokeWidth={2} fill="url(#riskFill)" isAnimationActive={false} />
           </AreaChart>
         </Chart>
-      </Panel>
-      <Panel title="Attendance snapshot" subtitle={`All invitations · ${period(d)}`}>
-        <div className="donut-wrap"><Chart height={164} label="Share attending within twelve months">
-          <PieChart><Pie data={share} dataKey="value" innerRadius={57} outerRadius={72} startAngle={90} endAngle={-270} stroke="none" paddingAngle={2} isAnimationActive={false} />
-            <Tooltip content={<ChartTooltip labelFormat={() => "Within 12 months"} />} /></PieChart>
-        </Chart><div className="donut-center"><strong>{pct(d.meta.attendance_overall)}</strong><small>attendance</small></div></div>
-        <div className="donut-stats"><div><LegendItem color={TEAL}>Attended</LegendItem><strong>{pct(d.meta.attendance_overall)}</strong></div>
-          <div><LegendItem color="#c4c9ef">Did not attend</LegendItem><strong>{pct(1 - d.meta.attendance_overall)}</strong></div></div>
       </Panel>
       <Panel title="Outreach precision" subtitle="Highest-risk 10% · model vs. rule" action={<Icon name="target" size={18} />}
         footer="Historical attenders in the selected group; outreach effects need a trial.">
