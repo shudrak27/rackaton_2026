@@ -4,15 +4,15 @@ import { Overview, Who, Why, What, Verify } from "./pages.jsx";
 
 // block = the challenge question each page answers (VZP: KDO / PROČ / CO / JAK OVĚŘIT)
 const PAGES = [
-  { id: "overview", label: "Overview", block: "Summary", icon: "overview", component: Overview,
-    title: "Screening overview", description: "Attendance, model performance and outreach opportunities in one place." },
-  { id: "risk", label: "Risk & performance", block: "01 · Who", icon: "chart", component: Who,
+  { id: "overview", label: "Overview", block: null, icon: "overview", component: Overview,
+    title: "Screening overview", description: null },
+  { id: "risk", label: "Risk", block: "01 · Who", icon: "chart", component: Who,
     title: "Who is unlikely to attend", description: "How well the model ranks risk and where it improves on the invitation-count rule." },
-  { id: "drivers", label: "Attendance drivers", block: "02 · Why", icon: "drivers", component: Why,
+  { id: "drivers", label: "Drivers", block: "02 · Why", icon: "drivers", component: Why,
     title: "What non-attendance is associated with", description: "The histories and patterns behind the risk score." },
-  { id: "segments", label: "Segments & outreach", block: "03 · What", icon: "people", component: What,
+  { id: "segments", label: "Segments", block: "03 · What", icon: "people", component: What,
     title: "Segments and targeted support", description: "Operational segments, each with a proposed intervention." },
-  { id: "experiment", label: "Experiment planner", block: "04 · How to verify", icon: "flask", component: Verify,
+  { id: "experiment", label: "Experiment", block: "04 · How to verify", icon: "flask", component: Verify,
     title: "Proving the effect", description: "Design a randomized pilot and estimate the participants needed." },
 ];
 
@@ -103,10 +103,10 @@ export default function App() {
     <aside className="sidebar" id="sidebar">
       <nav className="side-nav" aria-label="Dashboard sections">{PAGES.map((p, i) => <button key={p.id} className={`nav-item${tab === p.id ? " active" : ""}`}
         aria-current={tab === p.id ? "page" : undefined} onClick={() => navigate(p.id)}><Icon name={p.icon} size={18} /><span>{p.label}</span>{i > 0 && <span className="nav-number">0{i}</span>}</button>)}</nav>
-      <div className="sidebar-footer"><Icon name="shield" size={14} />Aggregates only · no individual records</div>
+      <div className="sidebar-footer"><Icon name="shield" size={14} />Aggregates only</div>
     </aside>
     <main className="main" id="main-content" tabIndex={-1}>
-      {data ? <><div className="page-heading"><span className="eyebrow">{page.block}</span><h1>{page.title}</h1><p className="page-description">{page.description}</p></div>
+      {data ? <><div className="page-heading">{page.block && <span className="eyebrow">{page.block}</span>}<h1>{page.title}</h1>{page.description && <p className="page-description">{page.description}</p>}</div>
         <Page key={page.id} d={data} navigate={navigate} />
         <footer className="page-footer"><span>VZP invitations {data.meta.years[0]}–{data.meta.years.at(-1)} · model tested on {data.meta.test_year}</span><span>Groups below {data.meta.min_cell} suppressed</span></footer>
       </> : <div className="empty-state" role={error ? "alert" : "status"}>

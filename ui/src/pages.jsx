@@ -78,14 +78,13 @@ export function Overview({ d, navigate }) {
   const first = d.deciles[0], last = d.deciles.at(-1);
   return <>
     <div className="kpis">
-      <Kpi label="Total invitations" value={num(d.meta.n_invitations)} detail={`${num(d.meta.n_clients)} women in the cohort`} foot={`Invitation history · ${period(d)}`} tone="amber" icon="mail" />
-      <Kpi label="Attendance rate" value={pct(d.meta.attendance_overall)} detail="Screened within 12 months" foot="Observed across all invitation years" tone="coral" icon="calendar" />
-      <Kpi label="Lowest-risk 10% · attendance" value={pct(t10?.bottom_attendance_model, 0)} detail={`Compared with ${pct(t10?.bottom_attendance_rule, 0)} using the rule`} foot={`A standard letter is enough · ${d.meta.test_year}`} tone="teal" icon="people" highlight />
-      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`Invitation-count rule: ${fixed(metric(d, "roc_auc", "baseline"))}`} foot="Evaluated on the held-out test year" icon="chart" />
+      <Kpi label="Total invitations" value={num(d.meta.n_invitations)} detail={`${num(d.meta.n_clients)} women · ${period(d)}`} tone="amber" icon="mail" />
+      <Kpi label="Attendance rate" value={pct(d.meta.attendance_overall)} detail="within 12 months of the letter" tone="coral" icon="calendar" />
+      <Kpi label="Lowest-risk 10% · attendance" value={pct(t10?.bottom_attendance_model, 0)} detail={`rule: ${pct(t10?.bottom_attendance_rule, 0)} · a letter is enough`} tone="teal" icon="people" highlight />
+      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`rule: ${fixed(metric(d, "roc_auc", "baseline"))} · random: 0.500`} icon="chart" />
     </div>
     <div className="overview-grid">
-      <Panel title="A clearer picture of risk" subtitle="Observed attendance across risk deciles" className="risk-highlight" action={<Badge>TEST {d.meta.test_year}</Badge>}
-        footer="Equal-sized groups, ordered by predicted non-attendance.">
+      <Panel title="A clearer picture of risk" subtitle="Attendance by model risk decile" className="risk-highlight" action={<Badge>TEST {d.meta.test_year}</Badge>}>
         <div className="risk-range"><div><strong>{pct(first?.attendance)}</strong><small>Lowest-risk decile</small></div><Icon name="arrow" /><div><strong>{pct(last?.attendance)}</strong><small>Highest-risk decile</small></div></div>
         <Chart height={122} label="Attendance decreases across model risk deciles">
           <AreaChart data={d.deciles} margin={{ top: 12, right: 0, left: 0, bottom: 0 }}>
@@ -95,10 +94,9 @@ export function Overview({ d, navigate }) {
           </AreaChart>
         </Chart>
       </Panel>
-      <Panel title="Outreach precision" subtitle="Highest-risk 10% · model vs. rule" action={<Icon name="target" size={18} />}
-        footer="Historical attenders in the selected group; outreach effects need a trial.">
+      <Panel title="Outreach precision" subtitle="Calling the highest-risk 10%" action={<Icon name="target" size={18} />}>
         <div className="precision-body"><div className="precision-summary"><div className="precision-value">{pct(reduction, 0)} fewer</div>
-          <p className="precision-description">contacts with observed attenders</p></div>
+          <p className="precision-description">calls to women who would attend anyway</p></div>
           {[{ name: "Model", value: t10?.top_wasted_model, color: INDIGO }, { name: "Invitation-count rule", value: t10?.top_wasted_rule, color: GREY }].map((r) => <div className="progress-row" key={r.name}>
             <div className="progress-label"><span>{r.name}</span><strong>{num(r.value)}</strong></div>
             <div className="progress-track"><i className="progress-fill" style={{ width: `${t10?.top_wasted_rule ? 100 * r.value / t10.top_wasted_rule : 0}%`, background: r.color }} /></div>
@@ -131,10 +129,10 @@ export function Who({ d }) {
   const rq = Object.fromEntries((d.ranking_quality || []).map((r) => [r.scorer, r]));
   return <>
     <div className="kpis">
-      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`Rule baseline: ${fixed(metric(d, "roc_auc", "baseline"))}`} foot="Ranking non-attendance risk" icon="chart" />
-      <Kpi label="Average precision" value={fixed(rq.model?.ap_attendance)} detail={`Attendance · rule: ${fixed(rq.rule?.ap_attendance)}`} foot="Evaluated for the attendance class" tone="amber" icon="target" />
-      <Kpi label="Lowest-risk decile" value={pct(d.deciles[0]?.attendance)} detail="Observed attendance within 12 months" foot="10% with the lowest predicted risk" tone="teal" icon="people" />
-      <Kpi label="Highest-risk decile" value={pct(d.deciles.at(-1)?.attendance)} detail="Observed attendance within 12 months" foot="10% with the highest predicted risk" tone="coral" icon="people" />
+      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`Rule baseline: ${fixed(metric(d, "roc_auc", "baseline"))}`} icon="chart" />
+      <Kpi label="Average precision" value={fixed(rq.model?.ap_attendance)} detail={`Attendance · rule: ${fixed(rq.rule?.ap_attendance)}`} tone="amber" icon="target" />
+      <Kpi label="Lowest-risk decile" value={pct(d.deciles[0]?.attendance)} detail="Observed attendance within 12 months" tone="teal" icon="people" />
+      <Kpi label="Highest-risk decile" value={pct(d.deciles.at(-1)?.attendance)} detail="Observed attendance within 12 months" tone="coral" icon="people" />
     </div>
     <div className="grid2">
       <Panel title="Model discrimination" subtitle={`ROC curve · held-out ${d.meta.test_year} invitations`}>
