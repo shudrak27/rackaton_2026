@@ -86,7 +86,8 @@ def metric(d: dict, name: str, col: str = "model") -> float:
 
 def rate_chart(rows: list[dict], title: str, color: str = MODEL, horizontal: bool = False):
     df = pd.DataFrame(rows)
-    df["group"] = df["group"].astype(str).replace({"none_in_5y": "No screening in 5 y"})
+    df["group"] = df["group"].astype(str).replace({"none_in_5y": "No screening in 5 y",
+                                                   "61+ (window edge)": "61+*"})
     df["err_hi"] = df["ci_high"] - df["attendance"]
     df["err_lo"] = df["attendance"] - df["ci_low"]
     kw = dict(error_y="err_hi", error_y_minus="err_lo") if not horizontal else \

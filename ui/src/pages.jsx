@@ -23,14 +23,17 @@ const recentAverage = (d) => d.recently_screened_per_year.length
   ? d.recently_screened_per_year.reduce((s, r) => s + r.n, 0) / d.recently_screened_per_year.length : null;
 const segmentRows = (d) => d.segments.map((r) => ({ ...r, attendance: 1 - r.non_attendance, label: SEGMENTS[r.segment] || r.segment }));
 
+// Short axis labels: long ones make Recharts hide neighbouring ticks.
+const GROUP_LABELS = { none_in_5y: "No screen in 5y", "61+ (window edge)": "61+*" };
+
 export function RateBars({ rows = [], color = INDIGO, horizontal = false, width, height }) {
-  const data = rows.map((r) => ({ ...r, group: r.group === "none_in_5y" ? "No screen in 5y" : String(r.group),
+  const data = rows.map((r) => ({ ...r, group: GROUP_LABELS[r.group] ?? String(r.group),
     err: [Math.max(0, r.attendance - r.ci_low), Math.max(0, r.ci_high - r.attendance)] }));
   return <BarChart width={width} height={height} data={data} layout={horizontal ? "vertical" : "horizontal"}
     margin={{ top: 8, right: 18, left: horizontal ? 5 : -12, bottom: 8 }} barCategoryGap="30%">
     <CartesianGrid {...GRID} vertical={horizontal} horizontal={!horizontal} />
     {horizontal ? <><XAxis {...AXIS} type="number" tickFormatter={pctTick} /><YAxis {...AXIS} type="category" dataKey="group" width={125} /></>
-      : <><XAxis {...AXIS} dataKey="group" /><YAxis {...AXIS} tickFormatter={pctTick} width={58} /></>}
+      : <><XAxis {...AXIS} dataKey="group" interval={0} /><YAxis {...AXIS} tickFormatter={pctTick} width={58} /></>}
     <Tooltip cursor={{ fill: "#f4f5ff" }} content={<ChartTooltip showCount />} />
     <Bar dataKey="attendance" name="Attendance" fill={color} radius={horizontal ? [0, 3, 3, 0] : [4, 4, 0, 0]} maxBarSize={42} isAnimationActive={false}>
       <ErrorBar dataKey="err" width={3} stroke="#a6adc4" direction={horizontal ? "x" : "y"} />
@@ -216,7 +219,8 @@ export function What({ d, navigate }) {
       </Panel>
       <Panel title="Time since the last screening" subtitle="Attendance after a new invitation">
         <Chart height={300} label="Attendance by months since last screening"><RateBars rows={since} color={TEAL} /></Chart>
-        <div className="chart-caption">Months since the previous screening, measured at invitation.</div>
+        <div className="chart-caption">Months since the previous screening, measured at invitation.
+          * 61+: edge of the 5-year history window in the VZP data (193 invitations).</div>
       </Panel>
     </div>
     <Panel title="A closer look at invitation timing" subtitle="Invitations sent within six months of a recorded screening" className="section-gap" action={<Badge tone="amber">PROCESS REVIEW</Badge>}>
