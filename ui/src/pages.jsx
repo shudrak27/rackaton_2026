@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ErrorBar, Legend, Line, LineChart,
-  Tooltip, XAxis, YAxis,
+  ReferenceLine, Tooltip, XAxis, YAxis,
 } from "recharts";
 import { BREAKDOWNS, FEATURES, SEGMENTS, num, pct } from "./labels.js";
 import { nPerGroup } from "./power.js";
@@ -85,10 +85,10 @@ export function Overview({ d, navigate }) {
   const first = d.deciles[0], last = d.deciles.at(-1);
   return <>
     <div className="kpis">
-      <Kpi label="Total invitations" value={num(d.meta.n_invitations)} detail={`${num(d.meta.n_clients)} women · ${period(d)}`} tone="amber" icon="mail" />
-      <Kpi label="Attendance rate" value={pct(d.meta.attendance_overall)} detail="within 12 months of the letter" tone="coral" icon="calendar" />
-      <Kpi label="Lowest-risk 10% · attendance" value={pct(t10?.bottom_attendance_model, 0)} detail={`rule: ${pct(t10?.bottom_attendance_rule, 0)} · a letter is enough`} tone="teal" icon="people" highlight />
-      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`rule: ${fixed(metric(d, "roc_auc", "baseline"))} · random: 0.500`} icon="chart" />
+      <Kpi label="Unique women" value={num(d.meta.n_clients)} detail={`${num(d.meta.n_invitations)} invitations · ${period(d)}`} tone="amber" icon="people" />
+      <Kpi label="Overall attendance rate" value={pct(d.meta.attendance_overall)} detail="within 12 months of invitation" tone="coral" icon="calendar" />
+      <Kpi label="Lowest-risk 10% · attendance" value={pct(t10?.bottom_attendance_model, 0)} detail={`Baseline: ${pct(t10?.bottom_attendance_rule, 0)} · observed in ${d.meta.test_year}`} tone="teal" icon="people" highlight />
+      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`Baseline: ${fixed(metric(d, "roc_auc", "baseline"))} · random: 0.500`} icon="chart" />
     </div>
     <div className="overview-grid">
       <Panel title="A clearer picture of risk" subtitle="Attendance by model risk decile" className="risk-highlight" action={<Badge>TEST {d.meta.test_year}</Badge>}>
@@ -101,10 +101,10 @@ export function Overview({ d, navigate }) {
           </AreaChart>
         </Chart>
       </Panel>
-      <Panel title="Outreach precision" subtitle="Calling the highest-risk 10%" action={<Icon name="target" size={18} />}>
+      <Panel title="Outreach targeting" subtitle="Highest-risk 10% selected for extra contact" action={<Icon name="target" size={18} />}>
         <div className="precision-body"><div className="precision-summary"><div className="precision-value">{pct(reduction, 0)} fewer</div>
-          <p className="precision-description">calls to women who would attend anyway</p></div>
-          {[{ name: "Model", value: t10?.top_wasted_model, color: INDIGO }, { name: "Invitation-count rule", value: t10?.top_wasted_rule, color: GREY }].map((r) => <div className="progress-row" key={r.name}>
+          <p className="precision-description">observed attenders in the contact list; outreach effect not measured</p></div>
+          {[{ name: "Model", value: t10?.top_wasted_model, color: INDIGO }, { name: "Baseline", value: t10?.top_wasted_rule, color: GREY }].map((r) => <div className="progress-row" key={r.name}>
             <div className="progress-label"><span>{r.name}</span><strong>{num(r.value)}</strong></div>
             <div className="progress-track"><i className="progress-fill" style={{ width: `${t10?.top_wasted_rule ? 100 * r.value / t10.top_wasted_rule : 0}%`, background: r.color }} /></div>
           </div>)}
@@ -134,35 +134,41 @@ export function Overview({ d, navigate }) {
 
 export function Who({ d }) {
   const rq = Object.fromEntries((d.ranking_quality || []).map((r) => [r.scorer, r]));
+  const t10 = d.targeting?.find((r) => Math.abs(r.share - .1) < 1e-9);
   return <>
     <div className="kpis">
-      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`Rule baseline: ${fixed(metric(d, "roc_auc", "baseline"))}`} icon="chart" />
-      <Kpi label="Average precision" value={fixed(rq.model?.ap_attendance)} detail={`Attendance · rule: ${fixed(rq.rule?.ap_attendance)}`} tone="amber" icon="target" />
+      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`Baseline: ${fixed(metric(d, "roc_auc", "baseline"))}`} icon="chart" />
+      <Kpi label="Average precision · non-attendance" value={fixed(metric(d, "average_precision"))} detail={`Baseline: ${fixed(metric(d, "average_precision", "baseline"))} · random: ${fixed(rq.random?.ap_attendance == null ? null : 1 - rq.random.ap_attendance)}`} tone="amber" icon="target" />
       <Kpi label="Lowest-risk decile" value={pct(d.deciles[0]?.attendance)} detail="Observed attendance within 12 months" tone="teal" icon="people" />
       <Kpi label="Highest-risk decile" value={pct(d.deciles.at(-1)?.attendance)} detail="Observed attendance within 12 months" tone="coral" icon="people" />
     </div>
     <div className="grid2">
       <Panel title="Model discrimination" subtitle={`ROC curve · held-out ${d.meta.test_year} invitations`}>
-        <Chart height={300} label="ROC curves for model, rule and random ranking"><LineChart margin={{ top: 10, right: 20, left: -12, bottom: 12 }}>
+        <Chart height={300} label="ROC curves for model, baseline and random ranking"><LineChart margin={{ top: 10, right: 20, left: -12, bottom: 12 }}>
           <CartesianGrid {...GRID} /><XAxis {...AXIS} type="number" dataKey="fpr" domain={[0, 1]} tickFormatter={pctTick} /><YAxis {...AXIS} type="number" domain={[0, 1]} tickFormatter={pctTick} />
           <Tooltip content={<ChartTooltip labelFormat={(v) => `False positive rate: ${pct(v)}`} />} /><Legend iconType="circle" iconSize={6} wrapperStyle={{ paddingTop: 14 }} />
           <Line data={d.roc.model} dataKey="tpr" name="Model" stroke={INDIGO} strokeWidth={2.5} dot={false} isAnimationActive={false} />
-          <Line data={d.roc.baseline} dataKey="tpr" name="Rule" stroke={CORAL} strokeWidth={2} dot={false} isAnimationActive={false} />
+          <Line data={d.roc.baseline} dataKey="tpr" name="Baseline" stroke={CORAL} strokeWidth={2} dot={false} isAnimationActive={false} />
           <Line data={[{ fpr: 0, tpr: 0 }, { fpr: 1, tpr: 1 }]} dataKey="tpr" name="Random" stroke={GREY} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
         </LineChart></Chart><div className="chart-caption">Horizontal: false positive rate · Vertical: non-attenders captured</div>
       </Panel>
-      <Panel title="Precision at your outreach capacity" subtitle="Attendance among the highest-risk women selected">
-        <Chart height={300} label="Attendance among selected high-risk women"><LineChart margin={{ top: 10, right: 20, left: -12, bottom: 12 }}>
-          <CartesianGrid {...GRID} /><XAxis {...AXIS} type="number" dataKey="top_share" domain={[0, 1]} tickFormatter={pctTick} /><YAxis {...AXIS} tickFormatter={pctTick} />
+      <Panel title="Targeting at limited outreach capacity" subtitle="Observed attenders among the highest-risk women selected">
+        <div className="targeting-highlight">
+          <strong>{pct(t10?.top_wasted_rule ? 1 - t10.top_wasted_model / t10.top_wasted_rule : null, 0)} fewer observed attenders</strong>
+          <span>At 10% capacity: {num(t10?.top_wasted_model)} model vs {num(t10?.top_wasted_rule)} baseline</span>
+        </div>
+        <Chart height={265} label="Observed attendance among the highest-risk 0 to 40 percent selected; vertical scale 0 to 6 percent"><LineChart margin={{ top: 12, right: 20, left: -12, bottom: 12 }}>
+          <CartesianGrid {...GRID} /><XAxis {...AXIS} type="number" dataKey="top_share" domain={[0, 0.4]} ticks={[0, 0.1, 0.2, 0.3, 0.4]} allowDataOverflow tickFormatter={pctTick} /><YAxis {...AXIS} domain={[0, 0.06]} ticks={[0, 0.02, 0.04, 0.06]} allowDataOverflow tickFormatter={pctTick} />
           <Tooltip content={<ChartTooltip labelFormat={(v) => `Selected share: ${pct(v, 0)}`} />} /><Legend iconType="circle" iconSize={6} wrapperStyle={{ paddingTop: 14 }} />
-          <Line data={d.gain.model} dataKey="attendance_in_top" name="Model" stroke={INDIGO} strokeWidth={2.5} dot={false} isAnimationActive={false} />
-          <Line data={d.gain.baseline} dataKey="attendance_in_top" name="Rule" stroke={CORAL} strokeWidth={2} dot={false} isAnimationActive={false} />
-        </LineChart></Chart><div className="chart-caption">A lower curve means fewer observed attenders selected for extra outreach.</div>
+          <ReferenceLine x={0.1} stroke={GREY} strokeDasharray="4 4" />
+          <Line data={d.gain.model.filter((r) => r.top_share <= 0.400001)} dataKey="attendance_in_top" name="Model" stroke={INDIGO} strokeWidth={2.5} dot={false} isAnimationActive={false} />
+          <Line data={d.gain.baseline.filter((r) => r.top_share <= 0.400001)} dataKey="attendance_in_top" name="Baseline" stroke={CORAL} strokeWidth={2} dot={false} isAnimationActive={false} />
+        </LineChart></Chart><div className="chart-caption">Zoom: 0–40% selected, 0–6% attendance; both axes start at zero. Lower is better for targeting, not a measured outreach effect.</div>
       </Panel>
     </div>
-    <Panel title="Model vs. rule, in people" subtitle="Same selection size. Different ranking." className="section-gap" action={<Badge>TEST {d.meta.test_year}</Badge>}
+    <Panel title="Model vs. baseline, in people" subtitle="Same selection size. Different ranking." className="section-gap" action={<Badge>TEST {d.meta.test_year}</Badge>}
       footer="Observed attendance is a retrospective targeting measure. It does not establish who benefits from extra contact.">
-      <Table label="Model and rule targeting comparison"><thead><tr><th>Selected share</th><th className="n">Women</th><th className="n">Low-risk attendance · model / rule</th><th className="n">High-risk attenders · model / rule</th></tr></thead>
+      <Table label="Model and baseline targeting comparison"><thead><tr><th>Selected share</th><th className="n">Women</th><th className="n">Low-risk attendance · model / baseline</th><th className="n">High-risk attenders · model / baseline</th></tr></thead>
         <tbody>{(d.targeting || []).map((r) => <tr key={r.share}><td><Badge>{pct(r.share, 0)}</Badge></td><td className="n">{num(r.n)}</td>
           <td className="n"><span className="ok">{pct(r.bottom_attendance_model)}</span> / {pct(r.bottom_attendance_rule)}</td>
           <td className="n"><span className="ok">{num(r.top_wasted_model)}</span> / {num(r.top_wasted_rule)}</td></tr>)}</tbody>
@@ -170,9 +176,9 @@ export function Who({ d }) {
     </Panel>
     {d.ranking_quality && <Panel title="Ranking benchmarks" subtitle="Context for interpreting model performance" className="section-gap">
       <Table label="Ranking quality benchmarks"><thead><tr><th>Scorer</th><th className="n">ROC-AUC</th><th className="n">Average precision · attendance</th></tr></thead>
-        <tbody>{d.ranking_quality.map((r) => <tr key={r.scorer}><td><strong>{{ random: "Random score", rule: "Invitation-count rule", model: "Model" }[r.scorer] || r.scorer}</strong></td>
+        <tbody>{d.ranking_quality.map((r) => <tr key={r.scorer}><td><strong>{{ random: "Random score", rule: "Baseline", model: "Model" }[r.scorer] || r.scorer}</strong></td>
           <td className="n">{fixed(r.roc_auc)}</td><td className="n">{fixed(r.ap_attendance)}</td></tr>)}</tbody></Table>
-      <div className="panel-footer">Average precision uses the attendance class. Its random baseline is the test-year attendance rate.</div>
+      <div className="panel-footer">The KPI measures non-attendance (81% of the test group); this table measures attendance (19%). The positive class changes the AP value and its random baseline.</div>
     </Panel>}
   </>;
 }
