@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Icon } from "./components.jsx";
-import { Overview, Who, Why, What, Verify } from "./pages.jsx";
+import { Overview, Why, What, Verify } from "./pages.jsx";
 import { Business } from "./business.jsx";
+import { WhoToCall } from "./call.jsx";
 export { RateBars } from "./pages.jsx";
 
 // block = the challenge question each page answers (VZP: KDO / PROČ / CO / JAK OVĚŘIT)
 const PAGES = [
   { id: "overview", label: "Overview", block: null, icon: "overview", component: Overview,
     title: "Screening overview", description: null },
-  { id: "risk", label: "Risk", block: "01 · Who", icon: "chart", component: Who,
-    title: "Who is unlikely to attend", description: "How well the model ranks risk and where it improves on the invitation-count rule." },
+  { id: "call", label: "Who to call", block: "01 · Who", icon: "phone", component: WhoToCall,
+    title: "Who to call", description: null },
   { id: "drivers", label: "Drivers", block: "02 · Why", icon: "drivers", component: Why,
-    title: "What non-attendance is associated with", description: "The histories and patterns behind the risk score." },
+    title: "Why women skip screening", description: null },
   { id: "segments", label: "Segments", block: "03 · What", icon: "people", component: What,
     title: "Segments and targeted support", description: "Operational segments, each with a proposed intervention." },
   { id: "experiment", label: "Experiment", block: "04 · How to verify", icon: "flask", component: Verify,
