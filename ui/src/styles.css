@@ -125,6 +125,9 @@ h1 { margin: 0 0 6px; color: var(--ink); font-size: 26px; font-weight: 700; lett
 .risk-range > svg { color: #a9aef3; }
 .risk-highlight .chart-container { margin-top: auto; padding: 0; }
 .precision-body { padding: 2px 22px 18px; }
+.targeting-highlight { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px;
+  padding: 0 22px 4px; color: var(--muted); font-size: 12.5px; }
+.targeting-highlight strong { color: var(--accent-ink); font-size: 17px; font-weight: 700; }
 .precision-value { color: var(--green); font-size: 30px; font-weight: 700; letter-spacing: -.6px; }
 .precision-description { margin: 4px 0 16px; color: var(--muted); font-size: 13px; }
 .progress-row { margin: 12px 0; }
