@@ -1,5 +1,7 @@
 # Rakathon 2026 — who will not attend mammography screening (VZP)
 
+![Who will skip mammography screening?](docs/cover/cover.png)
+
 VZP sends addressed invitations to mammography screening. This project predicts the risk that an invited
 woman will **not** be screened within 12 months, explains the drivers, groups women into actionable
 segments with a proposed intervention each, and designs the A/B test that would prove the effect.

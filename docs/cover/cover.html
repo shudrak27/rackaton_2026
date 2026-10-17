@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1f2537; --muted:#5f6880; --accent:#5863ed; --accent2:#8a63f0; --green:#1f8a6e; --coral:#d9555d; }
+  * { box-sizing:border-box; margin:0; }
+  html, body { width:1600px; height:900px; overflow:hidden; }
+  body { font-family:"DM Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7fc; position:relative; }
+  .blob { position:absolute; border-radius:50%; filter:blur(70px); opacity:.55; }
+  .b1 { width:620px; height:620px; right:-120px; top:-160px; background:#c9cdff; }
+  .b2 { width:520px; height:520px; right:330px; bottom:-260px; background:#e3d6ff; }
+  .b3 { width:420px; height:420px; left:-180px; top:-160px; background:#dfe9ff; }
+  .grid { position:absolute; inset:0; background-image:radial-gradient(#d9dcf0 1.2px, transparent 1.2px); background-size:28px 28px; opacity:.55;
+          mask-image:linear-gradient(90deg, #000 0%, transparent 55%); }
+  .wrap { position:relative; display:grid; grid-template-columns: 820px 1fr; gap:60px; padding:72px 80px; height:100%; }
+
+  .brand { display:flex; align-items:center; gap:14px; font-size:24px; font-weight:800; letter-spacing:-.5px; }
+  .brand span { font-weight:400; color:var(--muted); }
+  .mark { width:48px; height:48px; border-radius:14px; display:grid; place-items:center; color:#fff;
+          background:linear-gradient(135deg,var(--accent),var(--accent2)); box-shadow:0 10px 24px #5863ed40; }
+  .chip { display:inline-block; margin-top:44px; padding:8px 14px; border-radius:999px; background:#fff; border:1px solid #e3e6f3;
+          color:var(--accent); font-size:16px; font-weight:700; letter-spacing:.3px; }
+  h1 { margin-top:22px; font-size:78px; line-height:1.02; letter-spacing:-3px; font-weight:800; }
+  h1 em { font-style:normal; background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; color:transparent; }
+  .sub { margin-top:22px; font-size:24px; line-height:1.45; color:var(--muted); max-width:720px; }
+  .steps { display:flex; gap:10px; margin-top:30px; }
+  .steps div { padding:10px 16px; border-radius:12px; background:#fff; border:1px solid #e6e8f3; font-size:17px; font-weight:600; color:var(--ink); }
+  .steps b { color:var(--accent); margin-right:6px; }
+  .stats { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:40px; }
+  .stat { padding:20px 22px; border-radius:18px; background:#fff; border:1px solid #e6e8f3; box-shadow:0 8px 24px #1f25370a; }
+  .stat strong { display:block; font-size:40px; font-weight:800; letter-spacing:-1.5px; line-height:1; }
+  .stat strong small { font-size:22px; color:var(--muted); font-weight:600; letter-spacing:0; }
+  .stat span { display:block; margin-top:10px; font-size:16px; color:var(--muted); line-height:1.35; }
+  .stat.hot { background:linear-gradient(135deg,var(--accent),var(--accent2)); border:0; box-shadow:0 14px 34px #5863ed45; }
+  .stat.hot strong, .stat.hot strong small, .stat.hot span { color:#fff; }
+
+  .panel { align-self:center; padding:30px 30px 26px; border-radius:26px; background:#ffffffe8; border:1px solid #e3e6f3;
+           box-shadow:0 30px 70px #2a2f6b1f; backdrop-filter:blur(6px); }
+  .panel h3 { font-size:21px; letter-spacing:-.3px; }
+  .panel p.cap { margin-top:4px; font-size:15px; color:var(--muted); }
+  .bars { display:flex; align-items:flex-end; gap:12px; height:300px; margin-top:24px; padding-bottom:8px; border-bottom:2px solid #eef0f6; }
+  .bar { flex:1; border-radius:9px 9px 3px 3px; position:relative; }
+  .bar i { position:absolute; top:-26px; left:50%; transform:translateX(-50%); font-style:normal; font-size:14px; font-weight:700; color:var(--ink); white-space:nowrap; }
+  .axis { display:flex; justify-content:space-between; margin-top:10px; font-size:14px; color:var(--muted); }
+  .persona { display:flex; align-items:center; gap:16px; margin-top:24px; padding:16px 18px; border-radius:18px; background:#fff4f4; border:2px solid #f2c3c6; }
+  .avatar { width:56px; height:56px; border-radius:50%; display:grid; place-items:center; background:#ffe1e3; color:var(--coral); flex-shrink:0; }
+  .persona b { display:block; font-size:19px; }
+  .persona span { display:block; margin-top:3px; font-size:15px; color:var(--muted); }
+  .persona strong { margin-left:auto; flex-shrink:0; font-size:36px; font-weight:800; color:var(--coral); letter-spacing:-1px; }
+  .persona strong small { display:block; white-space:nowrap; font-size:13px; font-weight:600; color:var(--muted); letter-spacing:0; text-align:right; }
+</style></head>
+<body>
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="grid"></div>
+  <div class="wrap">
+    <div>
+      <div class="brand"><div class="mark"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div>screening<span>&nbsp;insights</span></div>
+      <div class="chip">RAKATHON 2026 · MAMMOGRAPHY SCREENING</div>
+      <h1>Who will skip<br><em>mammography screening?</em></h1>
+      <p class="sub">We predict who won't come, explain why, choose who is worth a call — and design the test that proves it works.</p>
+      <div class="steps"><div><b>01</b>Who</div><div><b>02</b>Why</div><div><b>03</b>What to do</div><div><b>04</b>How to verify</div></div>
+      <div class="stats">
+        <div class="stat"><strong>1.34M</strong><span>invitations analysed<br>508k women · 2020–2024</span></div>
+        <div class="stat hot"><strong>68% <small>vs</small> 1.7%</strong><span>attendance: lowest-risk vs highest-risk women</span></div>
+        <div class="stat"><strong>−42%</strong><span>wasted calls compared with today's rule</span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Who comes after the letter</h3>
+      <p class="cap">Real attendance in 2024 by predicted risk group</p>
+      <div class="bars" id="bars"></div>
+      <div class="axis"><span>lowest risk</span><span>highest risk</span></div>
+      <div class="persona">
+        <div class="avatar"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></div>
+        <div><b>Call her</b><span>65–69 · ignored 10 letters · 1 doctor visit a year</span></div>
+        <strong>1.8%<small>come without a call</small></strong>
+      </div>
+    </div>
+  </div>
+<script>
+  const vals = [67.9, 43.8, 26.9, 17.2, 12.1, 8.6, 6.3, 4.6, 3.0, 1.7];
+  const bars = document.getElementById("bars");
+  vals.forEach((v, i) => {
+    const b = document.createElement("div");
+    b.className = "bar";
+    b.style.height = `${(v / 70) * 100}%`;
+    b.style.background = i < 2 ? "linear-gradient(180deg,#2fb08b,#1f8a6e)"
+      : (() => { const h = 236 + (i - 2) / 7 * 120; return `linear-gradient(180deg, hsl(${h} 80% 66%), hsl(${h} 68% 56%))`; })();
+    if (i === 0 || i === 9) b.innerHTML = `<i>${v}%</i>`;
+    bars.appendChild(b);
+  });
+</script>
+</body></html>
