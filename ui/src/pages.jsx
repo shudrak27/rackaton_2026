@@ -1,11 +1,10 @@
 import React, { useMemo, useState } from "react";
 import {
-  Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ErrorBar, Legend, Line, LineChart,
-  ReferenceLine, Tooltip, XAxis, YAxis,
+  Bar, BarChart, CartesianGrid, Cell, ErrorBar, Line, LineChart, Tooltip, XAxis, YAxis,
 } from "recharts";
 import { BREAKDOWNS, FEATURES, SEGMENTS, num, pct } from "./labels.js";
 import { nPerGroup } from "./power.js";
-import { Badge, Chart, ChartTooltip, Icon, Kpi, LegendItem, Notice, Panel, Table } from "./components.jsx";
+import { Badge, Chart, ChartTooltip, Icon, LegendItem, Notice, Panel, Table } from "./components.jsx";
 import { InterventionActions } from "./intervention-info.jsx";
 import { PLAYBOOKS, PILOT_SEGMENTS } from "./interventions.js";
 
@@ -18,8 +17,6 @@ const segmentColor = (id) => SEGMENT_COLORS[id] || GREY;
 const AXIS = { axisLine: false, tickLine: false, tick: { fontSize: 11 }, tickMargin: 10 };
 const GRID = { stroke: "#eef0f6", strokeDasharray: "4 4", vertical: false };
 const pctTick = (v) => `${Math.round(v * 100)}%`;
-export const metric = (d, name, col = "model") => d.test_metrics.find((r) => r.metric === name)?.[col];
-const fixed = (v, digits = 3) => v == null ? "–" : v.toFixed(digits);
 const period = (d) => `${d.meta.years[0]}–${d.meta.years.at(-1)}`;
 const recentAverage = (d) => d.recently_screened_per_year.length
   ? d.recently_screened_per_year.reduce((s, r) => s + r.n, 0) / d.recently_screened_per_year.length : null;
@@ -83,135 +80,84 @@ export function Overview({ d, navigate }) {
   const t10 = d.targeting?.find((r) => Math.abs(r.share - .1) < 1e-9);
   const reduction = t10?.top_wasted_rule ? 1 - t10.top_wasted_model / t10.top_wasted_rule : null;
   const first = d.deciles[0], last = d.deciles.at(-1);
+  const call = d.personas?.call?.find((c) => c.share === 0.1);
+  const gyn = contrast(d.attendance_by.gyn_prevention_24m);
   return <>
-    <div className="kpis">
-      <Kpi label="Unique women" value={num(d.meta.n_clients)} detail={`${num(d.meta.n_invitations)} invitations · ${period(d)}`} tone="amber" icon="people" />
-      <Kpi label="Overall attendance rate" value={pct(d.meta.attendance_overall)} detail="within 12 months of invitation" tone="coral" icon="calendar" />
-      <Kpi label="Lowest-risk 10% · attendance" value={pct(t10?.bottom_attendance_model, 0)} detail={`Baseline: ${pct(t10?.bottom_attendance_rule, 0)} · observed in ${d.meta.test_year}`} tone="teal" icon="people" highlight />
-      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`Baseline: ${fixed(metric(d, "roc_auc", "baseline"))} · random: 0.500`} icon="chart" />
+    <div className="hero-stats">
+      <div className="hero-stat"><strong>{num(d.meta.n_invitations)}</strong><span>invitations analysed · {num(d.meta.n_clients)} women</span></div>
+      <div className="hero-stat"><strong>{pct(d.meta.attendance_overall, 0)}</strong><span>come after a standard letter</span></div>
+      <div className="hero-stat hero-accent"><strong>{pct(first?.attendance, 0)} <small>vs</small> {pct(last?.attendance, 1)}</strong><span>the model splits likely attenders from women who will skip</span></div>
+      <div className="hero-stat"><strong>−{pct(reduction, 0)}</strong><span>wasted calls compared with today's rule</span></div>
     </div>
-    <div className="overview-grid">
-      <Panel title="A clearer picture of risk" subtitle="Attendance by model risk decile" className="risk-highlight" action={<Badge>TEST {d.meta.test_year}</Badge>}>
-        <div className="risk-range"><div><strong>{pct(first?.attendance)}</strong><small>Lowest-risk decile</small></div><Icon name="arrow" /><div><strong>{pct(last?.attendance)}</strong><small>Highest-risk decile</small></div></div>
-        <Chart height={122} label="Attendance decreases across model risk deciles">
-          <AreaChart data={d.deciles} margin={{ top: 12, right: 0, left: 0, bottom: 0 }}>
-            <defs><linearGradient id="riskFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={INDIGO} stopOpacity={.22} /><stop offset="100%" stopColor={INDIGO} stopOpacity={0} /></linearGradient></defs>
-            <Tooltip content={<ChartTooltip labelFormat={(v) => `Risk decile ${d.deciles[v]?.decile ?? v}`} />} />
-            <Area type="monotone" dataKey="attendance" name="Observed attendance" stroke={INDIGO} strokeWidth={2} fill="url(#riskFill)" isAnimationActive={false} />
-          </AreaChart>
-        </Chart>
-      </Panel>
-      <Panel title="Outreach targeting" subtitle="Highest-risk 10% selected for extra contact" action={<Icon name="target" size={18} />}>
-        <div className="precision-body"><div className="precision-summary"><div className="precision-value">{pct(reduction, 0)} fewer</div>
-          <p className="precision-description">observed attenders in the contact list; outreach effect not measured</p></div>
-          {[{ name: "Model", value: t10?.top_wasted_model, color: INDIGO }, { name: "Baseline", value: t10?.top_wasted_rule, color: GREY }].map((r) => <div className="progress-row" key={r.name}>
-            <div className="progress-label"><span>{r.name}</span><strong>{num(r.value)}</strong></div>
-            <div className="progress-track"><i className="progress-fill" style={{ width: `${t10?.top_wasted_rule ? 100 * r.value / t10.top_wasted_rule : 0}%`, background: r.color }} /></div>
-          </div>)}
-        </div>
-      </Panel>
-    </div>
-    <div className="grid2">
-      <Panel title="Attendance by invitation history" subtitle="Observed attendance within 12 months" action={<Badge tone="neutral">{period(d)}</Badge>}>
-        <Chart label="Attendance by previous invitation count"><RateBars rows={d.attendance_by.prior_invitations} groupLabels={CAPPED_GROUP_LABELS.prior_invitations} /></Chart>
-        <div className="chart-caption">Previous invitations · 0 = first invitation, 10+ = ten or more</div>
-      </Panel>
-      <Panel title="Attendance by risk decile" subtitle="Predicted risk groups, actual outcomes" action={<Badge tone="teal">TEST {d.meta.test_year}</Badge>}>
-        <Chart label="Actual attendance in each model risk decile"><DecileChart d={d} /></Chart>
-        <div className="chart-caption">Risk decile · 1 = lowest risk of non-attendance, 10 = highest</div>
-      </Panel>
-    </div>
-    <Panel title="Your audience at a glance" subtitle={`Operational segments · ${num(d.meta.n_test)} test-year invitations`}
-      action={<button className="text-button" onClick={() => navigate("segments")}>Explore segments <Icon name="arrow" size={15} /></button>}>
-      <SegmentTable d={d} compact />
+    <Panel title="The model sorts women by how likely they are to skip" subtitle={`Real attendance in ${d.meta.test_year}, ten equal groups by predicted risk`}
+      action={<Badge tone="teal">{d.meta.test_year} · DATA THE MODEL NEVER SAW</Badge>} className="section-gap">
+      <Chart height={300} label="Actual attendance in each model risk group"><DecileChart d={d} /></Chart>
+      <div className="chart-caption">Green: a standard letter is enough. Right side: women who need more than a letter.</div>
     </Panel>
-    <div className="insight-strip"><span className="insight-icon"><Icon name="clock" /></span>
-      <div><h3>An opportunity to improve invitation timing</h3><p>About {num(recentAverage(d))} invitations per year follow a screening in the previous six months.</p></div>
-      <button className="text-button" onClick={() => navigate("segments")}>Review the opportunity <Icon name="arrow" size={15} /></button>
+    <div className="finding-grid">
+      <button className="finding" onClick={() => navigate("call")}>
+        <span className="finding-icon"><Icon name="phone" size={22} /></span><h3>Who to call</h3>
+        <p>{call ? <>Typically aged {call.top_age_band}, invited {Math.round(call.median_prior_invitations)} times, about {Math.round(call.median_contacts_12m)} doctor visit a year.
+          Without a call only <b>{pct(call.attendance, 1)}</b> come.</> : "Portrait of the woman worth a call."}</p>
+        <span className="finding-link">See her portrait <Icon name="arrow" size={15} /></span></button>
+      <button className="finding" onClick={() => navigate("drivers")}>
+        <span className="finding-icon"><Icon name="drivers" size={22} /></span><h3>Why women skip</h3>
+        <p>{gyn ? <>No gynaecologist check-up: <b>{pct(gyn.low.attendance, 0)}</b> come. Regular check-ups: <b>{pct(gyn.high.attendance, 0)}</b>.
+          Prevention habits predict screening.</> : "The habits behind skipping."}</p>
+        <span className="finding-link">See the drivers <Icon name="arrow" size={15} /></span></button>
+      <button className="finding" onClick={() => navigate("segments")}>
+        <span className="finding-icon"><Icon name="clock" size={22} /></span><h3>Quick win</h3>
+        <p><b>{num(recentAverage(d))}</b> letters a year go to women screened in the last 6 months. Only ~2% of them come again.</p>
+        <span className="finding-link">See the fix <Icon name="arrow" size={15} /></span></button>
     </div>
   </>;
 }
 
-export function Who({ d }) {
-  const rq = Object.fromEntries((d.ranking_quality || []).map((r) => [r.scorer, r]));
-  const t10 = d.targeting?.find((r) => Math.abs(r.share - .1) < 1e-9);
-  return <>
-    <div className="kpis">
-      <Kpi label="Model ROC-AUC" value={fixed(metric(d, "roc_auc"))} detail={`Baseline: ${fixed(metric(d, "roc_auc", "baseline"))}`} icon="chart" />
-      <Kpi label="Average precision · non-attendance" value={fixed(metric(d, "average_precision"))} detail={`Baseline: ${fixed(metric(d, "average_precision", "baseline"))} · random: ${fixed(rq.random?.ap_attendance == null ? null : 1 - rq.random.ap_attendance)}`} tone="amber" icon="target" />
-      <Kpi label="Lowest-risk decile" value={pct(d.deciles[0]?.attendance)} detail="Observed attendance within 12 months" tone="teal" icon="people" />
-      <Kpi label="Highest-risk decile" value={pct(d.deciles.at(-1)?.attendance)} detail="Observed attendance within 12 months" tone="coral" icon="people" />
-    </div>
-    <div className="grid2">
-      <Panel title="Model discrimination" subtitle={`ROC curve · held-out ${d.meta.test_year} invitations`}>
-        <Chart height={300} label="ROC curves for model, baseline and random ranking"><LineChart margin={{ top: 10, right: 20, left: -12, bottom: 12 }}>
-          <CartesianGrid {...GRID} /><XAxis {...AXIS} type="number" dataKey="fpr" domain={[0, 1]} tickFormatter={pctTick} /><YAxis {...AXIS} type="number" domain={[0, 1]} tickFormatter={pctTick} />
-          <Tooltip content={<ChartTooltip labelFormat={(v) => `False positive rate: ${pct(v)}`} />} /><Legend iconType="circle" iconSize={6} wrapperStyle={{ paddingTop: 14 }} />
-          <Line data={d.roc.model} dataKey="tpr" name="Model" stroke={INDIGO} strokeWidth={2.5} dot={false} isAnimationActive={false} />
-          <Line data={d.roc.baseline} dataKey="tpr" name="Baseline" stroke={CORAL} strokeWidth={2} dot={false} isAnimationActive={false} />
-          <Line data={[{ fpr: 0, tpr: 0 }, { fpr: 1, tpr: 1 }]} dataKey="tpr" name="Random" stroke={GREY} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
-        </LineChart></Chart><div className="chart-caption">Horizontal: false positive rate · Vertical: non-attenders captured</div>
-      </Panel>
-      <Panel title="Targeting at limited outreach capacity" subtitle="Observed attenders among the highest-risk women selected">
-        <div className="targeting-highlight">
-          <strong>{pct(t10?.top_wasted_rule ? 1 - t10.top_wasted_model / t10.top_wasted_rule : null, 0)} fewer observed attenders</strong>
-          <span>At 10% capacity: {num(t10?.top_wasted_model)} model vs {num(t10?.top_wasted_rule)} baseline</span>
-        </div>
-        <Chart height={265} label="Observed attendance among the highest-risk 0 to 40 percent selected; vertical scale 0 to 6 percent"><LineChart margin={{ top: 12, right: 20, left: -12, bottom: 12 }}>
-          <CartesianGrid {...GRID} /><XAxis {...AXIS} type="number" dataKey="top_share" domain={[0, 0.4]} ticks={[0, 0.1, 0.2, 0.3, 0.4]} allowDataOverflow tickFormatter={pctTick} /><YAxis {...AXIS} domain={[0, 0.06]} ticks={[0, 0.02, 0.04, 0.06]} allowDataOverflow tickFormatter={pctTick} />
-          <Tooltip content={<ChartTooltip labelFormat={(v) => `Selected share: ${pct(v, 0)}`} />} /><Legend iconType="circle" iconSize={6} wrapperStyle={{ paddingTop: 14 }} />
-          <ReferenceLine x={0.1} stroke={GREY} strokeDasharray="4 4" />
-          <Line data={d.gain.model.filter((r) => r.top_share <= 0.400001)} dataKey="attendance_in_top" name="Model" stroke={INDIGO} strokeWidth={2.5} dot={false} isAnimationActive={false} />
-          <Line data={d.gain.baseline.filter((r) => r.top_share <= 0.400001)} dataKey="attendance_in_top" name="Baseline" stroke={CORAL} strokeWidth={2} dot={false} isAnimationActive={false} />
-        </LineChart></Chart><div className="chart-caption">Zoom: 0–40% selected, 0–6% attendance; both axes start at zero. Lower is better for targeting, not a measured outreach effect.</div>
-      </Panel>
-    </div>
-    <Panel title="Model vs. baseline, in people" subtitle="Same selection size. Different ranking." className="section-gap" action={<Badge>TEST {d.meta.test_year}</Badge>}
-      footer="Observed attendance is a retrospective targeting measure. It does not establish who benefits from extra contact.">
-      <Table label="Model and baseline targeting comparison"><thead><tr><th>Selected share</th><th className="n">Women</th><th className="n">Low-risk attendance · model / baseline</th><th className="n">High-risk attenders · model / baseline</th></tr></thead>
-        <tbody>{(d.targeting || []).map((r) => <tr key={r.share}><td><Badge>{pct(r.share, 0)}</Badge></td><td className="n">{num(r.n)}</td>
-          <td className="n"><span className="ok">{pct(r.bottom_attendance_model)}</span> / {pct(r.bottom_attendance_rule)}</td>
-          <td className="n"><span className="ok">{num(r.top_wasted_model)}</span> / {num(r.top_wasted_rule)}</td></tr>)}</tbody>
-      </Table>
-    </Panel>
-    {d.ranking_quality && <Panel title="Ranking benchmarks" subtitle="Context for interpreting model performance" className="section-gap">
-      <Table label="Ranking quality benchmarks"><thead><tr><th>Scorer</th><th className="n">ROC-AUC</th><th className="n">Average precision · attendance</th></tr></thead>
-        <tbody>{d.ranking_quality.map((r) => <tr key={r.scorer}><td><strong>{{ random: "Random score", rule: "Baseline", model: "Model" }[r.scorer] || r.scorer}</strong></td>
-          <td className="n">{fixed(r.roc_auc)}</td><td className="n">{fixed(r.ap_attendance)}</td></tr>)}</tbody></Table>
-      <div className="panel-footer">The KPI measures non-attendance (81% of the test group); this table measures attendance (19%). The positive class changes the AP value and its random baseline.</div>
-    </Panel>}
-  </>;
+// Lowest- and highest-attendance group of a breakdown (for plain "this vs that" driver cards).
+function contrast(rows) {
+  if (!rows?.length) return null;
+  const sorted = [...rows].filter((r) => r.group !== "none_in_5y").sort((a, b) => a.attendance - b.attendance);
+  return { low: sorted[0], high: sorted.at(-1) };
 }
+
+const DRIVERS = [
+  ["prior_invitations", "mail", "Ignored earlier letters", (g) => g === "0" ? "First letter" : `${g}${g === "10" ? "+" : ""} letters before`],
+  ["gyn_prevention_24m", "doctor", "Gynaecologist check-ups", (g) => g === "0" ? "No check-up in 2 years" : `${g}${g === "3" ? "+" : ""} check-ups in 2 years`],
+  ["other_screening_36m", "shield", "Other cancer screenings", (g) => g === "0" ? "None in 3 years" : `${g}${g === "4" ? "+" : ""} in 3 years`],
+  ["healthcare_contacts_12m", "activity", "Doctor visits last year", (g) => g === "0" ? "No visits" : `${g} visits`],
+  ["age_band", "calendar", "Age", (g) => `Age ${g}`],
+];
 
 export function Why({ d }) {
   const [key, setKey] = useState("prior_invitations");
-  const [k, setK] = useState(10);
-  const fi = d.feature_importance.slice(0, 12).map((r) => ({ ...r, label: FEATURES[r.feature] || r.feature,
-    color: r.direction === 1 ? INDIGO : r.direction === -1 ? TEAL : GREY }));
-  const isShap = fi.every((r) => r.method === "mean_abs_shap");
-  const regions = [...d.attendance_by.region].sort((a, b) => a.attendance - b.attendance);
-  const shown = [...new Map([...regions.slice(0, k), ...regions.slice(-k)].map((r) => [r.group, r])).values()];
+  const fi = d.feature_importance.slice(0, 8).map((r) => ({ ...r, label: FEATURES[r.feature] || r.feature }));
+  const max = Math.max(...fi.map((r) => r.importance));
   return <>
-    <Panel title="What drives the prediction?" subtitle={isShap ? "Mean absolute SHAP impact on predicted risk · associations, not causes" : "Exported feature importance · associations, not causes"} className="section-gap" action={<Badge>{isShap ? "SHAP METHOD" : "IMPORTANCE METHOD"}</Badge>}>
-      <div className="legend-explainer"><LegendItem color={INDIGO}>Higher value → higher risk</LegendItem><LegendItem color={TEAL}>Higher value → lower risk</LegendItem><LegendItem color={GREY}>No directional summary</LegendItem></div>
-      <Chart height={430} label="Feature importance and direction of association"><BarChart data={fi} layout="vertical" margin={{ top: 0, right: 28, left: 24, bottom: 8 }}>
-        <CartesianGrid {...GRID} horizontal={false} vertical /><XAxis {...AXIS} type="number" /><YAxis {...AXIS} type="category" dataKey="label" width={225} tick={{ fontSize: 11 }} />
-        <Tooltip cursor={{ fill: "#f5f6fc" }} content={<ChartTooltip format={(v) => fixed(v)} />} />
-        <Bar dataKey="importance" name={isShap ? "Mean |SHAP|" : "Importance"} radius={[0, 3, 3, 0]} maxBarSize={17} isAnimationActive={false}>{fi.map((r) => <Cell key={r.feature} fill={r.color} />)}</Bar>
-      </BarChart></Chart>
-    </Panel>
-    <Panel title="Explore attendance patterns" subtitle={`Observed outcomes across ${period(d)}`} className="section-gap">
-      <div className="controls panel-controls"><label className="field">Break down by<select value={key} onChange={(e) => setKey(e.target.value)}>
-        {Object.entries(BREAKDOWNS).filter(([id]) => d.attendance_by[id]).map(([id, name]) => <option key={id} value={id}>{name}</option>)}</select></label></div>
-      <Chart height={290} label={`Attendance by ${BREAKDOWNS[key]}`}><RateBars rows={d.attendance_by[key]} groupLabels={CAPPED_GROUP_LABELS[key]} /></Chart>
-      <div className="chart-caption">Attendance within 12 months · whiskers show 95% confidence intervals.
-        {BREAKDOWN_NOTES[key] && <><br />{BREAKDOWN_NOTES[key]}</>}</div>
-    </Panel>
-    <Panel title="Regional variation" subtitle="Territorial offices with the lowest and highest attendance" className="section-gap" action={<Badge tone="neutral">{regions.length} OFFICES</Badge>}>
-      <div className="controls panel-controls"><label className="field">Offices at each end: {k}<input type="range" min={5} max={20} value={k} onChange={(e) => setK(+e.target.value)} /></label></div>
-      <Chart height={50 + 25 * shown.length} label="Attendance by territorial office"><RateBars rows={shown} horizontal /></Chart>
-      <div className="panel-footer">Crude rates are not adjusted for age or invitation history. A territorial office is not a measure of travel distance or access.</div>
-    </Panel>
+    <div className="driver-grid">{DRIVERS.map(([id, icon, title, say]) => {
+      const c = contrast(d.attendance_by[id]);
+      if (!c) return null;
+      return <section className="driver" key={id}>
+        <div className="driver-head"><span className="driver-icon"><Icon name={icon} size={20} /></span><h3>{title}</h3></div>
+        {[[c.high, "driver-good"], [c.low, "driver-bad"]].map(([r, cls]) => <div className={`driver-row ${cls}`} key={cls}>
+          <span>{say(String(r.group))}</span><div className="driver-bar"><i style={{ width: `${100 * r.attendance / c.high.attendance}%` }} /></div>
+          <strong>{pct(r.attendance, 0)}</strong></div>)}
+        <p className="driver-x">{(c.high.attendance / c.low.attendance).toFixed(c.high.attendance / c.low.attendance >= 10 ? 0 : 1)}× more likely to come</p>
+      </section>;
+    })}</div>
+    <p className="persona-caveat"><Icon name="info" size={15} />Share who came within 12 months of the letter, all invitations {period(d)}. These are patterns, not causes.</p>
+
+    <div className="grid2">
+      <Panel title="What the AI looks at most" subtitle="Ranked by influence on the prediction">
+        <ol className="ai-ranking">{fi.map((r, i) => <li key={r.feature}><span className="ai-rank">{i + 1}</span><span className="ai-label">{r.label}</span>
+          <div className="ai-bar"><i style={{ width: `${100 * r.importance / max}%` }} /></div></li>)}</ol>
+      </Panel>
+      <Panel title="Explore any factor" subtitle="Share who came, by group">
+        <div className="controls panel-controls"><label className="field"><select aria-label="Factor" value={key} onChange={(e) => setKey(e.target.value)}>
+          {Object.entries(BREAKDOWNS).filter(([id]) => d.attendance_by[id]).map(([id, name]) => <option key={id} value={id}>{name}</option>)}</select></label></div>
+        <Chart height={280} label={`Attendance by ${BREAKDOWNS[key]}`}><RateBars rows={d.attendance_by[key]} groupLabels={CAPPED_GROUP_LABELS[key]} /></Chart>
+        {BREAKDOWN_NOTES[key] && <div className="chart-caption">{BREAKDOWN_NOTES[key]}</div>}
+      </Panel>
+    </div>
   </>;
 }
 

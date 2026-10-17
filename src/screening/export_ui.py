@@ -100,6 +100,48 @@ def ranking_quality(y: np.ndarray, model: np.ndarray, rule: np.ndarray) -> list[
     return rows
 
 
+def persona(g: pd.DataFrame) -> dict:
+    """Plain-language profile of a group of invitations (aggregates only)."""
+    def share(mask) -> float | None:
+        return float(mask.mean()) if len(g) else None
+
+    def median(col: str) -> float | None:
+        return float(g[col].median()) if col in g and len(g) else None
+
+    out: dict = {"n": int(len(g)), "attendance": share(g[s.ATTENDED] == 1)}
+    if s.AGE_BAND in g and len(g):
+        counts = g[s.AGE_BAND].astype(str).value_counts(normalize=True)
+        out["top_age_band"], out["top_age_band_share"] = counts.index[0], float(counts.iloc[0])
+    if "segment" in g and len(g):
+        counts = g["segment"].value_counts(normalize=True)
+        out["top_segment"], out["top_segment_share"] = counts.index[0], float(counts.iloc[0])
+    out["median_prior_invitations"] = median(s.N_PRIOR_INVITATIONS)
+    out["median_contacts_12m"] = median(s.N_HEALTHCARE_CONTACTS)
+    if s.MONTHS_SINCE_LAST in g:
+        out["no_screening_5y"] = share(g[s.MONTHS_SINCE_LAST].isna())
+    for key, col in (("no_gyn_checkup_24m", s.GYN_PREVENTION_24M), ("no_other_screening_36m", s.OTHER_SCREENING_36M),
+                     ("no_dental_checkup_24m", s.DENTAL_PREVENTION_24M)):
+        if col in g:
+            out[key] = share(g[col] == 0)
+    if s.HAS_GYN in g:
+        out["no_gynaecologist"] = share(g[s.HAS_GYN] == 0)
+    return out
+
+
+def call_personas(test_df: pd.DataFrame, risk: np.ndarray, shares=(0.05, 0.1, 0.2, 0.3)) -> dict:
+    """Who to call with limited capacity: the typical woman in the top-k% by risk, plus contrasts.
+
+    Selection by risk shows who will most likely NOT come without extra help; whether a call
+    changes that is what the pilot measures."""
+    order = np.argsort(-risk, kind="stable")
+    n = len(risk)
+    return {
+        "everyone": persona(test_df),
+        "letter_enough": persona(test_df.iloc[order[-max(int(0.1 * n), 1):]]),
+        "call": [{"share": share, **persona(test_df.iloc[order[:max(int(share * n), 1)]])} for share in shares],
+    }
+
+
 def _records(path) -> list[dict]:
     return pd.read_csv(path).replace({np.nan: None}).to_dict("records") if path.exists() else []
 
@@ -163,6 +205,7 @@ def build_payload(cfg: dict) -> dict:
         "gain": {"model": _gain(y, risk), "baseline": _gain(y, base)},
         "targeting": targeting_comparison(y, risk, base),
         "ranking_quality": ranking_quality(y, risk, base),
+        "personas": call_personas(test_df, risk),
         "deciles": _records(reports / "decile_table.csv"),
         "calibration": _records(reports / "calibration.csv"),
         "feature_importance": _records(reports / "feature_importance.csv")[:15],

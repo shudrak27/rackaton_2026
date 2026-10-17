@@ -1,23 +1,24 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Icon } from "./components.jsx";
-import { Overview, Who, Why, What, Verify } from "./pages.jsx";
+import { Overview, Why, What, Verify } from "./pages.jsx";
 import { Business } from "./business.jsx";
+import { WhoToCall } from "./call.jsx";
 export { RateBars } from "./pages.jsx";
 
 // block = the challenge question each page answers (VZP: KDO / PROČ / CO / JAK OVĚŘIT)
 const PAGES = [
   { id: "overview", label: "Overview", block: null, icon: "overview", component: Overview,
     title: "Screening overview", description: null },
-  { id: "risk", label: "Risk", block: "01 · Who", icon: "chart", component: Who,
-    title: "Who is unlikely to attend", description: "How well the model ranks risk and where it improves on the invitation-count rule." },
+  { id: "call", label: "Who to call", block: "01 · Who", icon: "phone", component: WhoToCall,
+    title: "Who to call", description: null },
   { id: "drivers", label: "Drivers", block: "02 · Why", icon: "drivers", component: Why,
-    title: "What non-attendance is associated with", description: "The histories and patterns behind the risk score." },
+    title: "Why women skip screening", description: null },
   { id: "segments", label: "Segments", block: "03 · What", icon: "people", component: What,
     title: "Segments and targeted support", description: "Operational segments, each with a proposed intervention." },
   { id: "experiment", label: "Experiment", block: "04 · How to verify", icon: "flask", component: Verify,
     title: "Proving the effect", description: null },
-  { id: "business", label: "Business actions", block: null, icon: "target", component: Business,
-    title: "Business actions", description: null },
+  { id: "business", label: "Business actions", block: "Action plan", icon: "target", component: Business,
+    title: "What to do for each group", description: null },
 ];
 
 function currentPage() {
@@ -92,7 +93,7 @@ export default function App() {
 
   const Page = page.component;
 
-  return <div className={`app${mobileOpen ? " mobile-open" : ""}${tab === "business" ? " business-view" : ""}`}>
+  return <div className={`app${mobileOpen ? " mobile-open" : ""}`}>
     <a href="#main-content" className="skip-link" onClick={(e) => { e.preventDefault(); document.getElementById("main-content").focus(); }}>Skip to content</a>
     <header className="topbar">
       <button className="icon-button menu-button" aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded={mobileOpen}
@@ -109,7 +110,7 @@ export default function App() {
         aria-current={tab === p.id ? "page" : undefined} onClick={() => navigate(p.id)}><Icon name={p.icon} size={18} /><span>{p.label}</span>{i > 0 && <span className="nav-number">0{i}</span>}</button>)}</nav>
       <div className="sidebar-footer"><Icon name="shield" size={14} />Aggregates only</div>
     </aside>
-    <main className={`main${tab === "business" ? " business-main" : ""}`} id="main-content" tabIndex={-1}>
+    <main className="main" id="main-content" tabIndex={-1}>
       {data ? <><div className="page-heading">{page.block && <span className="eyebrow">{page.block}</span>}<h1>{page.title}</h1>{page.description && <p className="page-description">{page.description}</p>}</div>
         <Page key={page.id} d={data} navigate={navigate} />
         <footer className="page-footer"><span>VZP invitations {data.meta.years[0]}–{data.meta.years.at(-1)} · model tested on {data.meta.test_year}</span><span>Groups below {data.meta.min_cell} suppressed</span></footer>

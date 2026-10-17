@@ -38,3 +38,19 @@ def test_ranking_quality_random_level_is_attendance_rate():
     rows = {r["scorer"]: r for r in ranking_quality(y, y.astype(float), np.zeros(10))}
     assert rows["random"]["ap_attendance"] == pytest.approx(0.3)
     assert rows["model"]["ap_attendance"] == pytest.approx(1.0) and rows["model"]["roc_auc"] == 1.0
+
+
+def test_call_personas_pick_highest_risk_and_describe_them():
+    import numpy as np
+
+    from screening.data import schema as s
+    from screening.export_ui import call_personas
+    n = 100
+    df = pd.DataFrame({s.ATTENDED: [0] * 50 + [1] * 50, s.N_PRIOR_INVITATIONS: [10] * 50 + [0] * 50,
+                       s.AGE_BAND: ["65-69"] * 50 + ["45-49"] * 50, s.GYN_PREVENTION_24M: [0] * 50 + [2] * 50})
+    risk = np.r_[np.full(50, 0.9), np.full(50, 0.1)]
+    p = call_personas(df, risk, shares=(0.1,))
+    call, letter = p["call"][0], p["letter_enough"]
+    assert call["n"] == n // 10 and call["attendance"] == 0 and call["top_age_band"] == "65-69"
+    assert call["median_prior_invitations"] == 10 and call["no_gyn_checkup_24m"] == 1
+    assert letter["attendance"] == 1 and letter["top_age_band"] == "45-49"
