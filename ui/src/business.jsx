@@ -4,7 +4,7 @@ import { InterventionActions } from "./intervention-info.jsx";
 import { PLAYBOOKS } from "./interventions.js";
 import { num, pct } from "./labels.js";
 
-// One card per segment: who, what we do, how big the group is and how many come today.
+// One card per segment: population, proposed action and observed test-year attendance.
 const ACTION_ORDER = [
   "lapsed_regular",
   "repeated_nonresponder",
@@ -33,7 +33,7 @@ export function Business({ d }) {
           <p className="action-do"><Icon name="arrow" size={16} />{play.title}</p>
           <div className="action-stats">
             <div><strong>{num(row.n)}</strong><span>women in {d.meta.test_year}</span></div>
-            <div><strong>{pct(1 - row.non_attendance, 0)}</strong><span>come today</span></div>
+            <div><strong>{pct(1 - row.non_attendance, 0)}</strong><span>attended within 12 months</span></div>
           </div>
           <div className="action-buttons"><InterventionActions segment={id} d={d} /></div>
         </li>;

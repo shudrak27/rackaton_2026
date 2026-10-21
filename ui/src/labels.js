@@ -1,4 +1,4 @@
-// Human-readable labels; keep in sync with app/dashboard.py.
+// Human-readable labels for the aggregate dashboard export.
 
 export const SEGMENTS = {
   first_invitation: "First invitation",

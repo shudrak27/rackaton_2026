@@ -1,33 +1,56 @@
 # React dashboard
 
-Six sections, including **Business actions**, built with Vite + React + Recharts. No backend: it reads only
-`reports/ui/data.json` (aggregates; created by `python -m screening export-ui`).
+Vite + React + Recharts. The dashboard reads **only aggregate data** from `reports/ui/data.json`.
+It needs no Python environment, API server, raw medical records or trained model file.
+
+## Run locally
+
+Install Node.js 20+ and place the supplied JSON at `reports/ui/data.json` in the repository. Then:
 
 ```bash
 cd ui
 npm install
-npm run dev      # copies ../reports/ui/data.json -> public/, opens http://localhost:5173
-npm run build    # static site in ui/dist/ (open with any static server, e.g. `npm run preview`)
+npm run dev                 # http://localhost:5173
 ```
 
-`public/data.json`, `dist/` and `node_modules/` are not committed.
+`dev` and `build` copy `../reports/ui/data.json` into `public/`. If the file is missing, obtain the supplied
+aggregate export or regenerate it using the [Python pipeline](../README.md#train-and-refresh-reports).
+To refresh an already-running dashboard after replacing the export:
 
-## Intervention playbooks
+```bash
+npm run data
+```
 
-`src/interventions.js` defines the proposed actions, operational prerequisites and A/B questions.
-Separate **Use case** and **A/B test** buttons are available from Overview, Segments, Business actions and the
-Experiment planner. They separate observed segment outcomes from
-unverified intervention hypotheses. These playbooks replace legacy intervention wording in the UI;
-the raw aggregate export remains unchanged. No messages are sent and no trial results are simulated.
-Business actions contains exactly six segment actions; the residual `other` segment stays in
-Segments & outreach and is not given a blanket intervention.
+Reload the browser. `npm run data` copies the JSON; it does not retrain the model or regenerate reports.
 
-The planner lists the four defined outreach pilot candidates and starts with `lapsed_regular`.
-Recently screened women need an eligibility review; first invitations and the residual group need
-a specific intervention hypothesis before an outreach pilot. Default baseline calculations retain
-the export's full precision. Doctor-mediated trials may need practice-level randomization and a
-separate cluster-adjusted sample size. Exported individual-level sample sizes do not cover that case.
+```bash
+npm run build               # static site in dist/
+npm run preview             # serve the build locally; open the printed address
+npm test                    # dashboard data and calculation checks
+```
 
-Use `/#business` to open the action plan directly. Design references: challenge slides 3, 6, 8–10,
-`docs/segments-real-data.md` and `docs/experiment-design.md`. Effect and cost assumptions are not
-measured results. The primary outcome is screening within 12 months, not appointment no-show.
+`public/data.json`, `dist/` and `node_modules/` are not committed. The export suppresses groups smaller
+than 20 and contains no client IDs or individual medical records.
+
+## Views
+
+- **Overview, Who to call and Drivers:** observed outcomes, suggested audiences and patterns behind risk.
+- **Segments and Business actions:** operational groups, proposed support, use cases and A/B questions.
+- **Experiment:** required sample sizes for a proposed attendance improvement.
+- **[Model quality](http://localhost:5173/#model-quality):** model-versus-rule performance and ranking.
+- **[Calibration](http://localhost:5173/#calibration):** predicted probabilities versus observed outcomes.
+- **[Validation](http://localhost:5173/#validation):** data split, evaluation approach and limitations.
+
+The model predicts non-attendance within 12 months. Each average-precision result identifies its positive
+class; attendance and non-attendance produce different values and different random baselines.
+
+## Proposed actions
+
+`src/interventions.js` defines the playbooks. Business actions contains six proposals; the residual
+`other` group receives no blanket intervention. Use case and A/B test dialogs explain what to try and
+how to measure it. Calls and reminders have **not** been tested; high risk alone does not prove benefit.
+
+The experiment planner starts with women last screened over two years ago. Contact availability and
+eligibility must be checked before recruitment. Doctor-mediated trials may require randomization by
+practice and a larger sample than the individual-level calculator shows. See the
+[experiment design](../docs/experiment-design.md) for assumptions and analysis.

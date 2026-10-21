@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "test": "node --test src/*.test.js",
     "data": "node scripts/copy-data.mjs",
     "dev": "npm run data && vite",
     "build": "npm run data && vite build",
