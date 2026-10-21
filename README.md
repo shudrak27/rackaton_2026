@@ -66,52 +66,6 @@ At **33.36%** historical attendance, detecting **+2 percentage points** needs **
 unreached women. Primary outcome: screening within 12 months. **The trial has not run.**
 See [experiment design](docs/experiment-design.md) and [segment definitions](docs/segments-real-data.md).
 
-## Run the dashboard
-
-Requires Node.js 20+ and the supplied `reports/ui/data.json`. **No Python, raw data or model file needed.**
-Reports are git-ignored and supplied separately.
-
-```bash
-cd ui
-npm install
-npm run dev                 # http://localhost:5173
-```
-
-After replacing the JSON, run `npm run data` in `ui/` and reload. `npm run build` creates a static site;
-`npm run preview` serves it. [Dashboard documentation](ui/README.md).
-
-## Train and refresh reports
-
-From the repository root, using Python 3.10+:
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1  # Linux/macOS: source .venv/bin/activate
-python -m pip install -e ".[dev]"
-```
-
-Put the authorized CSV at `data/raw/Rakhaton2026.csv`, or update [config](configs/config.yaml). Keep it out of git.
-```bash
-python -m screening profile
-python -m screening train
-python -m screening export-ui
-cd ui
-npm run data                # refresh an already-running dashboard, then reload
-```
-
-Training writes reports, `models/model.joblib` and MLflow runs. Export needs matching raw data and
-`reports/scored_test.parquet`; aggregate JSON alone supports viewing only.
-
-Other commands, from the repository root (`npm test` runs dashboard tests from `ui/`):
-```bash
-python -m screening score --input data/raw/new.csv
-python -m screening power --p 0.10 --mde 0.02
-mlflow ui --backend-store-uri sqlite:///mlflow.db
-python -m screening.viz.figures       # PNG figures from data.json
-python scripts/build_deck.py          # backup presentation
-pytest -m "not slow"                 # pytest also includes the end-to-end test
-```
-
-Synthetic demo: `python -m screening synth`, set `data.path` to `data/raw/synthetic.parquet`, then train and export.
 
 ## Repository map
 
