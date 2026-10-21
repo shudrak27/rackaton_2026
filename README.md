@@ -5,7 +5,7 @@ We help VZP predict missed mammography screening, propose support, and plan how 
 
 ## Live Demo
 
-[🌐 [Explore the Interactive ML Dashboard](https://shudrak27.github.io/rackaton_2026/)
+[Explore the Interactive ML Dashboard](https://shudrak27.github.io/rackaton_2026/)
 The dashboard showcases model performance,
 risk segmentation, explainability, and intervention strategies.
 
