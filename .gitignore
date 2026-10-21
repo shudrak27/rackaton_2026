@@ -18,4 +18,3 @@ catboost_info/
 # React UI
 ui/node_modules/
 ui/dist/
-ui/public/data.json

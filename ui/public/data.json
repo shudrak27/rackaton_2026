@@ -1,0 +1,3712 @@
+{
+ "meta": {
+  "generated_at": "2026-10-17T11:48:39",
+  "n_invitations": 1344556,
+  "n_clients": 508527,
+  "years": [
+   2020,
+   2021,
+   2022,
+   2023,
+   2024
+  ],
+  "attendance_overall": 0.19302728930591215,
+  "test_year": 2024,
+  "n_test": 256466,
+  "calibration": "isotonic",
+  "min_cell": 20
+ },
+ "test_metrics": [
+  {
+   "metric": "roc_auc",
+   "model": 0.835866168100932,
+   "baseline": 0.7847166322190167,
+   "model_uncalibrated": 0.8359431002790406
+  },
+  {
+   "metric": "average_precision",
+   "model": 0.9472583056699384,
+   "baseline": 0.92707522892352,
+   "model_uncalibrated": 0.9484701971600852
+  },
+  {
+   "metric": "brier",
+   "model": 0.1125592060212552,
+   "baseline": null,
+   "model_uncalibrated": 0.1128491128220685
+  },
+  {
+   "metric": "log_loss",
+   "model": 0.3638980438591543,
+   "baseline": null,
+   "model_uncalibrated": 0.3653127781312978
+  },
+  {
+   "metric": "precision_top5",
+   "model": 0.9856507837479528,
+   "baseline": 0.9713795523668408,
+   "model_uncalibrated": 0.986040708102628
+  },
+  {
+   "metric": "lift_top5",
+   "model": 1.2200033489447564,
+   "baseline": 1.2023389282740633,
+   "model_uncalibrated": 1.220485983389311
+  },
+  {
+   "metric": "attendance_top5",
+   "model": 0.0143492162520471,
+   "baseline": 0.0286204476331591,
+   "model_uncalibrated": 0.0139592918973718
+  },
+  {
+   "metric": "precision_top10",
+   "model": 0.9821811517916326,
+   "baseline": 0.9695091043786798,
+   "model_uncalibrated": 0.9829219791788514
+  },
+  {
+   "metric": "lift_top10",
+   "model": 1.2157087623872125,
+   "baseline": 1.2000237545358492,
+   "model_uncalibrated": 1.2166257320769849
+  },
+  {
+   "metric": "attendance_top10",
+   "model": 0.0178188482083674,
+   "baseline": 0.0304908956213202,
+   "model_uncalibrated": 0.0170780208211486
+  },
+  {
+   "metric": "precision_top20",
+   "model": 0.976195582243191,
+   "baseline": 0.9670520343906576,
+   "model_uncalibrated": 0.9760591113797203
+  },
+  {
+   "metric": "lift_top20",
+   "model": 1.208300038105908,
+   "baseline": 1.1969824810306628,
+   "model_uncalibrated": 1.2081311193435909
+  },
+  {
+   "metric": "attendance_top20",
+   "model": 0.0238044177568089,
+   "baseline": 0.0329479656093424,
+   "model_uncalibrated": 0.0239408886202795
+  },
+  {
+   "metric": "precision_top30",
+   "model": 0.9690148167403172,
+   "baseline": 0.9598258383155706,
+   "model_uncalibrated": 0.9687288796464778
+  },
+  {
+   "metric": "lift_top30",
+   "model": 1.1994119429448804,
+   "baseline": 1.1880381535293802,
+   "model_uncalibrated": 1.19905802021908
+  },
+  {
+   "metric": "attendance_top30",
+   "model": 0.0309851832596829,
+   "baseline": 0.0401741616844294,
+   "model_uncalibrated": 0.0312711203535222
+  }
+ ],
+ "roc": {
+  "model": [
+   {
+    "fpr": 0.0,
+    "tpr": 0.0
+   },
+   {
+    "fpr": 4.059677255658175e-05,
+    "tpr": 0.0022635025892732176
+   },
+   {
+    "fpr": 0.001299096721810616,
+    "tpr": 0.026829021095458032
+   },
+   {
+    "fpr": 0.002476403125951487,
+    "tpr": 0.046177383313787096
+   },
+   {
+    "fpr": 0.003897290165431848,
+    "tpr": 0.06386069565301326
+   },
+   {
+    "fpr": 0.003897290165431848,
+    "tpr": 0.06388482681068142
+   },
+   {
+    "fpr": 0.004100274028214757,
+    "tpr": 0.067610677554645
+   },
+   {
+    "fpr": 0.004973104638181265,
+    "tpr": 0.0768818683307513
+   },
+   {
+    "fpr": 0.006596975540444534,
+    "tpr": 0.09326209815589694
+   },
+   {
+    "fpr": 0.0160154267735715,
+    "tpr": 0.1795358130510953
+   },
+   {
+    "fpr": 0.026083426367603777,
+    "tpr": 0.2509012987389057
+   },
+   {
+    "fpr": 0.027423119861970973,
+    "tpr": 0.2584640035521064
+   },
+   {
+    "fpr": 0.04053587739774688,
+    "tpr": 0.32536522507130755
+   },
+   {
+    "fpr": 0.04055617578402517,
+    "tpr": 0.32537970376590847
+   },
+   {
+    "fpr": 0.04153049832538313,
+    "tpr": 0.32980535808224865
+   },
+   {
+    "fpr": 0.05397340911397544,
+    "tpr": 0.3818417864778645
+   },
+   {
+    "fpr": 0.060326804019080485,
+    "tpr": 0.40604533761902695
+   },
+   {
+    "fpr": 0.06448797320613012,
+    "tpr": 0.42127692433916825
+   },
+   {
+    "fpr": 0.06588856185933219,
+    "tpr": 0.42653269047929304
+   },
+   {
+    "fpr": 0.07865624682837714,
+    "tpr": 0.4683375080236099
+   },
+   {
+    "fpr": 0.08442098853141175,
+    "tpr": 0.4862814368656522
+   },
+   {
+    "fpr": 0.09873135085760681,
+    "tpr": 0.5270293097041038
+   },
+   {
+    "fpr": 0.11354917284075916,
+    "tpr": 0.5618360915246549
+   },
+   {
+    "fpr": 0.11356947122703745,
+    "tpr": 0.5618409177561884
+   },
+   {
+    "fpr": 0.11462498731350858,
+    "tpr": 0.5644567352474168
+   },
+   {
+    "fpr": 0.11807571298081802,
+    "tpr": 0.5709721478178195
+   },
+   {
+    "fpr": 0.1181366081396529,
+    "tpr": 0.571068672448492
+   },
+   {
+    "fpr": 0.12515984979194153,
+    "tpr": 0.58602999020275
+   },
+   {
+    "fpr": 0.13135085760682025,
+    "tpr": 0.599417956477044
+   },
+   {
+    "fpr": 0.13159443824215974,
+    "tpr": 0.599982625566479
+   },
+   {
+    "fpr": 0.13695321221962853,
+    "tpr": 0.6110250433154281
+   },
+   {
+    "fpr": 0.13721709124124631,
+    "tpr": 0.6116186697940647
+   },
+   {
+    "fpr": 0.1515071551811631,
+    "tpr": 0.6396590750044643
+   },
+   {
+    "fpr": 0.1543489292601238,
+    "tpr": 0.6438482439756565
+   },
+   {
+    "fpr": 0.1581650258804425,
+    "tpr": 0.6503443516199247
+   },
+   {
+    "fpr": 0.18640008119354512,
+    "tpr": 0.6933315958899813
+   },
+   {
+    "fpr": 0.20138029026692378,
+    "tpr": 0.7149482869291172
+   },
+   {
+    "fpr": 0.22922967624073887,
+    "tpr": 0.7493593177639104
+   },
+   {
+    "fpr": 0.23747082106972495,
+    "tpr": 0.7587415118652903
+   },
+   {
+    "fpr": 0.24122602253120876,
+    "tpr": 0.762896897215747
+   },
+   {
+    "fpr": 0.2583984573226428,
+    "tpr": 0.7805512521657714
+   },
+   {
+    "fpr": 0.25841875570892114,
+    "tpr": 0.7805657308603723
+   },
+   {
+    "fpr": 0.28304069826448797,
+    "tpr": 0.8040501735030237
+   },
+   {
+    "fpr": 0.29582868161981124,
+    "tpr": 0.8150636338627709
+   },
+   {
+    "fpr": 0.3001116411245306,
+    "tpr": 0.8187267435967973
+   },
+   {
+    "fpr": 0.30409012483507564,
+    "tpr": 0.8217431383053171
+   },
+   {
+    "fpr": 0.3186846645691668,
+    "tpr": 0.8329737790840778
+   },
+   {
+    "fpr": 0.31870496295544504,
+    "tpr": 0.8330027364732796
+   },
+   {
+    "fpr": 0.32534253526844614,
+    "tpr": 0.8374090858634852
+   },
+   {
+    "fpr": 0.3285090835278595,
+    "tpr": 0.8397015458419602
+   },
+   {
+    "fpr": 0.3285699786866944,
+    "tpr": 0.8397208507680948
+   },
+   {
+    "fpr": 0.3350248655231909,
+    "tpr": 0.8443588592719147
+   },
+   {
+    "fpr": 0.33506546229574746,
+    "tpr": 0.8443733379665156
+   },
+   {
+    "fpr": 0.3454582360702324,
+    "tpr": 0.8512989802172769
+   },
+   {
+    "fpr": 0.395392266314828,
+    "tpr": 0.8794793461421518
+   },
+   {
+    "fpr": 0.3995534355018776,
+    "tpr": 0.8814918846916762
+   },
+   {
+    "fpr": 0.42342433776514765,
+    "tpr": 0.8930555354462575
+   },
+   {
+    "fpr": 0.44727494164213943,
+    "tpr": 0.9034995004850362
+   },
+   {
+    "fpr": 0.45133461889779763,
+    "tpr": 0.9055168652660943
+   },
+   {
+    "fpr": 0.4631279813254846,
+    "tpr": 0.9101597000014479
+   },
+   {
+    "fpr": 0.48884603674007915,
+    "tpr": 0.9194888055559577
+   },
+   {
+    "fpr": 0.4945295848980006,
+    "tpr": 0.9216219998938229
+   },
+   {
+    "fpr": 0.5153963259920836,
+    "tpr": 0.9285235109869161
+   },
+   {
+    "fpr": 0.5168375114178423,
+    "tpr": 0.9289916554456783
+   },
+   {
+    "fpr": 0.5624682837714402,
+    "tpr": 0.9413226770141071
+   },
+   {
+    "fpr": 0.5658175175073582,
+    "tpr": 0.9420610904387527
+   },
+   {
+    "fpr": 0.565878412666193,
+    "tpr": 0.94207074290182
+   },
+   {
+    "fpr": 0.5662031868466457,
+    "tpr": 0.9421817462270935
+   },
+   {
+    "fpr": 0.5763523799857911,
+    "tpr": 0.94471551778225
+   },
+   {
+    "fpr": 0.5763726783720694,
+    "tpr": 0.9447444751714519
+   },
+   {
+    "fpr": 0.5875367908251294,
+    "tpr": 0.94751955830329
+   },
+   {
+    "fpr": 0.6089921851212828,
+    "tpr": 0.9524133570783925
+   },
+   {
+    "fpr": 0.638729321018979,
+    "tpr": 0.9587115892297817
+   },
+   {
+    "fpr": 0.6428295950471937,
+    "tpr": 0.9595368748220328
+   },
+   {
+    "fpr": 0.6693392875266416,
+    "tpr": 0.9648264245828929
+   },
+   {
+    "fpr": 0.6693595859129199,
+    "tpr": 0.9648360770459602
+   },
+   {
+    "fpr": 0.6693798842991983,
+    "tpr": 0.9648409032774938
+   },
+   {
+    "fpr": 0.690713488277682,
+    "tpr": 0.9686391474944619
+   },
+   {
+    "fpr": 0.7205724144930478,
+    "tpr": 0.9731468477468738
+   },
+   {
+    "fpr": 0.7245305998173145,
+    "tpr": 0.973851477550784
+   },
+   {
+    "fpr": 0.7245508982035929,
+    "tpr": 0.9738563037823177
+   },
+   {
+    "fpr": 0.7245711965898711,
+    "tpr": 0.9738611300138513
+   },
+   {
+    "fpr": 0.7736526946107785,
+    "tpr": 0.9805599393825319
+   },
+   {
+    "fpr": 0.7968334517405866,
+    "tpr": 0.9836680324901906
+   },
+   {
+    "fpr": 0.8028823708515173,
+    "tpr": 0.9843050950526301
+   },
+   {
+    "fpr": 0.852755505937278,
+    "tpr": 0.9895608611927549
+   },
+   {
+    "fpr": 0.8527758043235563,
+    "tpr": 0.9895656874242885
+   },
+   {
+    "fpr": 0.861057545925099,
+    "tpr": 0.990410277942674
+   },
+   {
+    "fpr": 0.8617273926722826,
+    "tpr": 0.9904681927210776
+   },
+   {
+    "fpr": 0.877600730741906,
+    "tpr": 0.991838842476629
+   },
+   {
+    "fpr": 0.8785953516695423,
+    "tpr": 0.9919305408757679
+   },
+   {
+    "fpr": 0.8945701816705572,
+    "tpr": 0.9930647052861714
+   },
+   {
+    "fpr": 0.895808383233533,
+    "tpr": 0.9931419249907095
+   },
+   {
+    "fpr": 0.8958286816198112,
+    "tpr": 0.9931515774537768
+   },
+   {
+    "fpr": 0.9095097939713793,
+    "tpr": 0.9941119975289695
+   },
+   {
+    "fpr": 0.9590175581041307,
+    "tpr": 0.9976496252431214
+   },
+   {
+    "fpr": 0.9880239520958084,
+    "tpr": 0.9994353309105651
+   },
+   {
+    "fpr": 0.9900740891099158,
+    "tpr": 0.9995366817727713
+   },
+   {
+    "fpr": 0.9962447985385162,
+    "tpr": 0.999855213053991
+   },
+   {
+    "fpr": 0.9993504516390946,
+    "tpr": 0.9999903475369327
+   },
+   {
+    "fpr": 1.0,
+    "tpr": 1.0
+   }
+  ],
+  "baseline": [
+   {
+    "fpr": 0.0,
+    "tpr": 0.0
+   },
+   {
+    "fpr": 0.0380391758855171,
+    "tpr": 0.2687293980241408
+   },
+   {
+    "fpr": 0.0380391758855171,
+    "tpr": 0.26873422425567445
+   },
+   {
+    "fpr": 0.03812036943063026,
+    "tpr": 0.2697670378038716
+   },
+   {
+    "fpr": 0.03816096620318685,
+    "tpr": 0.26983460504534246
+   },
+   {
+    "fpr": 0.03816096620318685,
+    "tpr": 0.26984425750840974
+   },
+   {
+    "fpr": 0.038181264589465136,
+    "tpr": 0.26986356243454424
+   },
+   {
+    "fpr": 0.04477824012990967,
+    "tpr": 0.2972765575455717
+   },
+   {
+    "fpr": 0.04477824012990967,
+    "tpr": 0.29728138377710533
+   },
+   {
+    "fpr": 0.04477824012990967,
+    "tpr": 0.2974454756492488
+   },
+   {
+    "fpr": 0.04477824012990967,
+    "tpr": 0.297469606806917
+   },
+   {
+    "fpr": 0.04477824012990967,
+    "tpr": 0.2974744330384506
+   },
+   {
+    "fpr": 0.06477215061402619,
+    "tpr": 0.3633476672409882
+   },
+   {
+    "fpr": 0.06481274738658277,
+    "tpr": 0.3634007557878582
+   },
+   {
+    "fpr": 0.06550289252004465,
+    "tpr": 0.3647472743857414
+   },
+   {
+    "fpr": 0.0656246828377144,
+    "tpr": 0.3649306711840194
+   },
+   {
+    "fpr": 0.0656246828377144,
+    "tpr": 0.36501271712009115
+   },
+   {
+    "fpr": 0.0656246828377144,
+    "tpr": 0.36502236958315837
+   },
+   {
+    "fpr": 0.10021313305592205,
+    "tpr": 0.45241094396262566
+   },
+   {
+    "fpr": 0.10035522175987009,
+    "tpr": 0.4526184719185718
+   },
+   {
+    "fpr": 0.10695219730031462,
+    "tpr": 0.461170554196167
+   },
+   {
+    "fpr": 0.107885923069116,
+    "tpr": 0.46238676454264216
+   },
+   {
+    "fpr": 0.10792651984167259,
+    "tpr": 0.4627583843707318
+   },
+   {
+    "fpr": 0.10792651984167259,
+    "tpr": 0.46281629914913536
+   },
+   {
+    "fpr": 0.10794681822795088,
+    "tpr": 0.462821125380669
+   },
+   {
+    "fpr": 0.10794681822795088,
+    "tpr": 0.4628307778437363
+   },
+   {
+    "fpr": 0.13053892215568863,
+    "tpr": 0.5152919146143117
+   },
+   {
+    "fpr": 0.13066071247335836,
+    "tpr": 0.5154029179395853
+   },
+   {
+    "fpr": 0.13342129300720593,
+    "tpr": 0.5183855290273696
+   },
+   {
+    "fpr": 0.1337257688013803,
+    "tpr": 0.5187523226239256
+   },
+   {
+    "fpr": 0.13382726073277174,
+    "tpr": 0.5188922833384009
+   },
+   {
+    "fpr": 0.13384755911905002,
+    "tpr": 0.5189260669591363
+   },
+   {
+    "fpr": 0.13384755911905002,
+    "tpr": 0.5189357194222035
+   },
+   {
+    "fpr": 0.17294225109103825,
+    "tpr": 0.5910106611454577
+   },
+   {
+    "fpr": 0.17344971074799553,
+    "tpr": 0.591218189101404
+   },
+   {
+    "fpr": 0.18394397645387192,
+    "tpr": 0.6000694977340842
+   },
+   {
+    "fpr": 0.1851009844717345,
+    "tpr": 0.6008947833263353
+   },
+   {
+    "fpr": 0.18524307317568253,
+    "tpr": 0.601382232711232
+   },
+   {
+    "fpr": 0.18526337156196082,
+    "tpr": 0.6014401474896357
+   },
+   {
+    "fpr": 0.1852836699482391,
+    "tpr": 0.6014546261842365
+   },
+   {
+    "fpr": 0.1852836699482391,
+    "tpr": 0.6014594524157701
+   },
+   {
+    "fpr": 0.22255150715518116,
+    "tpr": 0.6628829011442995
+   },
+   {
+    "fpr": 0.22316045874352988,
+    "tpr": 0.6632931308246581
+   },
+   {
+    "fpr": 0.2389526032680402,
+    "tpr": 0.6748519553477058
+   },
+   {
+    "fpr": 0.24043438546635543,
+    "tpr": 0.6760102509157775
+   },
+   {
+    "fpr": 0.2404952806251903,
+    "tpr": 0.676893451286432
+   },
+   {
+    "fpr": 0.24053587739774687,
+    "tpr": 0.676985149685571
+   },
+   {
+    "fpr": 0.24055617578402516,
+    "tpr": 0.6770141070747728
+   },
+   {
+    "fpr": 0.2828986095605399,
+    "tpr": 0.733394143850657
+   },
+   {
+    "fpr": 0.283669948239115,
+    "tpr": 0.7336644128165405
+   },
+   {
+    "fpr": 0.305998173145235,
+    "tpr": 0.7462029623409153
+   },
+   {
+    "fpr": 0.30839338272607325,
+    "tpr": 0.7477232252740093
+   },
+   {
+    "fpr": 0.3085963665888562,
+    "tpr": 0.7487029502753365
+   },
+   {
+    "fpr": 0.3085963665888562,
+    "tpr": 0.7488477372213455
+   },
+   {
+    "fpr": 0.3085963665888562,
+    "tpr": 0.7488573896844127
+   },
+   {
+    "fpr": 0.3617375418654217,
+    "tpr": 0.8005028933258044
+   },
+   {
+    "fpr": 0.3632802192225718,
+    "tpr": 0.8011399558882438
+   },
+   {
+    "fpr": 0.40943874961940524,
+    "tpr": 0.8219651449558641
+   },
+   {
+    "fpr": 0.41441185425758653,
+    "tpr": 0.8243203459442763
+   },
+   {
+    "fpr": 0.4146960316654826,
+    "tpr": 0.826617632154285
+   },
+   {
+    "fpr": 0.41473662843803916,
+    "tpr": 0.8269120322778365
+   },
+   {
+    "fpr": 0.4147569268243175,
+    "tpr": 0.8269989044454419
+   },
+   {
+    "fpr": 0.4147569268243175,
+    "tpr": 0.8270037306769755
+   },
+   {
+    "fpr": 0.5096518826753274,
+    "tpr": 0.8769552270500625
+   },
+   {
+    "fpr": 0.5119658987110525,
+    "tpr": 0.87761642077017
+   },
+   {
+    "fpr": 0.5737338881558917,
+    "tpr": 0.9032678413714219
+   },
+   {
+    "fpr": 0.5794783314726479,
+    "tpr": 0.9060525769663273
+   },
+   {
+    "fpr": 0.5799451943570486,
+    "tpr": 0.9096722506165511
+   },
+   {
+    "fpr": 0.5800263879021618,
+    "tpr": 0.9101307426122461
+   },
+   {
+    "fpr": 0.5800263879021618,
+    "tpr": 0.9102513984005869
+   },
+   {
+    "fpr": 0.5800263879021618,
+    "tpr": 0.9102755295582551
+   },
+   {
+    "fpr": 0.58004668628844,
+    "tpr": 0.9102851820213222
+   },
+   {
+    "fpr": 0.58004668628844,
+    "tpr": 0.9102900082528559
+   },
+   {
+    "fpr": 0.9527250583578606,
+    "tpr": 0.9800338801453661
+   },
+   {
+    "fpr": 0.9546940018268547,
+    "tpr": 0.9804778934464602
+   },
+   {
+    "fpr": 0.99762508880544,
+    "tpr": 0.9957384375558033
+   },
+   {
+    "fpr": 0.9998173145234954,
+    "tpr": 0.9969836052914802
+   },
+   {
+    "fpr": 0.9999594032274434,
+    "tpr": 0.9997876458125202
+   },
+   {
+    "fpr": 1.0,
+    "tpr": 0.9999565639161974
+   },
+   {
+    "fpr": 1.0,
+    "tpr": 0.9999951737684664
+   },
+   {
+    "fpr": 1.0,
+    "tpr": 1.0
+   }
+  ]
+ },
+ "gain": {
+  "model": [
+   {
+    "top_share": 0.05,
+    "captured": 0.060998740353569725,
+    "attendance_in_top": 0.014349216252047103
+   },
+   {
+    "top_share": 0.1,
+    "captured": 0.12157277233217986,
+    "attendance_in_top": 0.017818848208367433
+   },
+   {
+    "top_share": 0.15,
+    "captured": 0.18178966317730127,
+    "attendance_in_top": 0.020873407850272918
+   },
+   {
+    "top_share": 0.2,
+    "captured": 0.24165906535200118,
+    "attendance_in_top": 0.02380441775680897
+   },
+   {
+    "top_share": 0.25,
+    "captured": 0.3008817525011945,
+    "attendance_in_top": 0.027653003930376174
+   },
+   {
+    "top_share": 0.3,
+    "captured": 0.35982451822143713,
+    "attendance_in_top": 0.030985183259682914
+   },
+   {
+    "top_share": 0.35,
+    "captured": 0.4180771328323705,
+    "attendance_in_top": 0.03494758419393296
+   },
+   {
+    "top_share": 0.39999999999999997,
+    "captured": 0.47587125544760883,
+    "attendance_in_top": 0.038845456495038344
+   },
+   {
+    "top_share": 0.44999999999999996,
+    "captured": 0.5328593973967307,
+    "attendance_in_top": 0.04333246685729142
+   },
+   {
+    "top_share": 0.49999999999999994,
+    "captured": 0.5887568110192518,
+    "attendance_in_top": 0.04867701761637022
+   },
+   {
+    "top_share": 0.5499999999999999,
+    "captured": 0.6440461194685354,
+    "attendance_in_top": 0.05394311479128855
+   },
+   {
+    "top_share": 0.6,
+    "captured": 0.6975642009449762,
+    "attendance_in_top": 0.06072264101897584
+   },
+   {
+    "top_share": 0.65,
+    "captured": 0.7499239868533453,
+    "attendance_in_top": 0.06789319928255644
+   },
+   {
+    "top_share": 0.7,
+    "captured": 0.800140925960782,
+    "attendance_in_top": 0.07651259427603796
+   },
+   {
+    "top_share": 0.75,
+    "captured": 0.8475296933895107,
+    "attendance_in_top": 0.08703405250844809
+   },
+   {
+    "top_share": 0.7999999999999999,
+    "captured": 0.890690681994778,
+    "attendance_in_top": 0.10050542712735111
+   },
+   {
+    "top_share": 0.85,
+    "captured": 0.9291219636970864,
+    "attendance_in_top": 0.11688746582506104
+   },
+   {
+    "top_share": 0.9,
+    "captured": 0.9603138980989474,
+    "attendance_in_top": 0.13794791589947097
+   },
+   {
+    "top_share": 0.95,
+    "captured": 0.9844836656193744,
+    "attendance_in_top": 0.16276683508247725
+   },
+   {
+    "top_share": 1.0,
+    "captured": 1.0,
+    "attendance_in_top": 0.19209173925588574
+   }
+  ],
+  "baseline": [
+   {
+    "top_share": 0.05,
+    "captured": 0.06011553998291514,
+    "attendance_in_top": 0.028620447633159185
+   },
+   {
+    "top_share": 0.1,
+    "captured": 0.1200042470837496,
+    "attendance_in_top": 0.030490895621320235
+   },
+   {
+    "top_share": 0.15,
+    "captured": 0.17958890159796526,
+    "attendance_in_top": 0.032726800103977105
+   },
+   {
+    "top_share": 0.2,
+    "captured": 0.23939556276272797,
+    "attendance_in_top": 0.03294796560934243
+   },
+   {
+    "top_share": 0.25,
+    "captured": 0.2987437319317957,
+    "attendance_in_top": 0.034562355730238914
+   },
+   {
+    "top_share": 0.3,
+    "captured": 0.3564123725271596,
+    "attendance_in_top": 0.040174161684429444
+   },
+   {
+    "top_share": 0.35,
+    "captured": 0.4131302455103981,
+    "attendance_in_top": 0.04636654300769805
+   },
+   {
+    "top_share": 0.39999999999999997,
+    "captured": 0.4688056524823722,
+    "attendance_in_top": 0.05311640964654052
+   },
+   {
+    "top_share": 0.44999999999999996,
+    "captured": 0.524418318444409,
+    "attendance_in_top": 0.05848713283077722
+   },
+   {
+    "top_share": 0.49999999999999994,
+    "captured": 0.5792925709818003,
+    "attendance_in_top": 0.06396949303221477
+   },
+   {
+    "top_share": 0.5499999999999999,
+    "captured": 0.6321060226543308,
+    "attendance_in_top": 0.07148224818511795
+   },
+   {
+    "top_share": 0.6,
+    "captured": 0.684007316567005,
+    "attendance_in_top": 0.07897712503249288
+   },
+   {
+    "top_share": 0.65,
+    "captured": 0.7360533974256881,
+    "attendance_in_top": 0.08513344090988162
+   },
+   {
+    "top_share": 0.7,
+    "captured": 0.784460499708013,
+    "attendance_in_top": 0.09461025143990287
+   },
+   {
+    "top_share": 0.75,
+    "captured": 0.829040400384168,
+    "attendance_in_top": 0.10695087080842214
+   },
+   {
+    "top_share": 0.7999999999999999,
+    "captured": 0.8716415461315341,
+    "attendance_in_top": 0.11974285115487904
+   },
+   {
+    "top_share": 0.85,
+    "captured": 0.912659687935869,
+    "attendance_in_top": 0.13253454191820035
+   },
+   {
+    "top_share": 0.9,
+    "captured": 0.9394645778736589,
+    "attendance_in_top": 0.15666387948998994
+   },
+   {
+    "top_share": 0.95,
+    "captured": 0.9666024777872694,
+    "attendance_in_top": 0.177973510423037
+   },
+   {
+    "top_share": 1.0,
+    "captured": 1.0,
+    "attendance_in_top": 0.19209173925588574
+   }
+  ]
+ },
+ "targeting": [
+  {
+   "share": 0.1,
+   "n": 25646,
+   "top_wasted_model": 450,
+   "top_wasted_rule": 779,
+   "bottom_attendance_model": 0.6792092334087187,
+   "bottom_attendance_rule": 0.5099040786087499
+  },
+  {
+   "share": 0.2,
+   "n": 51293,
+   "top_wasted_model": 1215,
+   "top_wasted_rule": 1667,
+   "bottom_attendance_model": 0.5591016318016103,
+   "bottom_attendance_rule": 0.4806698769812645
+  },
+  {
+   "share": 0.3,
+   "n": 76939,
+   "top_wasted_model": 2394,
+   "top_wasted_rule": 3095,
+   "bottom_attendance_model": 0.46200236551033935,
+   "bottom_attendance_rule": 0.4199430717841407
+  }
+ ],
+ "ranking_quality": [
+  {
+   "scorer": "random",
+   "roc_auc": 0.5,
+   "ap_attendance": 0.19209173925588574
+  },
+  {
+   "scorer": "rule",
+   "roc_auc": 0.7847166322190167,
+   "ap_attendance": 0.42531520022716884
+  },
+  {
+   "scorer": "model",
+   "roc_auc": 0.835866168100932,
+   "ap_attendance": 0.5706672669975451
+  }
+ ],
+ "personas": {
+  "everyone": {
+   "n": 256466,
+   "attendance": 0.19209173925588577,
+   "top_age_band": "45-49",
+   "top_age_band_share": 0.27733890652172216,
+   "top_segment": "repeated_nonresponder",
+   "top_segment_share": 0.3409925682156699,
+   "median_prior_invitations": 5.0,
+   "median_contacts_12m": 11.0,
+   "no_screening_5y": 0.8407859131424829,
+   "no_gyn_checkup_24m": 0.613426341113442,
+   "no_other_screening_36m": 0.46112935047920584,
+   "no_dental_checkup_24m": 0.4511124281581184,
+   "no_gynaecologist": 0.20070496674023067
+  },
+  "letter_enough": {
+   "n": 25646,
+   "attendance": 0.6793652031505888,
+   "top_age_band": "45-49",
+   "top_age_band_share": 0.6219683381424004,
+   "top_segment": "first_invitation",
+   "top_segment_share": 0.9059112532168759,
+   "median_prior_invitations": 0.0,
+   "median_contacts_12m": 17.0,
+   "no_screening_5y": 0.8474615924510644,
+   "no_gyn_checkup_24m": 0.012204632301333541,
+   "no_other_screening_36m": 0.014661155735787258,
+   "no_dental_checkup_24m": 0.10457771192388676,
+   "no_gynaecologist": 0.017702565702253762
+  },
+  "call": [
+   {
+    "share": 0.05,
+    "n": 12823,
+    "attendance": 0.014349216252047103,
+    "top_age_band": "65-69",
+    "top_age_band_share": 0.325274896670046,
+    "top_segment": "low_contact",
+    "top_segment_share": 0.767761054355455,
+    "median_prior_invitations": 10.0,
+    "median_contacts_12m": 0.0,
+    "no_screening_5y": 0.8285112688138501,
+    "no_gyn_checkup_24m": 0.8490212898697652,
+    "no_other_screening_36m": 0.8228963581065273,
+    "no_dental_checkup_24m": 0.7917024097325119,
+    "no_gynaecologist": 0.5875380176245808
+   },
+   {
+    "share": 0.1,
+    "n": 25646,
+    "attendance": 0.017819543008656322,
+    "top_age_band": "65-69",
+    "top_age_band_share": 0.32796537471730486,
+    "top_segment": "low_contact",
+    "top_segment_share": 0.5965452702175777,
+    "median_prior_invitations": 10.0,
+    "median_contacts_12m": 1.0,
+    "no_screening_5y": 0.8638774077828901,
+    "no_gyn_checkup_24m": 0.8852842548545582,
+    "no_other_screening_36m": 0.8384543398580675,
+    "no_dental_checkup_24m": 0.7376978866099977,
+    "no_gynaecologist": 0.6031349918115886
+   },
+   {
+    "share": 0.2,
+    "n": 51293,
+    "attendance": 0.023804417756808922,
+    "top_age_band": "65-69",
+    "top_age_band_share": 0.3216813210379584,
+    "top_segment": "low_contact",
+    "top_segment_share": 0.4153588208917396,
+    "median_prior_invitations": 10.0,
+    "median_contacts_12m": 4.0,
+    "no_screening_5y": 0.8997913945372663,
+    "no_gyn_checkup_24m": 0.9150566354083404,
+    "no_other_screening_36m": 0.8102470122628819,
+    "no_dental_checkup_24m": 0.6714366482755931,
+    "no_gynaecologist": 0.5340884721112042
+   },
+   {
+    "share": 0.3,
+    "n": 76939,
+    "attendance": 0.030985585983701373,
+    "top_age_band": "65-69",
+    "top_age_band_share": 0.30188850907862075,
+    "top_segment": "repeated_nonresponder",
+    "top_segment_share": 0.34440270863931166,
+    "median_prior_invitations": 10.0,
+    "median_contacts_12m": 6.0,
+    "no_screening_5y": 0.9152835363079842,
+    "no_gyn_checkup_24m": 0.9242126879735895,
+    "no_other_screening_36m": 0.7582760368603699,
+    "no_dental_checkup_24m": 0.6343206956160075,
+    "no_gynaecologist": 0.44861513666671
+   }
+  ]
+ },
+ "deciles": [
+  {
+   "decile": 1,
+   "n": 25647,
+   "non_attendance": 0.3207392677506141,
+   "mean_score": 0.3188147629511706,
+   "attendance": 0.6792607322493859
+  },
+  {
+   "decile": 2,
+   "n": 25647,
+   "non_attendance": 0.562210005068819,
+   "mean_score": 0.5687623755330993,
+   "attendance": 0.437789994931181
+  },
+  {
+   "decile": 3,
+   "n": 25646,
+   "non_attendance": 0.7313811120642595,
+   "mean_score": 0.7454744397979985,
+   "attendance": 0.2686188879357405
+  },
+  {
+   "decile": 4,
+   "n": 25647,
+   "non_attendance": 0.8281280461652435,
+   "mean_score": 0.8397069793533664,
+   "attendance": 0.1718719538347565
+  },
+  {
+   "decile": 5,
+   "n": 25646,
+   "non_attendance": 0.8792404273570927,
+   "mean_score": 0.8909505288449492,
+   "attendance": 0.1207595726429072
+  },
+  {
+   "decile": 6,
+   "n": 25647,
+   "non_attendance": 0.914025032167505,
+   "mean_score": 0.924794952007491,
+   "attendance": 0.085974967832495
+  },
+  {
+   "decile": 7,
+   "n": 25646,
+   "non_attendance": 0.937222178897294,
+   "mean_score": 0.9467048248644412,
+   "attendance": 0.062777821102706
+  },
+  {
+   "decile": 8,
+   "n": 25647,
+   "non_attendance": 0.9539907201622022,
+   "mean_score": 0.9656019396867168,
+   "attendance": 0.0460092798377977
+  },
+  {
+   "decile": 9,
+   "n": 25646,
+   "non_attendance": 0.969585900335335,
+   "mean_score": 0.9775065089669692,
+   "attendance": 0.030414099664665
+  },
+  {
+   "decile": 10,
+   "n": 25647,
+   "non_attendance": 0.9825710609428004,
+   "mean_score": 0.9880641664990172,
+   "attendance": 0.0174289390571996
+  }
+ ],
+ "calibration": [
+  {
+   "bin": "(-0.001, 0.1]",
+   "n": 34,
+   "predicted": 0.0490196078431372,
+   "observed": 0.0588235294117647
+  },
+  {
+   "bin": "(0.1, 0.2]",
+   "n": 3260,
+   "predicted": 0.1786036198304666,
+   "observed": 0.202760736196319
+  },
+  {
+   "bin": "(0.2, 0.3]",
+   "n": 10097,
+   "predicted": 0.2685983396520126,
+   "observed": 0.2693869466178072
+  },
+  {
+   "bin": "(0.3, 0.4]",
+   "n": 5712,
+   "predicted": 0.3506340145823894,
+   "observed": 0.3655462184873949
+  },
+  {
+   "bin": "(0.4, 0.5]",
+   "n": 12091,
+   "predicted": 0.4592841454541345,
+   "observed": 0.4468613017947233
+  },
+  {
+   "bin": "(0.5, 0.6]",
+   "n": 10670,
+   "predicted": 0.5578434276897155,
+   "observed": 0.5443298969072164
+  },
+  {
+   "bin": "(0.6, 0.7]",
+   "n": 12893,
+   "predicted": 0.6454205566429471,
+   "observed": 0.6429070038005119
+  },
+  {
+   "bin": "(0.7, 0.8]",
+   "n": 21164,
+   "predicted": 0.7527488179285499,
+   "observed": 0.7385182385182385
+  },
+  {
+   "bin": "(0.8, 0.9]",
+   "n": 47057,
+   "predicted": 0.8592052102994204,
+   "observed": 0.8473128333722931
+  },
+  {
+   "bin": "(0.9, 1.0]",
+   "n": 133488,
+   "predicted": 0.9585225261612546,
+   "observed": 0.9493587438571256
+  }
+ ],
+ "feature_importance": [
+  {
+   "feature": "n_prior_invitations",
+   "importance": 0.405070591009294,
+   "direction": 1.0,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "invitation_sequence",
+   "importance": 0.3803732289832346,
+   "direction": 1.0,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "gyn_prevention_24m",
+   "importance": 0.2337413132746997,
+   "direction": -1.0,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "other_screening_36m",
+   "importance": 0.1922994060609267,
+   "direction": -1.0,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "n_healthcare_contacts",
+   "importance": 0.1922974725717347,
+   "direction": -1.0,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "dental_prevention_24m",
+   "importance": 0.1213773717882844,
+   "direction": -1.0,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "region",
+   "importance": 0.1003609136607157,
+   "direction": null,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "months_since_last_screening",
+   "importance": 0.1000354428177515,
+   "direction": -1.0,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "months_since_last_invitation",
+   "importance": 0.0988203773014961,
+   "direction": -1.0,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "age_band",
+   "importance": 0.0723887938375285,
+   "direction": null,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "first_invitation",
+   "importance": 0.068283997772465,
+   "direction": -1.0,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "recently_screened",
+   "importance": 0.0513884195720491,
+   "direction": 1.0,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "has_gyn",
+   "importance": 0.0485595902918895,
+   "direction": -1.0,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "insurance_years",
+   "importance": 0.0420984286648545,
+   "direction": 1.0,
+   "method": "mean_abs_shap"
+  },
+  {
+   "feature": "n_preventive_visits",
+   "importance": 0.0381893795531736,
+   "direction": -1.0,
+   "method": "mean_abs_shap"
+  }
+ ],
+ "segments": [
+  {
+   "segment": "recently_screened",
+   "n": 7590,
+   "non_attendance": 0.9762845849802372,
+   "mean_predicted_risk": 0.9760474886897338,
+   "share": 0.0295945661413208,
+   "intervention": "Do not send / postpone the invitation (screened recently)"
+  },
+  {
+   "segment": "low_contact",
+   "n": 36257,
+   "non_attendance": 0.9548776787930606,
+   "mean_predicted_risk": 0.9617889854386784,
+   "share": 0.1413715658215903,
+   "intervention": "Multichannel outreach + 'screening matters without symptoms'"
+  },
+  {
+   "segment": "care_no_prevention",
+   "n": 39893,
+   "non_attendance": 0.9270548717820168,
+   "mean_predicted_risk": 0.9357008520626374,
+   "share": 0.1555488836726895,
+   "intervention": "Involve GP or gynaecologist"
+  },
+  {
+   "segment": "repeated_nonresponder",
+   "n": 87453,
+   "non_attendance": 0.9039484065726732,
+   "mean_predicted_risk": 0.914999460100256,
+   "share": 0.3409925682156699,
+   "intervention": "Different channel, phone navigation, booking help"
+  },
+  {
+   "segment": "other",
+   "n": 19922,
+   "non_attendance": 0.6889368537295453,
+   "mean_predicted_risk": 0.680044106133889,
+   "share": 0.0776789126043998,
+   "intervention": "Standard letter + SMS reminder"
+  },
+  {
+   "segment": "lapsed_regular",
+   "n": 27888,
+   "non_attendance": 0.6663798049340218,
+   "mean_predicted_risk": 0.7026325774096609,
+   "share": 0.1087395600196517,
+   "intervention": "Simple reminder + concrete booking step"
+  },
+  {
+   "segment": "first_invitation",
+   "n": 37463,
+   "non_attendance": 0.4491097883244802,
+   "mean_predicted_risk": 0.4449623250149008,
+   "share": 0.1460739435246777,
+   "intervention": "Standard letter (control / low intensity)"
+  }
+ ],
+ "segment_response_speed": [
+  {
+   "segment": "care_no_prevention",
+   "3m": 0.015967713633970874,
+   "6m": 0.037349911011956984,
+   "12m": 0.0729451282179831
+  },
+  {
+   "segment": "first_invitation",
+   "3m": 0.22691722499532874,
+   "6m": 0.38403224514854656,
+   "12m": 0.5508902116755199
+  },
+  {
+   "segment": "lapsed_regular",
+   "3m": 0.12048192771084337,
+   "6m": 0.2143215720022949,
+   "12m": 0.3336201950659782
+  },
+  {
+   "segment": "low_contact",
+   "3m": 0.009901536255067987,
+   "6m": 0.022450837079736326,
+   "12m": 0.04512232120693935
+  },
+  {
+   "segment": "other",
+   "3m": 0.1195161128400763,
+   "6m": 0.20233912257805442,
+   "12m": 0.3110631462704548
+  },
+  {
+   "segment": "recently_screened",
+   "3m": 0.015283267457180501,
+   "6m": 0.021870882740447958,
+   "12m": 0.023715415019762844
+  },
+  {
+   "segment": "repeated_nonresponder",
+   "3m": 0.032314500360193475,
+   "6m": 0.05685339553817479,
+   "12m": 0.09605159342732668
+  }
+ ],
+ "interventions": {
+  "recently_screened": "Do not send / postpone the invitation (screened recently)",
+  "first_invitation": "Standard letter (control / low intensity)",
+  "repeated_nonresponder": "Different channel, phone navigation, booking help",
+  "lapsed_regular": "Simple reminder + concrete booking step",
+  "care_no_prevention": "Involve GP or gynaecologist",
+  "low_contact": "Multichannel outreach + 'screening matters without symptoms'",
+  "other": "Standard letter + SMS reminder"
+ },
+ "experiment_design": [
+  {
+   "segment": "recently_screened",
+   "baseline_attendance": 0.0237154150197628,
+   "mde_pp": 1.0,
+   "n_per_arm": 4375,
+   "segment_size": 7590,
+   "feasible": false
+  },
+  {
+   "segment": "recently_screened",
+   "baseline_attendance": 0.0237154150197628,
+   "mde_pp": 2.0,
+   "n_per_arm": 1275,
+   "segment_size": 7590,
+   "feasible": true
+  },
+  {
+   "segment": "recently_screened",
+   "baseline_attendance": 0.0237154150197628,
+   "mde_pp": 3.0,
+   "n_per_arm": 646,
+   "segment_size": 7590,
+   "feasible": true
+  },
+  {
+   "segment": "recently_screened",
+   "baseline_attendance": 0.0237154150197628,
+   "mde_pp": 5.0,
+   "n_per_arm": 288,
+   "segment_size": 7590,
+   "feasible": true
+  },
+  {
+   "segment": "low_contact",
+   "baseline_attendance": 0.0451223212069393,
+   "mde_pp": 1.0,
+   "n_per_arm": 7470,
+   "segment_size": 36257,
+   "feasible": true
+  },
+  {
+   "segment": "low_contact",
+   "baseline_attendance": 0.0451223212069393,
+   "mde_pp": 2.0,
+   "n_per_arm": 2041,
+   "segment_size": 36257,
+   "feasible": true
+  },
+  {
+   "segment": "low_contact",
+   "baseline_attendance": 0.0451223212069393,
+   "mde_pp": 3.0,
+   "n_per_arm": 982,
+   "segment_size": 36257,
+   "feasible": true
+  },
+  {
+   "segment": "low_contact",
+   "baseline_attendance": 0.0451223212069393,
+   "mde_pp": 5.0,
+   "n_per_arm": 406,
+   "segment_size": 36257,
+   "feasible": true
+  },
+  {
+   "segment": "care_no_prevention",
+   "baseline_attendance": 0.0729451282179831,
+   "mde_pp": 1.0,
+   "n_per_arm": 11279,
+   "segment_size": 39893,
+   "feasible": true
+  },
+  {
+   "segment": "care_no_prevention",
+   "baseline_attendance": 0.0729451282179831,
+   "mde_pp": 2.0,
+   "n_per_arm": 2982,
+   "segment_size": 39893,
+   "feasible": true
+  },
+  {
+   "segment": "care_no_prevention",
+   "baseline_attendance": 0.0729451282179831,
+   "mde_pp": 3.0,
+   "n_per_arm": 1396,
+   "segment_size": 39893,
+   "feasible": true
+  },
+  {
+   "segment": "care_no_prevention",
+   "baseline_attendance": 0.0729451282179831,
+   "mde_pp": 5.0,
+   "n_per_arm": 551,
+   "segment_size": 39893,
+   "feasible": true
+  },
+  {
+   "segment": "repeated_nonresponder",
+   "baseline_attendance": 0.0960515934273267,
+   "mde_pp": 1.0,
+   "n_per_arm": 14256,
+   "segment_size": 87453,
+   "feasible": true
+  },
+  {
+   "segment": "repeated_nonresponder",
+   "baseline_attendance": 0.0960515934273267,
+   "mde_pp": 2.0,
+   "n_per_arm": 3717,
+   "segment_size": 87453,
+   "feasible": true
+  },
+  {
+   "segment": "repeated_nonresponder",
+   "baseline_attendance": 0.0960515934273267,
+   "mde_pp": 3.0,
+   "n_per_arm": 1718,
+   "segment_size": 87453,
+   "feasible": true
+  },
+  {
+   "segment": "repeated_nonresponder",
+   "baseline_attendance": 0.0960515934273267,
+   "mde_pp": 5.0,
+   "n_per_arm": 665,
+   "segment_size": 87453,
+   "feasible": true
+  },
+  {
+   "segment": "other",
+   "baseline_attendance": 0.3110631462704547,
+   "mde_pp": 1.0,
+   "n_per_arm": 33930,
+   "segment_size": 19922,
+   "feasible": false
+  },
+  {
+   "segment": "other",
+   "baseline_attendance": 0.3110631462704547,
+   "mde_pp": 2.0,
+   "n_per_arm": 8551,
+   "segment_size": 19922,
+   "feasible": true
+  },
+  {
+   "segment": "other",
+   "baseline_attendance": 0.3110631462704547,
+   "mde_pp": 3.0,
+   "n_per_arm": 3829,
+   "segment_size": 19922,
+   "feasible": true
+  },
+  {
+   "segment": "other",
+   "baseline_attendance": 0.3110631462704547,
+   "mde_pp": 5.0,
+   "n_per_arm": 1398,
+   "segment_size": 19922,
+   "feasible": true
+  },
+  {
+   "segment": "lapsed_regular",
+   "baseline_attendance": 0.3336201950659782,
+   "mde_pp": 1.0,
+   "n_per_arm": 35153,
+   "segment_size": 27888,
+   "feasible": false
+  },
+  {
+   "segment": "lapsed_regular",
+   "baseline_attendance": 0.3336201950659782,
+   "mde_pp": 2.0,
+   "n_per_arm": 8848,
+   "segment_size": 27888,
+   "feasible": true
+  },
+  {
+   "segment": "lapsed_regular",
+   "baseline_attendance": 0.3336201950659782,
+   "mde_pp": 3.0,
+   "n_per_arm": 3957,
+   "segment_size": 27888,
+   "feasible": true
+  },
+  {
+   "segment": "lapsed_regular",
+   "baseline_attendance": 0.3336201950659782,
+   "mde_pp": 5.0,
+   "n_per_arm": 1441,
+   "segment_size": 27888,
+   "feasible": true
+  },
+  {
+   "segment": "first_invitation",
+   "baseline_attendance": 0.5508902116755199,
+   "mde_pp": 1.0,
+   "n_per_arm": 38751,
+   "segment_size": 37463,
+   "feasible": false
+  },
+  {
+   "segment": "first_invitation",
+   "baseline_attendance": 0.5508902116755199,
+   "mde_pp": 2.0,
+   "n_per_arm": 9662,
+   "segment_size": 37463,
+   "feasible": true
+  },
+  {
+   "segment": "first_invitation",
+   "baseline_attendance": 0.5508902116755199,
+   "mde_pp": 3.0,
+   "n_per_arm": 4281,
+   "segment_size": 37463,
+   "feasible": true
+  },
+  {
+   "segment": "first_invitation",
+   "baseline_attendance": 0.5508902116755199,
+   "mde_pp": 5.0,
+   "n_per_arm": 1530,
+   "segment_size": 37463,
+   "feasible": true
+  }
+ ],
+ "budget": {
+  "n_clients": 248872,
+  "budget_spent_czk": 497744.0,
+  "expected_additional_screenings": 2427.9300000000003,
+  "cost_per_additional_screening_czk": 205.00755787852202,
+  "by_segment": [
+   {
+    "segment": "lapsed_regular",
+    "n_clients": 27888,
+    "budget_spent_czk": 55776.0,
+    "expected_additional_screenings": 836.6400000000003,
+    "cost_per_additional_screening_czk": 66.66666666666664
+   },
+   {
+    "segment": "care_no_prevention",
+    "n_clients": 39893,
+    "budget_spent_czk": 79786.0,
+    "expected_additional_screenings": 398.93,
+    "cost_per_additional_screening_czk": 200.0
+   },
+   {
+    "segment": "first_invitation",
+    "n_clients": 37459,
+    "budget_spent_czk": 74918.0,
+    "expected_additional_screenings": 374.59,
+    "cost_per_additional_screening_czk": 200.0
+   },
+   {
+    "segment": "other",
+    "n_clients": 19922,
+    "budget_spent_czk": 39844.0,
+    "expected_additional_screenings": 199.22000000000003,
+    "cost_per_additional_screening_czk": 199.99999999999997
+   },
+   {
+    "segment": "repeated_nonresponder",
+    "n_clients": 87453,
+    "budget_spent_czk": 174906.0,
+    "expected_additional_screenings": 437.26499999999993,
+    "cost_per_additional_screening_czk": 400.00000000000006
+   },
+   {
+    "segment": "low_contact",
+    "n_clients": 36257,
+    "budget_spent_czk": 72514.0,
+    "expected_additional_screenings": 181.28500000000003,
+    "cost_per_additional_screening_czk": 399.99999999999994
+   }
+  ],
+  "by_intervention": [
+   {
+    "intervention": "sms",
+    "n_clients": 248872,
+    "budget_spent_czk": 497744.0,
+    "expected_additional_screenings": 2427.9300000000003,
+    "cost_per_additional_screening_czk": 205.00755787852202
+   }
+  ]
+ },
+ "fairness": {
+  "region": [
+   {
+    "region": "NOVÝ JIČÍN",
+    "n": 2290,
+    "non_attendance": 0.8266375545851529,
+    "mean_risk": 0.8203107982728727,
+    "roc_auc": 0.8372034846664298,
+    "n_top_k": 381,
+    "top_k_share": 0.007427914140331,
+    "population_share": 0.0089290588226119,
+    "selection_rate": 0.1663755458515284
+   },
+   {
+    "region": "DĚČÍN",
+    "n": 3305,
+    "non_attendance": 0.8329803328290469,
+    "mean_risk": 0.8335763982418954,
+    "roc_auc": 0.8304247803450254,
+    "n_top_k": 646,
+    "top_k_share": 0.012594311114577,
+    "population_share": 0.0128866984317609,
+    "selection_rate": 0.1954614220877458
+   },
+   {
+    "region": "LOUNY",
+    "n": 3440,
+    "non_attendance": 0.8168604651162791,
+    "mean_risk": 0.8347243738517879,
+    "roc_auc": 0.8418095802971248,
+    "n_top_k": 752,
+    "top_k_share": 0.0146608699042754,
+    "population_share": 0.0134130839955393,
+    "selection_rate": 0.2186046511627907
+   },
+   {
+    "region": "VSETÍN",
+    "n": 3971,
+    "non_attendance": 0.8091160916645681,
+    "mean_risk": 0.8142269221475867,
+    "roc_auc": 0.8270776208460517,
+    "n_top_k": 960,
+    "top_k_share": 0.0187160041331175,
+    "population_share": 0.0154835338797345,
+    "selection_rate": 0.2417527071266683
+   },
+   {
+    "region": "CHOMUTOV",
+    "n": 3607,
+    "non_attendance": 0.7890213473800942,
+    "mean_risk": 0.7988089645772734,
+    "roc_auc": 0.8482195542906429,
+    "n_top_k": 562,
+    "top_k_share": 0.0109566607529292,
+    "population_share": 0.0140642424336949,
+    "selection_rate": 0.1558081508178541
+   },
+   {
+    "region": "NÁCHOD",
+    "n": 2865,
+    "non_attendance": 0.800349040139616,
+    "mean_risk": 0.7893475757618789,
+    "roc_auc": 0.851048264862046,
+    "n_top_k": 557,
+    "top_k_share": 0.0108591815647359,
+    "population_share": 0.0111710714090756,
+    "selection_rate": 0.1944153577661431
+   },
+   {
+    "region": "KARVINÁ",
+    "n": 3293,
+    "non_attendance": 0.8748861220771333,
+    "mean_risk": 0.8821404306828617,
+    "roc_auc": 0.807568333541145,
+    "n_top_k": 1080,
+    "top_k_share": 0.0210555046497572,
+    "population_share": 0.0128399086038695,
+    "selection_rate": 0.3279684178560583
+   },
+   {
+    "region": "BŘECLAV",
+    "n": 2690,
+    "non_attendance": 0.7966542750929368,
+    "mean_risk": 0.790298173335051,
+    "roc_auc": 0.8505222138146306,
+    "n_top_k": 518,
+    "top_k_share": 0.010098843896828,
+    "population_share": 0.0104887197523258,
+    "selection_rate": 0.1925650557620817
+   },
+   {
+    "region": "HODONÍN",
+    "n": 3094,
+    "non_attendance": 0.7798965740142211,
+    "mean_risk": 0.8039231621426055,
+    "roc_auc": 0.8480084929100996,
+    "n_top_k": 563,
+    "top_k_share": 0.0109761565905679,
+    "population_share": 0.0120639772913368,
+    "selection_rate": 0.1819650937297996
+   },
+   {
+    "region": "PRAHA-HL.MĚSTO",
+    "n": 38072,
+    "non_attendance": 0.8129596553897878,
+    "mean_risk": 0.8222540293720793,
+    "roc_auc": 0.8198124599291992,
+    "n_top_k": 6520,
+    "top_k_share": 0.1271128614040902,
+    "population_share": 0.1484485272901671,
+    "selection_rate": 0.1712544652237865
+   },
+   {
+    "region": "SVITAVY",
+    "n": 3699,
+    "non_attendance": 0.7783184644498513,
+    "mean_risk": 0.7846949193904251,
+    "roc_auc": 0.825139572514169,
+    "n_top_k": 695,
+    "top_k_share": 0.0135496071588715,
+    "population_share": 0.0144229644475291,
+    "selection_rate": 0.1878886185455528
+   },
+   {
+    "region": "BLANSKO",
+    "n": 2774,
+    "non_attendance": 0.7945205479452054,
+    "mean_risk": 0.791165373827027,
+    "roc_auc": 0.8352966695322699,
+    "n_top_k": 386,
+    "top_k_share": 0.0075253933285243,
+    "population_share": 0.0108162485475657,
+    "selection_rate": 0.1391492429704398
+   },
+   {
+    "region": "STRAKONICE",
+    "n": 2311,
+    "non_attendance": 0.8113370835136304,
+    "mean_risk": 0.8355028134656668,
+    "roc_auc": 0.8474470948012233,
+    "n_top_k": 604,
+    "top_k_share": 0.0117754859337531,
+    "population_share": 0.0090109410214219,
+    "selection_rate": 0.2613587191691908
+   },
+   {
+    "region": "JIHLAVA",
+    "n": 3711,
+    "non_attendance": 0.7865804365400162,
+    "mean_risk": 0.7966584178586562,
+    "roc_auc": 0.8341244753115257,
+    "n_top_k": 769,
+    "top_k_share": 0.0149922991441327,
+    "population_share": 0.0144697542754205,
+    "selection_rate": 0.2072217731069792
+   },
+   {
+    "region": "KLATOVY",
+    "n": 2433,
+    "non_attendance": 0.8281956432387998,
+    "mean_risk": 0.8384974048513514,
+    "roc_auc": 0.8404169684305508,
+    "n_top_k": 561,
+    "top_k_share": 0.0109371649152905,
+    "population_share": 0.0094866376049846,
+    "selection_rate": 0.2305795314426633
+   },
+   {
+    "region": "OSTRAVA",
+    "n": 2817,
+    "non_attendance": 0.8615548455804047,
+    "mean_risk": 0.8639845853432022,
+    "roc_auc": 0.8215016956673322,
+    "n_top_k": 832,
+    "top_k_share": 0.0162205369153685,
+    "population_share": 0.01098391209751,
+    "selection_rate": 0.2953496627618033
+   },
+   {
+    "region": "JIČÍN",
+    "n": 2537,
+    "non_attendance": 0.7997635001970832,
+    "mean_risk": 0.7885125755605005,
+    "roc_auc": 0.8412807596931113,
+    "n_top_k": 463,
+    "top_k_share": 0.0090265728267014,
+    "population_share": 0.0098921494467102,
+    "selection_rate": 0.1824990145841545
+   },
+   {
+    "region": "ŠUMPERK",
+    "n": 3439,
+    "non_attendance": 0.845594649607444,
+    "mean_risk": 0.8505872229386766,
+    "roc_auc": 0.820618230894966,
+    "n_top_k": 801,
+    "top_k_share": 0.0156161659485699,
+    "population_share": 0.013409184843215,
+    "selection_rate": 0.2329165455074149
+   },
+   {
+    "region": "PLZEŇ-SEVER",
+    "n": 1850,
+    "non_attendance": 0.8124324324324325,
+    "mean_risk": 0.8093936950370726,
+    "roc_auc": 0.8194245514734221,
+    "n_top_k": 370,
+    "top_k_share": 0.0072134599263057,
+    "population_share": 0.0072134317999266,
+    "selection_rate": 0.2
+   },
+   {
+    "region": "PŘÍBRAM",
+    "n": 3337,
+    "non_attendance": 0.7980221756068325,
+    "mean_risk": 0.7888802725640968,
+    "roc_auc": 0.861029148759069,
+    "n_top_k": 649,
+    "top_k_share": 0.012652798627493,
+    "population_share": 0.013011471306138,
+    "selection_rate": 0.194486065328139
+   },
+   {
+    "region": "BRNO-MĚSTO",
+    "n": 9116,
+    "non_attendance": 0.8050680122860904,
+    "mean_risk": 0.8172101082113565,
+    "roc_auc": 0.8222317414775082,
+    "n_top_k": 1775,
+    "top_k_share": 0.0346051118086288,
+    "population_share": 0.0355446725881793,
+    "selection_rate": 0.1947125932426502
+   },
+   {
+    "region": "ZLÍN",
+    "n": 7245,
+    "non_attendance": 0.7968253968253968,
+    "mean_risk": 0.8267809994059447,
+    "roc_auc": 0.8244663712823564,
+    "n_top_k": 1543,
+    "top_k_share": 0.0300820774764587,
+    "population_share": 0.0282493585894426,
+    "selection_rate": 0.2129744651483782
+   },
+   {
+    "region": "JINDŘICHŮV HRADEC",
+    "n": 2665,
+    "non_attendance": 0.8514071294559099,
+    "mean_risk": 0.8410155393375638,
+    "roc_auc": 0.8573310228775192,
+    "n_top_k": 742,
+    "top_k_share": 0.0144659115278887,
+    "population_share": 0.0103912409442187,
+    "selection_rate": 0.2784240150093808
+   },
+   {
+    "region": "OLOMOUC",
+    "n": 1745,
+    "non_attendance": 0.8406876790830946,
+    "mean_risk": 0.8630599911592811,
+    "roc_auc": 0.8731628194377014,
+    "n_top_k": 557,
+    "top_k_share": 0.0108591815647359,
+    "population_share": 0.0068040208058768,
+    "selection_rate": 0.3191977077363896
+   },
+   {
+    "region": "HRADEC KRÁLOVÉ",
+    "n": 3554,
+    "non_attendance": 0.7791221159257175,
+    "mean_risk": 0.792483686034015,
+    "roc_auc": 0.8625797903540794,
+    "n_top_k": 508,
+    "top_k_share": 0.0099038855204413,
+    "population_share": 0.0138575873605078,
+    "selection_rate": 0.1429375351716376
+   },
+   {
+    "region": "ÚSTÍ NAD LABEM",
+    "n": 1745,
+    "non_attendance": 0.8252148997134671,
+    "mean_risk": 0.8220820215129719,
+    "roc_auc": 0.851080373406193,
+    "n_top_k": 297,
+    "top_k_share": 0.0057902637786832,
+    "population_share": 0.0068040208058768,
+    "selection_rate": 0.1702005730659025
+   },
+   {
+    "region": "SEMILY",
+    "n": 3121,
+    "non_attendance": 0.8269785325216277,
+    "mean_risk": 0.8348596580276965,
+    "roc_auc": 0.8301752837688522,
+    "n_top_k": 698,
+    "top_k_share": 0.0136080946717875,
+    "population_share": 0.0121692544040925,
+    "selection_rate": 0.2236462672220442
+   },
+   {
+    "region": "UHERSKÉ HRADIŠTĚ",
+    "n": 3587,
+    "non_attendance": 0.7889601338165598,
+    "mean_risk": 0.8139470758713101,
+    "roc_auc": 0.8354967301651022,
+    "n_top_k": 670,
+    "top_k_share": 0.0130622112179049,
+    "population_share": 0.0139862593872092,
+    "selection_rate": 0.1867856147198215
+   },
+   {
+    "region": "PLZEŇ-MĚSTO",
+    "n": 4032,
+    "non_attendance": 0.816468253968254,
+    "mean_risk": 0.8237424213546347,
+    "roc_auc": 0.8299594019900824,
+    "n_top_k": 743,
+    "top_k_share": 0.0144854073655274,
+    "population_share": 0.0157213821715159,
+    "selection_rate": 0.1842757936507936
+   },
+   {
+    "region": "FRÝDEK-MÍSTEK",
+    "n": 3024,
+    "non_attendance": 0.8356481481481481,
+    "mean_risk": 0.8260331137005769,
+    "roc_auc": 0.8233624142958264,
+    "n_top_k": 519,
+    "top_k_share": 0.0101183397344666,
+    "population_share": 0.0117910366286369,
+    "selection_rate": 0.1716269841269841
+   },
+   {
+    "region": "PARDUBICE",
+    "n": 4686,
+    "non_attendance": 0.8113529662825437,
+    "mean_risk": 0.8044942141433421,
+    "roc_auc": 0.843514427986223,
+    "n_top_k": 737,
+    "top_k_share": 0.0143684323396954,
+    "population_share": 0.0182714277915981,
+    "selection_rate": 0.1572769953051643
+   },
+   {
+    "region": "BRNO-VENKOV",
+    "n": 5280,
+    "non_attendance": 0.7926136363636364,
+    "mean_risk": 0.8048437637757684,
+    "roc_auc": 0.8406105737494749,
+    "n_top_k": 1115,
+    "top_k_share": 0.0217378589671105,
+    "population_share": 0.0205875242722232,
+    "selection_rate": 0.2111742424242424
+   },
+   {
+    "region": "KOLÍN",
+    "n": 2876,
+    "non_attendance": 0.7698191933240612,
+    "mean_risk": 0.7837936210074568,
+    "roc_auc": 0.8391051042937419,
+    "n_top_k": 438,
+    "top_k_share": 0.0085391768857348,
+    "population_share": 0.0112139620846427,
+    "selection_rate": 0.1522948539638386
+   },
+   {
+    "region": "KLADNO",
+    "n": 2925,
+    "non_attendance": 0.8153846153846154,
+    "mean_risk": 0.8300793836644119,
+    "roc_auc": 0.841480705023682,
+    "n_top_k": 622,
+    "top_k_share": 0.012126411011249,
+    "population_share": 0.0114050205485327,
+    "selection_rate": 0.2126495726495726
+   },
+   {
+    "region": "PLZEŇ-JIH",
+    "n": 1825,
+    "non_attendance": 0.8032876712328767,
+    "mean_risk": 0.8306612868221634,
+    "roc_auc": 0.8365694839766367,
+    "n_top_k": 491,
+    "top_k_share": 0.009572456280584,
+    "population_share": 0.0071159529918195,
+    "selection_rate": 0.269041095890411
+   },
+   {
+    "region": "BENEŠOV",
+    "n": 2116,
+    "non_attendance": 0.8104914933837429,
+    "mean_risk": 0.8068904625329657,
+    "roc_auc": 0.8390925019811986,
+    "n_top_k": 395,
+    "top_k_share": 0.0077008558672723,
+    "population_share": 0.0082506063181864,
+    "selection_rate": 0.1866729678638941
+   },
+   {
+    "region": "MOST",
+    "n": 4362,
+    "non_attendance": 0.8266850068775791,
+    "mean_risk": 0.8402062923951261,
+    "roc_auc": 0.8329323995574689,
+    "n_top_k": 1141,
+    "top_k_share": 0.0222447507457157,
+    "population_share": 0.0170081024385298,
+    "selection_rate": 0.2615772581384686
+   },
+   {
+    "region": "TŘEBÍČ",
+    "n": 2457,
+    "non_attendance": 0.7643467643467643,
+    "mean_risk": 0.7799183398241527,
+    "roc_auc": 0.8623075847785742,
+    "n_top_k": 536,
+    "top_k_share": 0.0104497689743239,
+    "population_share": 0.0095802172607675,
+    "selection_rate": 0.2181522181522181
+   },
+   {
+    "region": "PRAHA-VÝCHOD",
+    "n": 3937,
+    "non_attendance": 0.8018796037592075,
+    "mean_risk": 0.8072781544860579,
+    "roc_auc": 0.831515638832712,
+    "n_top_k": 731,
+    "top_k_share": 0.0142514573138634,
+    "population_share": 0.0153509627007088,
+    "selection_rate": 0.1856743713487427
+   },
+   {
+    "region": "ČESKÉ BUDĚJOVICE",
+    "n": 4270,
+    "non_attendance": 0.8166276346604215,
+    "mean_risk": 0.8011551073378089,
+    "roc_auc": 0.8401081777563884,
+    "n_top_k": 666,
+    "top_k_share": 0.0129842278673503,
+    "population_share": 0.0166493804246956,
+    "selection_rate": 0.1559718969555035
+   },
+   {
+    "region": "ZNOJMO",
+    "n": 2564,
+    "non_attendance": 0.8116224648985959,
+    "mean_risk": 0.8227372993578786,
+    "roc_auc": 0.8072912469419166,
+    "n_top_k": 424,
+    "top_k_share": 0.0082662351587935,
+    "population_share": 0.0099974265594659,
+    "selection_rate": 0.1653666146645865
+   },
+   {
+    "region": "PELHŘIMOV",
+    "n": 1743,
+    "non_attendance": 0.7837062535857716,
+    "mean_risk": 0.7779478218955909,
+    "roc_auc": 0.8643311805072799,
+    "n_top_k": 334,
+    "top_k_share": 0.0065116097713138,
+    "population_share": 0.0067962225012282,
+    "selection_rate": 0.1916236374067699
+   },
+   {
+    "region": "NYMBURK",
+    "n": 2758,
+    "non_attendance": 0.7886149383611313,
+    "mean_risk": 0.8103458695822116,
+    "roc_auc": 0.8389495475246939,
+    "n_top_k": 441,
+    "top_k_share": 0.0085976643986508,
+    "population_share": 0.0107538621103772,
+    "selection_rate": 0.1598984771573604
+   },
+   {
+    "region": "CHRUDIM",
+    "n": 2805,
+    "non_attendance": 0.7953654188948307,
+    "mean_risk": 0.8099662934455607,
+    "roc_auc": 0.8615755657140358,
+    "n_top_k": 625,
+    "top_k_share": 0.012184898524165,
+    "population_share": 0.0109371222696185,
+    "selection_rate": 0.2228163992869875
+   },
+   {
+    "region": "BEROUN",
+    "n": 1652,
+    "non_attendance": 0.7923728813559322,
+    "mean_risk": 0.8010822649430872,
+    "roc_auc": 0.814426698323114,
+    "n_top_k": 233,
+    "top_k_share": 0.0045425301698087,
+    "population_share": 0.0064413996397183,
+    "selection_rate": 0.1410411622276029
+   },
+   {
+    "region": "PRACHATICE",
+    "n": 1348,
+    "non_attendance": 0.8345697329376854,
+    "mean_risk": 0.8385593056550449,
+    "roc_auc": 0.8534409566517189,
+    "n_top_k": 376,
+    "top_k_share": 0.0073304349521377,
+    "population_share": 0.0052560573331357,
+    "selection_rate": 0.2789317507418398
+   },
+   {
+    "region": "ROKYCANY",
+    "n": 1236,
+    "non_attendance": 0.8454692556634305,
+    "mean_risk": 0.8409854165258052,
+    "roc_auc": 0.8356396703324231,
+    "n_top_k": 249,
+    "top_k_share": 0.0048544635720273,
+    "population_share": 0.0048193522728158,
+    "selection_rate": 0.2014563106796116
+   },
+   {
+    "region": "JABLONEC NAD NISOU",
+    "n": 3707,
+    "non_attendance": 0.7612624763960075,
+    "mean_risk": 0.8008874268812398,
+    "roc_auc": 0.838532594986126,
+    "n_top_k": 812,
+    "top_k_share": 0.0158306201625952,
+    "population_share": 0.0144541576661233,
+    "selection_rate": 0.219045049905584
+   },
+   {
+    "region": "VYŠKOV",
+    "n": 2222,
+    "non_attendance": 0.7902790279027903,
+    "mean_risk": 0.8055919790611504,
+    "roc_auc": 0.8414412388671092,
+    "n_top_k": 508,
+    "top_k_share": 0.0099038855204413,
+    "population_share": 0.0086639164645606,
+    "selection_rate": 0.2286228622862286
+   },
+   {
+    "region": "MLADÁ BOLESLAV",
+    "n": 1016,
+    "non_attendance": 0.8336614173228346,
+    "mean_risk": 0.8295034772528946,
+    "roc_auc": 0.8266907917257568,
+    "n_top_k": 244,
+    "top_k_share": 0.004756984383834,
+    "population_share": 0.0039615387614732,
+    "selection_rate": 0.2401574803149606
+   },
+   {
+    "region": "CHEB",
+    "n": 2722,
+    "non_attendance": 0.8335782512858193,
+    "mean_risk": 0.8558078586763725,
+    "roc_auc": 0.8667241649373405,
+    "n_top_k": 863,
+    "top_k_share": 0.0168249078821671,
+    "population_share": 0.0106134926267029,
+    "selection_rate": 0.3170462894930198
+   },
+   {
+    "region": "KROMĚŘÍŽ",
+    "n": 1616,
+    "non_attendance": 0.8038366336633663,
+    "mean_risk": 0.8090478117079882,
+    "roc_auc": 0.8346374182518462,
+    "n_top_k": 284,
+    "top_k_share": 0.0055368178893806,
+    "population_share": 0.006301030156044,
+    "selection_rate": 0.1757425742574257
+   },
+   {
+    "region": "LITOMĚŘICE",
+    "n": 3564,
+    "non_attendance": 0.8100448933782267,
+    "mean_risk": 0.8195992009841464,
+    "roc_auc": 0.8501810438378327,
+    "n_top_k": 913,
+    "top_k_share": 0.0177996997641003,
+    "population_share": 0.0138965788837506,
+    "selection_rate": 0.2561728395061728
+   },
+   {
+    "region": "OPAVA",
+    "n": 4090,
+    "non_attendance": 0.8046454767726161,
+    "mean_risk": 0.8188584400101413,
+    "roc_auc": 0.8614703353363689,
+    "n_top_k": 857,
+    "top_k_share": 0.0167079328563351,
+    "population_share": 0.0159475330063244,
+    "selection_rate": 0.2095354523227383
+   },
+   {
+    "region": "DOMAŽLICE",
+    "n": 1626,
+    "non_attendance": 0.7970479704797048,
+    "mean_risk": 0.8079233950368466,
+    "roc_auc": 0.8496784979423868,
+    "n_top_k": 421,
+    "top_k_share": 0.0082077476458776,
+    "population_share": 0.0063400216792869,
+    "selection_rate": 0.2589175891758917
+   },
+   {
+    "region": "TÁBOR",
+    "n": 1929,
+    "non_attendance": 0.8361845515811301,
+    "mean_risk": 0.8358621793291305,
+    "roc_auc": 0.8676761989217355,
+    "n_top_k": 564,
+    "top_k_share": 0.0109956524282065,
+    "population_share": 0.0075214648335451,
+    "selection_rate": 0.2923794712286158
+   },
+   {
+    "region": "ŽĎÁR NAD SÁZAVOU",
+    "n": 2912,
+    "non_attendance": 0.788804945054945,
+    "mean_risk": 0.8053761819746653,
+    "roc_auc": 0.837458544372122,
+    "n_top_k": 585,
+    "top_k_share": 0.0114050650186185,
+    "population_share": 0.011354331568317,
+    "selection_rate": 0.2008928571428571
+   },
+   {
+    "region": "ČESKÝ KRUMLOV",
+    "n": 1557,
+    "non_attendance": 0.8272318561335903,
+    "mean_risk": 0.8273543271394574,
+    "roc_auc": 0.8279962017132697,
+    "n_top_k": 402,
+    "top_k_share": 0.0078373267307429,
+    "population_share": 0.0060709801689112,
+    "selection_rate": 0.2581888246628131
+   },
+   {
+    "region": "SOKOLOV",
+    "n": 2085,
+    "non_attendance": 0.7880095923261391,
+    "mean_risk": 0.7987218589227277,
+    "roc_auc": 0.8553316827456672,
+    "n_top_k": 486,
+    "top_k_share": 0.0094749770923907,
+    "population_share": 0.0081297325961336,
+    "selection_rate": 0.2330935251798561
+   },
+   {
+    "region": "TRUTNOV",
+    "n": 2337,
+    "non_attendance": 0.8215661103979461,
+    "mean_risk": 0.8197562446521593,
+    "roc_auc": 0.8266661670663469,
+    "n_top_k": 435,
+    "top_k_share": 0.0084806893728189,
+    "population_share": 0.0091123189818533,
+    "selection_rate": 0.1861360718870346
+   },
+   {
+    "region": "MĚLNÍK",
+    "n": 3271,
+    "non_attendance": 0.8284928156527056,
+    "mean_risk": 0.8422449390540553,
+    "roc_auc": 0.829406502621176,
+    "n_top_k": 792,
+    "top_k_share": 0.015440703409822,
+    "population_share": 0.0127541272527352,
+    "selection_rate": 0.2421277896667685
+   },
+   {
+    "region": "LIBEREC",
+    "n": 5688,
+    "non_attendance": 0.7809423347398031,
+    "mean_risk": 0.7902605214427006,
+    "roc_auc": 0.822544162933273,
+    "n_top_k": 788,
+    "top_k_share": 0.0153627200592673,
+    "population_share": 0.0221783784205313,
+    "selection_rate": 0.1385372714486638
+   },
+   {
+    "region": "HAVLÍČKŮV BROD",
+    "n": 2570,
+    "non_attendance": 0.809727626459144,
+    "mean_risk": 0.8197146854541777,
+    "roc_auc": 0.8442574702071228,
+    "n_top_k": 615,
+    "top_k_share": 0.0119899401477784,
+    "population_share": 0.0100208214734116,
+    "selection_rate": 0.2392996108949416
+   },
+   {
+    "region": "PŘEROV",
+    "n": 3208,
+    "non_attendance": 0.8042394014962594,
+    "mean_risk": 0.825005617072959,
+    "roc_auc": 0.841163654767195,
+    "n_top_k": 817,
+    "top_k_share": 0.0159280993507886,
+    "population_share": 0.0125084806563053,
+    "selection_rate": 0.2546758104738154
+   },
+   {
+    "region": "TACHOV",
+    "n": 1386,
+    "non_attendance": 0.8066378066378066,
+    "mean_risk": 0.8140195633077341,
+    "roc_auc": 0.8188779937521694,
+    "n_top_k": 251,
+    "top_k_share": 0.0048934552473047,
+    "population_share": 0.0054042251214585,
+    "selection_rate": 0.1810966810966811
+   },
+   {
+    "region": "PROSTĚJOV",
+    "n": 1296,
+    "non_attendance": 0.8395061728395061,
+    "mean_risk": 0.8502418974067135,
+    "roc_auc": 0.821503375989819,
+    "n_top_k": 298,
+    "top_k_share": 0.0058097596163219,
+    "population_share": 0.0050533014122729,
+    "selection_rate": 0.2299382716049382
+   },
+   {
+    "region": "PÍSEK",
+    "n": 1976,
+    "non_attendance": 0.7844129554655871,
+    "mean_risk": 0.7961499052718711,
+    "roc_auc": 0.8408003937604119,
+    "n_top_k": 293,
+    "top_k_share": 0.0057122804281285,
+    "population_share": 0.0077047249927865,
+    "selection_rate": 0.1482793522267206
+   },
+   {
+    "region": "PRAHA-ZÁPAD",
+    "n": 3317,
+    "non_attendance": 0.8097678625263792,
+    "mean_risk": 0.8124915734087106,
+    "roc_auc": 0.814522210015423,
+    "n_top_k": 497,
+    "top_k_share": 0.009689431306416,
+    "population_share": 0.0129334882596523,
+    "selection_rate": 0.1498341875188423
+   },
+   {
+    "region": "TEPLICE",
+    "n": 4026,
+    "non_attendance": 0.8281172379533035,
+    "mean_risk": 0.830177942490667,
+    "roc_auc": 0.8352388770800753,
+    "n_top_k": 803,
+    "top_k_share": 0.0156551576238473,
+    "population_share": 0.0156979872575702,
+    "selection_rate": 0.1994535519125683
+   },
+   {
+    "region": "KUTNÁ HORA",
+    "n": 1417,
+    "non_attendance": 0.8193366266760762,
+    "mean_risk": 0.8192383867562861,
+    "roc_auc": 0.862399736218777,
+    "n_top_k": 337,
+    "top_k_share": 0.0065700972842298,
+    "population_share": 0.0055250988435114,
+    "selection_rate": 0.2378263937896965
+   },
+   {
+    "region": "RAKOVNÍK",
+    "n": 1294,
+    "non_attendance": 0.821483771251932,
+    "mean_risk": 0.8223692734622913,
+    "roc_auc": 0.8750799216462434,
+    "n_top_k": 304,
+    "top_k_share": 0.0059267346421539,
+    "population_share": 0.0050455031076244,
+    "selection_rate": 0.2349304482225656
+   },
+   {
+    "region": "KARLOVY VARY",
+    "n": 3635,
+    "non_attendance": 0.7840440165061898,
+    "mean_risk": 0.7989497578998239,
+    "roc_auc": 0.8184994971505196,
+    "n_top_k": 478,
+    "top_k_share": 0.0093190103912814,
+    "population_share": 0.0141734186987748,
+    "selection_rate": 0.1314993122420907
+   },
+   {
+    "region": "ÚSTÍ NAD ORLICÍ",
+    "n": 3130,
+    "non_attendance": 0.7939297124600639,
+    "mean_risk": 0.8054889621657378,
+    "roc_auc": 0.8367017609533168,
+    "n_top_k": 683,
+    "top_k_share": 0.0133156571072076,
+    "population_share": 0.0122043467750111,
+    "selection_rate": 0.2182108626198083
+   },
+   {
+    "region": "ČESKÁ LÍPA",
+    "n": 2763,
+    "non_attendance": 0.7911690191820485,
+    "mean_risk": 0.7983274237887811,
+    "roc_auc": 0.8083827920229727,
+    "n_top_k": 363,
+    "top_k_share": 0.007076989062835,
+    "population_share": 0.0107733578719986,
+    "selection_rate": 0.1313789359391965
+   },
+   {
+    "region": "RYCHNOV NAD KNĚŽNOU",
+    "n": 1897,
+    "non_attendance": 0.7944122298365841,
+    "mean_risk": 0.800573307786093,
+    "roc_auc": 0.8399988089769111,
+    "n_top_k": 325,
+    "top_k_share": 0.0063361472325658,
+    "population_share": 0.007396691959168,
+    "selection_rate": 0.1713231418028466
+   }
+  ],
+  "age_band": [
+   {
+    "age_band": "70-74",
+    "n": 6936,
+    "non_attendance": 0.903114186851211,
+    "mean_risk": 0.9136390678756132,
+    "roc_auc": 0.7974116550355774,
+    "n_top_k": 2729,
+    "top_k_share": 0.0532041409159144,
+    "population_share": 0.0270445205212386,
+    "selection_rate": 0.3934544405997693
+   },
+   {
+    "age_band": "65-69",
+    "n": 44662,
+    "non_attendance": 0.8957950830683803,
+    "mean_risk": 0.90964295537028,
+    "roc_auc": 0.8028076647240384,
+    "n_top_k": 16500,
+    "top_k_share": 0.3216813210379584,
+    "population_share": 0.1741439411072033,
+    "selection_rate": 0.369441583449017
+   },
+   {
+    "age_band": "60-64",
+    "n": 40983,
+    "non_attendance": 0.8847814947661226,
+    "mean_risk": 0.9010136890441786,
+    "roc_auc": 0.7973435212012546,
+    "n_top_k": 12718,
+    "top_k_share": 0.2479480630885306,
+    "population_share": 0.1597989597061598,
+    "selection_rate": 0.3103237927921333
+   },
+   {
+    "age_band": "55-59",
+    "n": 40867,
+    "non_attendance": 0.8765018229867619,
+    "mean_risk": 0.8930120605614298,
+    "roc_auc": 0.8021439368871746,
+    "n_top_k": 10566,
+    "top_k_share": 0.2059930204901253,
+    "population_share": 0.1593466580365428,
+    "selection_rate": 0.2585460151222257
+   },
+   {
+    "age_band": "50-54",
+    "n": 42529,
+    "non_attendance": 0.856733052740483,
+    "mean_risk": 0.8724211535324093,
+    "roc_auc": 0.7690844558733995,
+    "n_top_k": 6433,
+    "top_k_share": 0.1254167235295264,
+    "population_share": 0.165827049199504,
+    "selection_rate": 0.151261492158292
+   },
+   {
+    "age_band": "45-49",
+    "n": 71128,
+    "non_attendance": 0.6813912945675402,
+    "mean_risk": 0.6743573477901227,
+    "roc_auc": 0.8119198128218069,
+    "n_top_k": 2346,
+    "top_k_share": 0.045737235100306,
+    "population_share": 0.2773389065217221,
+    "selection_rate": 0.032982791586998
+   },
+   {
+    "age_band": "40-44",
+    "n": 9361,
+    "non_attendance": 0.4215361606665954,
+    "mean_risk": 0.425840650158209,
+    "roc_auc": 0.7390272838443643,
+    "n_top_k": 1,
+    "top_k_share": 1.9495837638664145e-05,
+    "population_share": 0.036499964907629,
+    "selection_rate": 0.0001068261937827
+   }
+  ]
+ },
+ "attendance_by": {
+  "year": [
+   {
+    "group": 2020,
+    "n": 266502,
+    "attendance": 0.17803993966274173,
+    "ci_low": 0.17659219789867805,
+    "ci_high": 0.17949696299696863
+   },
+   {
+    "group": 2021,
+    "n": 279010,
+    "attendance": 0.19719723307408338,
+    "ci_low": 0.1957250436886813,
+    "ci_high": 0.19867776042847088
+   },
+   {
+    "group": 2022,
+    "n": 275993,
+    "attendance": 0.19900867050975932,
+    "ci_low": 0.19752333531334354,
+    "ci_high": 0.2005023843949293
+   },
+   {
+    "group": 2023,
+    "n": 266585,
+    "attendance": 0.19835324568148996,
+    "ci_low": 0.19684389138880284,
+    "ci_high": 0.1998712932382841
+   },
+   {
+    "group": 2024,
+    "n": 256466,
+    "attendance": 0.19209173925588577,
+    "ci_low": 0.19057171120918318,
+    "ci_high": 0.19362099113113782
+   }
+  ],
+  "prior_invitations": [
+   {
+    "group": 0,
+    "n": 229169,
+    "attendance": 0.50636429883623,
+    "ci_low": 0.504317269937237,
+    "ci_high": 0.50841111437493
+   },
+   {
+    "group": 1,
+    "n": 155358,
+    "attendance": 0.30805623141389565,
+    "ci_low": 0.30576521338610696,
+    "ci_high": 0.3103567414004256
+   },
+   {
+    "group": 2,
+    "n": 124824,
+    "attendance": 0.22398737422290585,
+    "ci_low": 0.22168305026520377,
+    "ci_high": 0.2263086862361611
+   },
+   {
+    "group": 3,
+    "n": 119453,
+    "attendance": 0.16197165412337908,
+    "ci_low": 0.1598932410947813,
+    "ci_high": 0.16407180758936896
+   },
+   {
+    "group": 4,
+    "n": 113106,
+    "attendance": 0.12859618411048043,
+    "ci_low": 0.12665791695311426,
+    "ci_high": 0.13055967864804083
+   },
+   {
+    "group": 5,
+    "n": 93111,
+    "attendance": 0.1070765000912889,
+    "ci_low": 0.10510658180260479,
+    "ci_high": 0.10907883854940564
+   },
+   {
+    "group": 6,
+    "n": 155619,
+    "attendance": 0.058180556358799373,
+    "ci_low": 0.05702839930793882,
+    "ci_high": 0.0593545255191137
+   },
+   {
+    "group": 7,
+    "n": 129184,
+    "attendance": 0.050052638097597225,
+    "ci_low": 0.0488768910839042,
+    "ci_high": 0.051255143887812514
+   },
+   {
+    "group": 8,
+    "n": 95417,
+    "attendance": 0.03973086556902858,
+    "ci_low": 0.03850992657797661,
+    "ci_high": 0.04098886365382179
+   },
+   {
+    "group": 9,
+    "n": 71518,
+    "attendance": 0.03663413406415168,
+    "ci_low": 0.035282007799395325,
+    "ci_high": 0.038036035359435234
+   },
+   {
+    "group": 10,
+    "n": 57797,
+    "attendance": 0.03254494177898507,
+    "ci_low": 0.031129109693875317,
+    "ci_high": 0.03402290823237343
+   }
+  ],
+  "age_band": [
+   {
+    "group": "40-44",
+    "n": 53616,
+    "attendance": 0.5682259027156072,
+    "ci_low": 0.5640285016977243,
+    "ci_high": 0.5724135279865729
+   },
+   {
+    "group": "45-49",
+    "n": 371835,
+    "attendance": 0.3106646765366359,
+    "ci_low": 0.30917921707273444,
+    "ci_high": 0.31215404803865043
+   },
+   {
+    "group": "50-54",
+    "n": 211093,
+    "attendance": 0.1438181275551534,
+    "ci_low": 0.14232768047275698,
+    "ci_high": 0.1453215379581548
+   },
+   {
+    "group": "55-59",
+    "n": 217696,
+    "attendance": 0.12782504042334264,
+    "ci_low": 0.12642900853720235,
+    "ci_high": 0.12923420686019532
+   },
+   {
+    "group": "60-64",
+    "n": 212906,
+    "attendance": 0.11872375602378514,
+    "ci_low": 0.11735665493017854,
+    "ci_high": 0.12010461558908674
+   },
+   {
+    "group": "65-69",
+    "n": 242690,
+    "attendance": 0.1096707734146442,
+    "ci_low": 0.10843374069775523,
+    "ci_high": 0.11092016271763426
+   },
+   {
+    "group": "70-74",
+    "n": 34720,
+    "attendance": 0.10008640552995392,
+    "ci_low": 0.09697371850160262,
+    "ci_high": 0.10328757652578603
+   }
+  ],
+  "healthcare_contacts_12m": [
+   {
+    "group": "0",
+    "n": 91819,
+    "attendance": 0.036964027053224276,
+    "ci_low": 0.03576289687211574,
+    "ci_high": 0.038203899961575305
+   },
+   {
+    "group": "1-2",
+    "n": 99884,
+    "attendance": 0.08419766929638381,
+    "ci_low": 0.08249154803510866,
+    "ci_high": 0.08593577217890166
+   },
+   {
+    "group": "3-5",
+    "n": 165055,
+    "attendance": 0.13734209808851594,
+    "ci_low": 0.1356899749702918,
+    "ci_high": 0.1390111016768301
+   },
+   {
+    "group": "6-11",
+    "n": 308440,
+    "attendance": 0.19632343405524574,
+    "ci_low": 0.1949254087448689,
+    "ci_high": 0.19772902353701777
+   },
+   {
+    "group": "12-22",
+    "n": 358629,
+    "attendance": 0.2370639295762473,
+    "ci_low": 0.23567486927706194,
+    "ci_high": 0.23845862270090867
+   },
+   {
+    "group": "23+",
+    "n": 320729,
+    "attendance": 0.2478447536705443,
+    "ci_low": 0.24635353198709453,
+    "ci_high": 0.24934201554623675
+   }
+  ],
+  "gyn_prevention_24m": [
+   {
+    "group": 0,
+    "n": 850095,
+    "attendance": 0.09605749945594316,
+    "ci_low": 0.09543292550082542,
+    "ci_high": 0.09668572411243954
+   },
+   {
+    "group": 1,
+    "n": 273661,
+    "attendance": 0.31112946309485096,
+    "ci_low": 0.3093975976355359,
+    "ci_high": 0.3128666309408192
+   },
+   {
+    "group": 2,
+    "n": 199051,
+    "attendance": 0.4211885396204993,
+    "ci_low": 0.4190210150631608,
+    "ci_high": 0.42335910606300076
+   },
+   {
+    "group": 3,
+    "n": 21749,
+    "attendance": 0.40903030024368936,
+    "ci_low": 0.4025127769135561,
+    "ci_high": 0.4155799532945967
+   }
+  ],
+  "other_screening_36m": [
+   {
+    "group": 0,
+    "n": 642404,
+    "attendance": 0.0842834104395365,
+    "ci_low": 0.08360654070764022,
+    "ci_high": 0.08496525196063585
+   },
+   {
+    "group": 1,
+    "n": 189831,
+    "attendance": 0.23383430525045962,
+    "ci_low": 0.23193564577269288,
+    "ci_high": 0.235743736876944
+   },
+   {
+    "group": 2,
+    "n": 190114,
+    "attendance": 0.3387862019630327,
+    "ci_low": 0.3366619524974565,
+    "ci_high": 0.34091696629508866
+   },
+   {
+    "group": 3,
+    "n": 211418,
+    "attendance": 0.3137102801086,
+    "ci_low": 0.3117358214145478,
+    "ci_high": 0.3156915084371804
+   },
+   {
+    "group": 4,
+    "n": 110789,
+    "attendance": 0.2732310969500582,
+    "ci_low": 0.27061499828604596,
+    "ci_high": 0.2758629208794423
+   }
+  ],
+  "months_since_last_screening": [
+   {
+    "group": "0",
+    "n": 23677,
+    "attendance": 0.0300291422055159,
+    "ci_low": 0.027930339763033985,
+    "ci_high": 0.03228042011883442
+   },
+   {
+    "group": "1",
+    "n": 11996,
+    "attendance": 0.011420473491163721,
+    "ci_low": 0.009669343182925248,
+    "ci_high": 0.01348441762577782
+   },
+   {
+    "group": "2-6",
+    "n": 722,
+    "attendance": 0.008310249307479225,
+    "ci_low": 0.0038140673609704913,
+    "ci_high": 0.0180108899867562
+   },
+   {
+    "group": "7-24",
+    "n": 95,
+    "attendance": 0.07368421052631578,
+    "ci_low": 0.03614896941163346,
+    "ci_high": 0.1443568535823671
+   },
+   {
+    "group": "25-36",
+    "n": 12865,
+    "attendance": 0.45845316750874465,
+    "ci_low": 0.44985673588814734,
+    "ci_high": 0.467074403296706
+   },
+   {
+    "group": "37-48",
+    "n": 120784,
+    "attendance": 0.3849268114982117,
+    "ci_low": 0.3821864380863539,
+    "ci_high": 0.38767450433753226
+   },
+   {
+    "group": "49-60",
+    "n": 73938,
+    "attendance": 0.2521031134193513,
+    "ci_low": 0.24898619211344344,
+    "ci_high": 0.2552457924201668
+   },
+   {
+    "group": "61+ (window edge)",
+    "n": 193,
+    "attendance": 0.22279792746113988,
+    "ci_low": 0.16982488032902177,
+    "ci_high": 0.2865904469698595
+   },
+   {
+    "group": "none_in_5y",
+    "n": 1100286,
+    "attendance": 0.1705020331077556,
+    "ci_low": 0.16980048734778505,
+    "ci_high": 0.17120587963038633
+   }
+  ],
+  "region": [
+   {
+    "group": "BENEŠOV",
+    "n": 11960,
+    "attendance": 0.2140468227424749,
+    "ci_low": 0.20678843529424062,
+    "ci_high": 0.22148884307755173,
+    "mean_predicted_risk_test": 0.8068904625329657
+   },
+   {
+    "group": "BEROUN",
+    "n": 8556,
+    "attendance": 0.20652173913043478,
+    "ci_low": 0.19807681191343476,
+    "ci_high": 0.215230078859711,
+    "mean_predicted_risk_test": 0.8010822649430873
+   },
+   {
+    "group": "BLANSKO",
+    "n": 14820,
+    "attendance": 0.21862348178137653,
+    "ci_low": 0.21204255755225185,
+    "ci_high": 0.2253502381590569,
+    "mean_predicted_risk_test": 0.791165373827027
+   },
+   {
+    "group": "BRNO-MĚSTO",
+    "n": 46643,
+    "attendance": 0.19467015414960445,
+    "ci_low": 0.191102075497944,
+    "ci_high": 0.19828852182454637,
+    "mean_predicted_risk_test": 0.8172101082113566
+   },
+   {
+    "group": "BRNO-VENKOV",
+    "n": 27547,
+    "attendance": 0.20717319490325625,
+    "ci_low": 0.2024282477495904,
+    "ci_high": 0.21199980069757013,
+    "mean_predicted_risk_test": 0.8048437637757686
+   },
+   {
+    "group": "BŘECLAV",
+    "n": 13639,
+    "attendance": 0.2050003665957915,
+    "ci_low": 0.19830874558045117,
+    "ci_high": 0.21185811560802095,
+    "mean_predicted_risk_test": 0.790298173335051
+   },
+   {
+    "group": "CHEB",
+    "n": 14854,
+    "attendance": 0.15753332435707554,
+    "ci_low": 0.15176342233515616,
+    "ci_high": 0.16348031423611564,
+    "mean_predicted_risk_test": 0.8558078586763725
+   },
+   {
+    "group": "CHOMUTOV",
+    "n": 19021,
+    "attendance": 0.21733873087639977,
+    "ci_low": 0.21153491422039009,
+    "ci_high": 0.22325669635672632,
+    "mean_predicted_risk_test": 0.7988089645772735
+   },
+   {
+    "group": "CHRUDIM",
+    "n": 14767,
+    "attendance": 0.19618067312250287,
+    "ci_low": 0.1898551782118829,
+    "ci_high": 0.20266419687051734,
+    "mean_predicted_risk_test": 0.8099662934455606
+   },
+   {
+    "group": "DOMAŽLICE",
+    "n": 8445,
+    "attendance": 0.19810538780343398,
+    "ci_low": 0.18974276821039657,
+    "ci_high": 0.20674253396792666,
+    "mean_predicted_risk_test": 0.8079233950368466
+   },
+   {
+    "group": "DĚČÍN",
+    "n": 17909,
+    "attendance": 0.1757775420179798,
+    "ci_low": 0.17027260279103765,
+    "ci_high": 0.18142154206825248,
+    "mean_predicted_risk_test": 0.8335763982418956
+   },
+   {
+    "group": "FRÝDEK-MÍSTEK",
+    "n": 16364,
+    "attendance": 0.17624052798826692,
+    "ci_low": 0.17047880599033355,
+    "ci_high": 0.1821542197743104,
+    "mean_predicted_risk_test": 0.8260331137005769
+   },
+   {
+    "group": "HAVLÍČKŮV BROD",
+    "n": 13873,
+    "attendance": 0.19995675052259784,
+    "ci_low": 0.1933846060108409,
+    "ci_high": 0.20669501407648594,
+    "mean_predicted_risk_test": 0.8197146854541777
+   },
+   {
+    "group": "HODONÍN",
+    "n": 16143,
+    "attendance": 0.2090689462925107,
+    "ci_low": 0.20286560104589954,
+    "ci_high": 0.21541072104968031,
+    "mean_predicted_risk_test": 0.8039231621426055
+   },
+   {
+    "group": "HRADEC KRÁLOVÉ",
+    "n": 18623,
+    "attendance": 0.21634537936959675,
+    "ci_low": 0.21049049664769967,
+    "ci_high": 0.2223172596580482,
+    "mean_predicted_risk_test": 0.7924836860340151
+   },
+   {
+    "group": "JABLONEC NAD NISOU",
+    "n": 18919,
+    "attendance": 0.22051905491833607,
+    "ci_low": 0.2146683317210226,
+    "ci_high": 0.22648325098503544,
+    "mean_predicted_risk_test": 0.8008874268812398
+   },
+   {
+    "group": "JIHLAVA",
+    "n": 19309,
+    "attendance": 0.2188098814024548,
+    "ci_low": 0.21303462706381657,
+    "ci_high": 0.22469699709310784,
+    "mean_predicted_risk_test": 0.7966584178586564
+   },
+   {
+    "group": "JINDŘICHŮV HRADEC",
+    "n": 14202,
+    "attendance": 0.16722996761019573,
+    "ci_low": 0.16118260322863479,
+    "ci_high": 0.1734573033648081,
+    "mean_predicted_risk_test": 0.8410155393375638
+   },
+   {
+    "group": "JIČÍN",
+    "n": 13327,
+    "attendance": 0.21227583101973438,
+    "ci_low": 0.20541669395403436,
+    "ci_high": 0.21930079116084963,
+    "mean_predicted_risk_test": 0.7885125755605005
+   },
+   {
+    "group": "KARLOVY VARY",
+    "n": 18853,
+    "attendance": 0.20399936349652575,
+    "ci_low": 0.1983077999644712,
+    "ci_high": 0.20981152774280334,
+    "mean_predicted_risk_test": 0.798949757899824
+   },
+   {
+    "group": "KARVINÁ",
+    "n": 18097,
+    "attendance": 0.12808752831961098,
+    "ci_low": 0.12329739175263361,
+    "ci_high": 0.13303552345583186,
+    "mean_predicted_risk_test": 0.8821404306828617
+   },
+   {
+    "group": "KLADNO",
+    "n": 14918,
+    "attendance": 0.16992894489878,
+    "ci_low": 0.16398733175004743,
+    "ci_high": 0.17604050414827654,
+    "mean_predicted_risk_test": 0.8300793836644119
+   },
+   {
+    "group": "KLATOVY",
+    "n": 12773,
+    "attendance": 0.17458701949424568,
+    "ci_low": 0.16810182598527001,
+    "ci_high": 0.18126788899843127,
+    "mean_predicted_risk_test": 0.8384974048513516
+   },
+   {
+    "group": "KOLÍN",
+    "n": 14811,
+    "attendance": 0.21652825602592668,
+    "ci_low": 0.20996898541284406,
+    "ci_high": 0.22323453395616602,
+    "mean_predicted_risk_test": 0.7837936210074568
+   },
+   {
+    "group": "KROMĚŘÍŽ",
+    "n": 8502,
+    "attendance": 0.2030110562220654,
+    "ci_low": 0.19459591673312993,
+    "ci_high": 0.21169445154935324,
+    "mean_predicted_risk_test": 0.8090478117079882
+   },
+   {
+    "group": "KUTNÁ HORA",
+    "n": 7462,
+    "attendance": 0.1848030018761726,
+    "ci_low": 0.1761593956339633,
+    "ci_high": 0.19377096976320632,
+    "mean_predicted_risk_test": 0.8192383867562862
+   },
+   {
+    "group": "LIBEREC",
+    "n": 29522,
+    "attendance": 0.2177359257502879,
+    "ci_low": 0.2130650242126499,
+    "ci_high": 0.22248027520888752,
+    "mean_predicted_risk_test": 0.7902605214427006
+   },
+   {
+    "group": "LITOMĚŘICE",
+    "n": 18484,
+    "attendance": 0.1881086344946981,
+    "ci_low": 0.1825398266451857,
+    "ci_high": 0.19380705378194207,
+    "mean_predicted_risk_test": 0.8195992009841464
+   },
+   {
+    "group": "LOUNY",
+    "n": 18832,
+    "attendance": 0.1888806287170773,
+    "ci_low": 0.18335397866206865,
+    "ci_high": 0.19453418069728717,
+    "mean_predicted_risk_test": 0.8347243738517879
+   },
+   {
+    "group": "MLADÁ BOLESLAV",
+    "n": 5089,
+    "attendance": 0.16781292984869325,
+    "ci_low": 0.15779703691465002,
+    "ci_high": 0.17832995087839282,
+    "mean_predicted_risk_test": 0.8295034772528947
+   },
+   {
+    "group": "MOST",
+    "n": 22973,
+    "attendance": 0.18038567013450574,
+    "ci_low": 0.17546707520383997,
+    "ci_high": 0.18541113661305147,
+    "mean_predicted_risk_test": 0.8402062923951261
+   },
+   {
+    "group": "MĚLNÍK",
+    "n": 16891,
+    "attendance": 0.16926173701971464,
+    "ci_low": 0.16368209040985063,
+    "ci_high": 0.17499178663167872,
+    "mean_predicted_risk_test": 0.8422449390540553
+   },
+   {
+    "group": "NOVÝ JIČÍN",
+    "n": 11498,
+    "attendance": 0.18081405461819447,
+    "ci_low": 0.17388634646633191,
+    "ci_high": 0.1879549703140934,
+    "mean_predicted_risk_test": 0.8203107982728727
+   },
+   {
+    "group": "NYMBURK",
+    "n": 15131,
+    "attendance": 0.2036877932720904,
+    "ci_low": 0.19734628062530313,
+    "ci_high": 0.21017972324056078,
+    "mean_predicted_risk_test": 0.8103458695822113
+   },
+   {
+    "group": "NÁCHOD",
+    "n": 15543,
+    "attendance": 0.227304896094705,
+    "ci_low": 0.22078420621783112,
+    "ci_high": 0.23396034608109095,
+    "mean_predicted_risk_test": 0.7893475757618786
+   },
+   {
+    "group": "OLOMOUC",
+    "n": 9085,
+    "attendance": 0.15123830489818382,
+    "ci_low": 0.14401847560854997,
+    "ci_high": 0.15875294705635895,
+    "mean_predicted_risk_test": 0.8630599911592811
+   },
+   {
+    "group": "OPAVA",
+    "n": 22202,
+    "attendance": 0.19038825331051257,
+    "ci_low": 0.18527769418327977,
+    "ci_high": 0.1956059338721009,
+    "mean_predicted_risk_test": 0.8188584400101414
+   },
+   {
+    "group": "OSTRAVA",
+    "n": 15038,
+    "attendance": 0.1498869530522676,
+    "ci_low": 0.1442711624774064,
+    "ci_high": 0.1556815707843397,
+    "mean_predicted_risk_test": 0.8639845853432021
+   },
+   {
+    "group": "PARDUBICE",
+    "n": 25050,
+    "attendance": 0.20023952095808384,
+    "ci_low": 0.1953300168964771,
+    "ci_high": 0.20524094845237995,
+    "mean_predicted_risk_test": 0.8044942141433421
+   },
+   {
+    "group": "PELHŘIMOV",
+    "n": 9708,
+    "attendance": 0.23825710754017304,
+    "ci_low": 0.22988725487384265,
+    "ci_high": 0.24683402177420166,
+    "mean_predicted_risk_test": 0.777947821895591
+   },
+   {
+    "group": "PLZEŇ-JIH",
+    "n": 9463,
+    "attendance": 0.1830286378526894,
+    "ci_low": 0.17536671650535055,
+    "ci_high": 0.1909478007434778,
+    "mean_predicted_risk_test": 0.8306612868221632
+   },
+   {
+    "group": "PLZEŇ-MĚSTO",
+    "n": 20615,
+    "attendance": 0.1848168809119573,
+    "ci_low": 0.17957724719843104,
+    "ci_high": 0.1901739570137448,
+    "mean_predicted_risk_test": 0.8237424213546347
+   },
+   {
+    "group": "PLZEŇ-SEVER",
+    "n": 9490,
+    "attendance": 0.19388830347734456,
+    "ci_low": 0.18605875758731294,
+    "ci_high": 0.20196557111423036,
+    "mean_predicted_risk_test": 0.8093936950370727
+   },
+   {
+    "group": "PRACHATICE",
+    "n": 7348,
+    "attendance": 0.17242787152966793,
+    "ci_low": 0.1639624495462599,
+    "ci_high": 0.18123561723406897,
+    "mean_predicted_risk_test": 0.8385593056550449
+   },
+   {
+    "group": "PRAHA-HL.MĚSTO",
+    "n": 193569,
+    "attendance": 0.17972919217436675,
+    "ci_low": 0.17802507261074127,
+    "ci_high": 0.18144602330568813,
+    "mean_predicted_risk_test": 0.8222540293720793
+   },
+   {
+    "group": "PRAHA-VÝCHOD",
+    "n": 20316,
+    "attendance": 0.19669226225634967,
+    "ci_low": 0.19128389417774452,
+    "ci_high": 0.2022153107772485,
+    "mean_predicted_risk_test": 0.807278154486058
+   },
+   {
+    "group": "PRAHA-ZÁPAD",
+    "n": 17504,
+    "attendance": 0.1953267824497258,
+    "ci_low": 0.1895207590279844,
+    "ci_high": 0.20126650477891958,
+    "mean_predicted_risk_test": 0.8124915734087107
+   },
+   {
+    "group": "PROSTĚJOV",
+    "n": 7122,
+    "attendance": 0.17607413647851727,
+    "ci_low": 0.16740358433191982,
+    "ci_high": 0.18509393801341123,
+    "mean_predicted_risk_test": 0.8502418974067135
+   },
+   {
+    "group": "PÍSEK",
+    "n": 11000,
+    "attendance": 0.22363636363636363,
+    "ci_low": 0.2159468662719935,
+    "ci_high": 0.23151881898715027,
+    "mean_predicted_risk_test": 0.7961499052718711
+   },
+   {
+    "group": "PŘEROV",
+    "n": 16981,
+    "attendance": 0.19928154996761085,
+    "ci_low": 0.19334171949649118,
+    "ci_high": 0.2053574073264048,
+    "mean_predicted_risk_test": 0.8250056170729592
+   },
+   {
+    "group": "PŘÍBRAM",
+    "n": 17588,
+    "attendance": 0.21201955879008416,
+    "ci_low": 0.20604210005069087,
+    "ci_high": 0.21812278776519853,
+    "mean_predicted_risk_test": 0.7888802725640969
+   },
+   {
+    "group": "RAKOVNÍK",
+    "n": 6933,
+    "attendance": 0.17524881003894419,
+    "ci_low": 0.16648027923632233,
+    "ci_high": 0.1843770199117256,
+    "mean_predicted_risk_test": 0.8223692734622913
+   },
+   {
+    "group": "ROKYCANY",
+    "n": 6570,
+    "attendance": 0.16514459665144596,
+    "ci_low": 0.156362273875921,
+    "ci_high": 0.1743182684642695,
+    "mean_predicted_risk_test": 0.8409854165258052
+   },
+   {
+    "group": "RYCHNOV NAD KNĚŽNOU",
+    "n": 9918,
+    "attendance": 0.21385359951603145,
+    "ci_low": 0.20589569993393628,
+    "ci_high": 0.22203307482800413,
+    "mean_predicted_risk_test": 0.800573307786093
+   },
+   {
+    "group": "SEMILY",
+    "n": 16437,
+    "attendance": 0.17600535377501977,
+    "ci_low": 0.1702593816070789,
+    "ci_high": 0.1819027308591075,
+    "mean_predicted_risk_test": 0.8348596580276965
+   },
+   {
+    "group": "SOKOLOV",
+    "n": 10981,
+    "attendance": 0.2068117657772516,
+    "ci_low": 0.19933957258337826,
+    "ci_high": 0.21448901801552944,
+    "mean_predicted_risk_test": 0.7987218589227277
+   },
+   {
+    "group": "STRAKONICE",
+    "n": 12737,
+    "attendance": 0.1881918819188192,
+    "ci_low": 0.18149826944562306,
+    "ci_high": 0.19507351934599168,
+    "mean_predicted_risk_test": 0.8355028134656669
+   },
+   {
+    "group": "SVITAVY",
+    "n": 19468,
+    "attendance": 0.23058352167659749,
+    "ci_low": 0.2247202803281833,
+    "ci_high": 0.23655306548496224,
+    "mean_predicted_risk_test": 0.7846949193904252
+   },
+   {
+    "group": "TACHOV",
+    "n": 7255,
+    "attendance": 0.19931082012405238,
+    "ci_low": 0.19027864789639845,
+    "ci_high": 0.2086612484059506,
+    "mean_predicted_risk_test": 0.8140195633077342
+   },
+   {
+    "group": "TEPLICE",
+    "n": 21515,
+    "attendance": 0.17541250290495003,
+    "ci_low": 0.17038867083605383,
+    "ci_high": 0.18055222313872313,
+    "mean_predicted_risk_test": 0.830177942490667
+   },
+   {
+    "group": "TRUTNOV",
+    "n": 12442,
+    "attendance": 0.1796334994373895,
+    "ci_low": 0.17298740814097227,
+    "ci_high": 0.1864773555443134,
+    "mean_predicted_risk_test": 0.8197562446521595
+   },
+   {
+    "group": "TÁBOR",
+    "n": 10558,
+    "attendance": 0.1762644440234893,
+    "ci_low": 0.16911424682320048,
+    "ci_high": 0.1836501336483783,
+    "mean_predicted_risk_test": 0.8358621793291307
+   },
+   {
+    "group": "TŘEBÍČ",
+    "n": 12995,
+    "attendance": 0.2290881108118507,
+    "ci_low": 0.22194336730238448,
+    "ci_high": 0.23639297580384486,
+    "mean_predicted_risk_test": 0.7799183398241527
+   },
+   {
+    "group": "UHERSKÉ HRADIŠTĚ",
+    "n": 19280,
+    "attendance": 0.2078838174273859,
+    "ci_low": 0.20221433176872355,
+    "ci_high": 0.21366968573794948,
+    "mean_predicted_risk_test": 0.8139470758713102
+   },
+   {
+    "group": "VSETÍN",
+    "n": 20199,
+    "attendance": 0.19723748700430715,
+    "ci_low": 0.19180781454643372,
+    "ci_high": 0.20278229670629924,
+    "mean_predicted_risk_test": 0.8142269221475867
+   },
+   {
+    "group": "VYŠKOV",
+    "n": 11445,
+    "attendance": 0.19667977282656182,
+    "ci_low": 0.18949982710858115,
+    "ci_high": 0.20406326615846254,
+    "mean_predicted_risk_test": 0.8055919790611503
+   },
+   {
+    "group": "ZLÍN",
+    "n": 36946,
+    "attendance": 0.19192876089427813,
+    "ci_low": 0.18794518899701007,
+    "ci_high": 0.19597638952092894,
+    "mean_predicted_risk_test": 0.8267809994059447
+   },
+   {
+    "group": "ZNOJMO",
+    "n": 13850,
+    "attendance": 0.20014440433212996,
+    "ci_low": 0.1935644805211434,
+    "ci_high": 0.20689061890723476,
+    "mean_predicted_risk_test": 0.8227372993578786
+   },
+   {
+    "group": "ÚSTÍ NAD LABEM",
+    "n": 8969,
+    "attendance": 0.17192552123982607,
+    "ci_low": 0.16425764517369096,
+    "ci_high": 0.1798743082361131,
+    "mean_predicted_risk_test": 0.8220820215129719
+   },
+   {
+    "group": "ÚSTÍ NAD ORLICÍ",
+    "n": 16109,
+    "attendance": 0.21068967657831025,
+    "ci_low": 0.20446165230921787,
+    "ci_high": 0.21705564966471025,
+    "mean_predicted_risk_test": 0.8054889621657378
+   },
+   {
+    "group": "ČESKÁ LÍPA",
+    "n": 15027,
+    "attendance": 0.21607772675850137,
+    "ci_low": 0.20957031251664493,
+    "ci_high": 0.2227302660409119,
+    "mean_predicted_risk_test": 0.7983274237887811
+   },
+   {
+    "group": "ČESKÉ BUDĚJOVICE",
+    "n": 22620,
+    "attendance": 0.20344827586206896,
+    "ci_low": 0.19825274250408337,
+    "ci_high": 0.20874451636623248,
+    "mean_predicted_risk_test": 0.801155107337809
+   },
+   {
+    "group": "ČESKÝ KRUMLOV",
+    "n": 8203,
+    "attendance": 0.18176276971839572,
+    "ci_low": 0.17356682594388892,
+    "ci_high": 0.19025663449960148,
+    "mean_predicted_risk_test": 0.8273543271394574
+   },
+   {
+    "group": "ŠUMPERK",
+    "n": 18806,
+    "attendance": 0.16744655960863555,
+    "ci_low": 0.16217824151022894,
+    "ci_high": 0.17285070983193165,
+    "mean_predicted_risk_test": 0.8505872229386766
+   },
+   {
+    "group": "ŽĎÁR NAD SÁZAVOU",
+    "n": 14914,
+    "attendance": 0.20899825667158375,
+    "ci_low": 0.20254814261122198,
+    "ci_high": 0.21559824110487621,
+    "mean_predicted_risk_test": 0.8053761819746651
+   }
+  ]
+ },
+ "recently_screened_per_year": [
+  {
+   "group": 2020,
+   "n": 6084,
+   "attendance": 0.021696252465483234,
+   "ci_low": 0.01832593919657922,
+   "ci_high": 0.025670189922478794
+  },
+  {
+   "group": 2021,
+   "n": 8413,
+   "attendance": 0.02305955069535243,
+   "ci_low": 0.02006333409137445,
+   "ci_high": 0.02649111995122037
+  },
+  {
+   "group": 2022,
+   "n": 7478,
+   "attendance": 0.022599625568333778,
+   "ci_low": 0.019468153135962122,
+   "ci_high": 0.026221328625979538
+  },
+  {
+   "group": 2023,
+   "n": 6830,
+   "attendance": 0.026207906295754025,
+   "ci_low": 0.022677276450307995,
+   "ci_high": 0.03027119492680376
+  },
+  {
+   "group": 2024,
+   "n": 7590,
+   "attendance": 0.023715415019762844,
+   "ci_low": 0.020525557795863535,
+   "ci_high": 0.027387143680906043
+  }
+ ]
+}

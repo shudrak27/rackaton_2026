@@ -7,10 +7,15 @@ const here = dirname(fileURLToPath(import.meta.url));
 const src = resolve(here, "../../reports/ui/data.json");
 const dst = resolve(here, "../public/data.json");
 
-if (!existsSync(src)) {
-  console.error(`Missing ${src}\nRun: python -m screening train && python -m screening export-ui`);
+if (!existsSync(src) && !existsSync(dst)) {
+  console.error(`Missing ${src} and ${dst}\nProvide the approved aggregate export at public/data.json or regenerate it using the Python pipeline.`);
   process.exit(1);
 }
-mkdirSync(dirname(dst), { recursive: true });
-copyFileSync(src, dst);
-console.log(`data.json -> ${dst}`);
+
+if (existsSync(src)) {
+  mkdirSync(dirname(dst), { recursive: true });
+  copyFileSync(src, dst);
+  console.log(`data.json -> ${dst}`);
+} else {
+  console.log(`Using existing public data: ${dst}`);
+}
