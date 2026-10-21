@@ -3,6 +3,12 @@
 An MVP built in **24 hours at Rakathon 2026**, a hackathon tackling cancer.
 We help VZP predict missed mammography screening, propose support, and plan how to test it.
 
+## Live Demo
+
+[🌐 [Explore the Interactive ML Dashboard](https://shudrak27.github.io/rackaton_2026/)
+The dashboard showcases model performance,
+risk segmentation, explainability, and intervention strategies.
+
 ## Problem
 
 Only **19.3%** of invitations in the supplied dataset were followed by screening within 12 months.
