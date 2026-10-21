@@ -72,3 +72,8 @@ See [experiment design](docs/experiment-design.md) and [segment definitions](doc
 - `src/screening/`: Python pipeline; `ui/`: React business and technical views.
 - `configs/`, `tests/`, `notebooks/`: settings, Python tests and EDA; `docs/`, `scripts/`: experiment and pitch tools.
 - `data/`, `reports/`, `models/`, `mlflow.db`: local, git-ignored inputs and outputs.
+
+## Preview
+
+<img width="2879" height="1348" alt="image" src="https://github.com/user-attachments/assets/c4f48ab6-93fc-4386-91aa-79d040a04812" />
+
