@@ -2,7 +2,7 @@
 
 An MVP built in **24 hours at Rakathon 2026**, a hackathon tackling cancer.
 We help VZP predict missed mammography screening, propose support, and plan how to test it.
-<img width="2879" height="1348" alt="image" src="https://github.com/user-attachments/assets/406a4766-d938-4006-8f44-44ed1318e9ca" />
+<img width="1800" height="700" alt="image" src="https://github.com/user-attachments/assets/406a4766-d938-4006-8f44-44ed1318e9ca" />
 
 
 ## Problem
