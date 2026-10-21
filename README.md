@@ -9,7 +9,6 @@ Only **19.3%** of invitations in the supplied dataset were followed by screening
 Data: **1,344,556 invitations to 508,527 unique women in 2020–2024**.
 Target: **non-attendance within 12 months of an invitation**, not a missed appointment or cancer risk.
 
-**Scope:** women continuously insured with VZP in **2015–2025**. Results are not validated for other populations.
 
 ## Methodology
 
