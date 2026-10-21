@@ -66,7 +66,7 @@ export default function App() {
   useEffect(() => {
     const controller = new AbortController();
     setError(null);
-    fetch("./data.json", { signal: controller.signal })
+    fetch(`${import.meta.env.BASE_URL}data.json`, { signal: controller.signal })
       .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((payload) => {
         if (!payload.meta || !Array.isArray(payload.deciles) || !payload.deciles.length || !Array.isArray(payload.segments) || !payload.segments.length) {
@@ -128,7 +128,7 @@ export default function App() {
         <Page key={page.id} d={data} navigate={navigate} />
         <footer className="page-footer"><span>VZP invitations {data.meta.years[0]}–{data.meta.years.at(-1)} · model tested on {data.meta.test_year}</span><span>Groups below {data.meta.min_cell} suppressed</span></footer>
       </> : <div className="empty-state" role={error ? "alert" : "status"}>
-        {error ? <><Icon name="file" size={32} /><h1>Dashboard data is unavailable</h1><p>Run <code>python -m screening export-ui</code>, then <code>npm run dev</code> again.</p>
+        {error ? <><Icon name="file" size={32} /><h1>Dashboard data is unavailable</h1><p>Ensure <code>public/data.json</code> is present, then rebuild or redeploy the dashboard.</p>
           <button className="button" onClick={() => setAttempt((v) => v + 1)}>Try again <Icon name="arrow" size={15} /></button></>
           : <><div className="spinner" /><h1>Loading</h1></>}
       </div>}
