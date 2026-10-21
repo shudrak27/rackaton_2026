@@ -22,7 +22,6 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest", "ruff", "jupyter", "matplotlib", "python-pptx"]
-ui = ["streamlit", "plotly"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,7 +1,7 @@
 """Rule baseline the ML model has to beat.
 
-Slide 4 shows attendance falls from 44.5 % (first invitation) to 3.2 % (invited for many
-years), so "how many times was she invited already" alone is a strong risk score.
+Risk increases with previous invitations and decreases by 0.1 per recorded screening
+procedure in the last five years. This is a ranking score, not a probability.
 """
 
 import numpy as np

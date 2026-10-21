@@ -84,21 +84,21 @@ export function Overview({ d, navigate }) {
   const gyn = contrast(d.attendance_by.gyn_prevention_24m);
   return <>
     <div className="hero-stats">
-      <div className="hero-stat"><strong>{num(d.meta.n_invitations)}</strong><span>invitations analysed · {num(d.meta.n_clients)} women</span></div>
-      <div className="hero-stat"><strong>{pct(d.meta.attendance_overall, 0)}</strong><span>come after a standard letter</span></div>
+      <div className="hero-stat"><strong>{num(d.meta.n_invitations)}</strong><span>invitations analysed · {num(d.meta.n_clients)} unique women</span></div>
+      <div className="hero-stat"><strong>{pct(d.meta.attendance_overall, 0)}</strong><span>attended within 12 months of invitation</span></div>
       <div className="hero-stat hero-accent"><strong>{pct(first?.attendance, 0)} <small>vs</small> {pct(last?.attendance, 1)}</strong><span>the model splits likely attenders from women who will skip</span></div>
-      <div className="hero-stat"><strong>−{pct(reduction, 0)}</strong><span>wasted calls compared with today's rule</span></div>
+      <div className="hero-stat"><strong>{reduction == null ? "–" : `−${pct(reduction, 0)}`}</strong><span>fewer attenders selected for outreach · top 10% vs baseline</span></div>
     </div>
     <Panel title="The model sorts women by how likely they are to skip" subtitle={`Real attendance in ${d.meta.test_year}, ten equal groups by predicted risk`}
-      action={<Badge tone="teal">{d.meta.test_year} · DATA THE MODEL NEVER SAW</Badge>} className="section-gap">
+      action={<Badge tone="teal">{d.meta.test_year} · HELD-OUT INVITATIONS</Badge>} className="section-gap">
       <Chart height={300} label="Actual attendance in each model risk group"><DecileChart d={d} /></Chart>
-      <div className="chart-caption">Green: a standard letter is enough. Right side: women who need more than a letter.</div>
+      <div className="chart-caption">Left: higher observed attendance. Right: higher risk of missing screening, a starting point for outreach pilots.</div>
     </Panel>
     <div className="finding-grid">
       <button className="finding" onClick={() => navigate("call")}>
         <span className="finding-icon"><Icon name="phone" size={22} /></span><h3>Who to call</h3>
-        <p>{call ? <>Typically aged {call.top_age_band}, invited {Math.round(call.median_prior_invitations)} times, about {Math.round(call.median_contacts_12m)} doctor visit a year.
-          Without a call only <b>{pct(call.attendance, 1)}</b> come.</> : "Portrait of the woman worth a call."}</p>
+        <p>{call ? <>Most common age band: {call.top_age_band}. Median: {Math.round(call.median_prior_invitations)} previous invitations and {Math.round(call.median_contacts_12m)} healthcare contacts a year.
+          Only <b>{pct(call.attendance, 1)}</b> attended in {d.meta.test_year}.</> : "Profile of the highest-risk group."}</p>
         <span className="finding-link">See her portrait <Icon name="arrow" size={15} /></span></button>
       <button className="finding" onClick={() => navigate("drivers")}>
         <span className="finding-icon"><Icon name="drivers" size={22} /></span><h3>Why women skip</h3>
@@ -110,6 +110,8 @@ export function Overview({ d, navigate }) {
         <p><b>{num(recentAverage(d))}</b> letters a year go to women screened in the last 6 months. Only ~2% of them come again.</p>
         <span className="finding-link">See the fix <Icon name="arrow" size={15} /></span></button>
     </div>
+    <div className="insight-strip"><span className="insight-icon"><Icon name="chart" /></span><div><h3>Explore model performance</h3><p>ROC-AUC, precision, calibration and the history-based baseline.</p></div>
+      <button className="text-button" onClick={() => navigate("model-quality")}>Model quality <Icon name="arrow" size={15} /></button></div>
   </>;
 }
 

@@ -1,140 +1,121 @@
-# Rakathon 2026 — who will not attend mammography screening (VZP)
+# Screening Insights — Rakathon 2026
 
-VZP sends addressed invitations to mammography screening. This project predicts the risk that an invited
-woman will **not** be screened within 12 months, explains the drivers, groups women into actionable
-segments with a proposed intervention each, and designs the A/B test that would prove the effect.
+An MVP built in **24 hours at Rakathon 2026**, a hackathon tackling cancer.
+We help VZP predict missed mammography screening, propose support, and plan how to test it.
 
-| Challenge block | What we deliver |
+## Problem
+
+Only **19.3%** of invitations in the supplied dataset were followed by screening within 12 months.
+Data: **1,344,556 invitations to 508,527 unique women in 2020–2024**.
+Target: **non-attendance within 12 months of an invitation**, not a missed appointment or cancer risk.
+
+**Scope:** women continuously insured with VZP in **2015–2025**. Results are not validated for other populations.
+
+## Methodology
+
+Current pipeline configuration (the supplied results below do not include a complete run manifest):
+
+```text
+VZP CSV → clean and map fields → features known when the invitation was sent
+  → time split: earlier invitations with known outcomes / 2024 test invitations
+  → FLAML compares model families + Optuna tunes LightGBM
+  → compare both candidates on the same client-grouped folds → choose the winner
+  → fit model + calibrate probabilities → evaluate on 2024
+  → explain predictions → segments and proposed actions → A/B test plan → React dashboard
+```
+
+- A 12-month gap keeps training outcomes known by January 2024. Folds group by woman; test-year women
+  may have earlier records. IDs and later outcomes are not inputs.
+- FLAML seeds Optuna's LightGBM search, with early stopping and pruning. Cross-validation selects the
+  winner; the final family is not hardcoded to LightGBM.
+- Isotonic calibration uses the last six months of training, excluded from the final base-model fit.
+  Model selection currently uses the broader training pool, including those months.
+- SHAP (LightGBM) or permutation importance explains associations, not causes. MLflow logs training runs.
+
+## Model results
+
+Supplied report: **256,466 test invitations from 2024**.
+
+| Measure | Model | Simple comparison rule |
+|---|---:|---:|
+| ROC-AUC | **0.836** | 0.785 |
+| Average precision — non-attendance | **0.947** | 0.927 |
+| Average precision — attendance | **0.571** | 0.425 |
+| Attendance among the 10% ranked most likely to attend | **68%** | 51% |
+
+Baseline: `previous invitations − 0.1 × screening procedure codes in the past 5 years` (higher = higher risk).
+This is our comparison rule, not a verified VZP policy. Random AP: **0.808** for non-attendance, **0.192** for
+attendance. Prediction quality does not measure the effect of calling women.
+
+## Business questions and answers
+
+| Question | What the MVP can answer |
 |---|---|
-| **01 WHO** — predict risk | Calibrated LightGBM risk score, honest out-of-time test on 2024 |
-| **02 WHY** — understand drivers | SHAP drivers, attendance breakdowns with confidence intervals, 75 regions |
-| **03 WHAT** — propose support | 7 rule-based segments → intervention, "wasted invitations" finding, budget illustration |
-| **04 HOW TO VERIFY** — measure effect | Stratified randomisation, ITT analysis, sample-size calculator, full A/B design |
+| Who might need extra support? | Rank women by non-attendance risk, then check eligibility before choosing an outreach pilot. In the highest-risk tenth, **98.3% did not attend** in 2024. |
+| Which histories matter? | Previous invitations, invitations since the last screening, preventive visits and contact with healthcare are leading model signals. |
+| What could VZP try? | Seven operational segments connect to six proposed actions, including a reminder, booking help or a doctor recommendation. The residual group needs a specific hypothesis. |
+| Can the mailing process improve? | **7,279 invitations per year**, on average, followed a screening recorded within six months. Review recent records and programme rules before suppressing any invitation. |
+| How much could this save? | Costs and intervention effects in the config are assumptions. Savings require confirmed unnecessary invitations and actual costs; no financial benefit has been measured. |
 
-## Key results (test year 2024, 256,466 invitations, never seen in training)
+## A/B tests
 
-- Overall attendance within 12 months: **19.3%** (1,344,556 invitations, 508,527 women, 2020–2024).
-- Model ROC-AUC **0.836** vs **0.785** for the rule "number of previous invitations" (random = 0.5).
-  Average precision for attendance (the 19% minority class): **0.571** vs **0.425** (random = 0.192).
-  AP on non-attendance is not reported: with 81% positives even a random score gets ~0.81.
-- In people: the 10% lowest-risk women attend at **68%** (rule: 51%) — a standard letter is enough for them;
-  phone outreach to the 10% highest-risk women wastes **42% fewer** contacts on women who would attend anyway.
-- Attendance by risk decile: **68% → 1.7%**.
-- **Quick win:** ~**7,300 invitations per year** go to women screened 0–6 months earlier (attendance ~2%).
-  Most of them responded late to the previous year's letter; the yearly cycle likely does not yet see the
-  fresh claim (reporting lag — a hypothesis to confirm with VZP).
+For women last screened over two years ago: standard invitation versus **invitation plus a day-14 reminder
+and booking guidance**. SMS requires contacts, which are absent from the CSV.
 
-## Quick start
+At **33.36%** historical attendance, detecting **+2 percentage points** needs **8,848 women per group**
+(80% power, two-sided 5% significance level). Randomize by woman; count everyone assigned, including
+unreached women. Primary outcome: screening within 12 months. **The trial has not run.**
+See [experiment design](docs/experiment-design.md) and [segment definitions](docs/segments-real-data.md).
+
+## Run the dashboard
+
+Requires Node.js 20+ and the supplied `reports/ui/data.json`. **No Python, raw data or model file needed.**
+Reports are git-ignored and supplied separately.
 
 ```bash
+cd ui
+npm install
+npm run dev                 # http://localhost:5173
+```
+
+After replacing the JSON, run `npm run data` in `ui/` and reload. `npm run build` creates a static site;
+`npm run preview` serves it. [Dashboard documentation](ui/README.md).
+
+## Train and refresh reports
+
+From the repository root, using Python 3.10+:
+```powershell
 python -m venv .venv
-.venv\Scripts\activate               # Linux/macOS: source .venv/bin/activate
-pip install -e ".[dev,ui]"
+.venv\Scripts\Activate.ps1  # Linux/macOS: source .venv/bin/activate
+python -m pip install -e ".[dev]"
 ```
 
-Put the VZP export at `data/raw/Rakhaton2026.csv` (git-ignored — **never commit data**), then:
-
+Put the authorized CSV at `data/raw/Rakhaton2026.csv`, or update [config](configs/config.yaml). Keep it out of git.
 ```bash
-python -m screening profile          # data overview + leakage check        -> reports/profile_*.csv
-python -m screening train            # full pipeline, ~20 min                -> reports/, models/, MLflow
-python -m screening export-ui        # aggregates for dashboards and slides  -> reports/ui/data.json
+python -m screening profile
+python -m screening train
+python -m screening export-ui
+cd ui
+npm run data                # refresh an already-running dashboard, then reload
 ```
 
-Demo dashboards (both read only `reports/ui/data.json` — aggregates, no row-level data):
+Training writes reports, `models/model.joblib` and MLflow runs. Export needs matching raw data and
+`reports/scored_test.parquet`; aggregate JSON alone supports viewing only.
 
+Other commands, from the repository root (`npm test` runs dashboard tests from `ui/`):
 ```bash
-cd ui && npm install && npm run dev  # React dashboard   -> http://localhost:5173  (Node.js 20+)
-streamlit run app/dashboard.py       # Streamlit version -> http://localhost:8501
+python -m screening score --input data/raw/new.csv
+python -m screening power --p 0.10 --mde 0.02
+mlflow ui --backend-store-uri sqlite:///mlflow.db
+python -m screening.viz.figures       # PNG figures from data.json
+python scripts/build_deck.py          # backup presentation
+pytest -m "not slow"                 # pytest also includes the end-to-end test
 ```
 
-Other commands:
+Synthetic demo: `python -m screening synth`, set `data.path` to `data/raw/synthetic.parquet`, then train and export.
 
-```bash
-python -m screening score --input data/raw/new.csv   # risk + decile + segment + intervention per invitation
-python -m screening power --p 0.10 --mde 0.02        # women per A/B arm
-python -m screening synth                            # synthetic data (no real data needed)
-mlflow ui --backend-store-uri sqlite:///mlflow.db    # experiment tracking, http://127.0.0.1:5000
-python -m screening.viz.figures                      # English PNG charts from data.json -> reports/figures/
-python scripts/build_deck.py                         # backup PPTX deck from data.json   -> reports/pitch/
-pytest                                               # all tests (`-m "not slow"` skips the end-to-end run)
-```
+## Repository map
 
-## Pipeline
-
-```
-VZP CSV ─► adapter (data/vzp.py) ─► features ─► out-of-time split
-                                                  train: invitations with outcome known by 1 Jan 2024
-                                                  test:  2024
-   ├─► FLAML AutoML (grouped CV by woman) — picks the model family, warm-starts Optuna
-   ├─► Optuna — tunes LightGBM (early stopping, pruning, 15 min budget)
-   ├─► champion: FLAML best vs Optuna LightGBM on identical folds (test year never used)
-   ├─► isotonic calibration on the last 6 months of train
-   └─► test 2024 vs rule baseline ─► deciles, calibration, SHAP, segments, fairness,
-                                     A/B sizes, budget plan, scored invitations
-```
-
-Everything is logged to MLflow (one parent run, nested runs for FLAML and each Optuna trial). Reports go to
-`reports/`, the model bundle (model + features + category levels + decile thresholds) to `models/model.joblib`.
-The modelling target is `non_attendance = 1 − attended_12m`.
-
-## Data notes (VZP export, version 29 Sep 2026)
-
-- Target: `SCREENING_12M_FLAG`. `SCREENING_3M/6M_FLAG` are measured **after** the invitation and are never
-  model inputs (single-feature AUC 0.69 / 0.83 — a generic leakage detector would not catch them).
-- `PRIOR_INVITATION_COUNT` includes the current invitation; the adapter subtracts 1 (0 = first invitation).
-- `PRIOR_SCREEN_COUNT_5Y` counts procedure codes (~2 per screening); `NEVER_SCREENED_BEFORE_FLAG` means
-  "no screening in the 5-year window".
-- `INVITATION_SEQUENCE` resets after attendance (a streak of non-responses).
-- The 5-year window is not perfectly aligned across fields: 193 invitations have a last screening
-  61–76 months ago while `PRIOR_SCREEN_COUNT_5Y = 0` (~0.25% of rows incl. the 55–60 month edge).
-- The 12-month window is closed for all years (`cutoff_date: 2025-12-31`).
-- Cohort: women continuously insured with VZP in 2015–2025. Results are evaluated on this group only.
-
-## Project structure
-
-```
-rackaton_2026/
-├── README.md
-├── pyproject.toml                  package + extras: dev (tests, notebook, charts, pptx), ui (streamlit, plotly)
-├── configs/config.yaml             single config: data, split, FLAML/Optuna, calibration, segments,
-│                                   interventions (assumed effects), budget, fairness
-├── src/screening/                  Python package
-│   ├── __main__.py                 CLI: synth | profile | train | score | export-ui | power
-│   ├── config.py, tracking.py      config loading, MLflow setup
-│   ├── pipeline.py                 end-to-end training run
-│   ├── scoring.py                  scoring of new invitations with the saved model bundle
-│   ├── export_ui.py                aggregates-only JSON for dashboards and slides
-│   ├── data/                       vzp.py (VZP adapter), schema.py, load.py, split.py,
-│   │                               profile.py (leakage check), synthetic.py (test data)
-│   ├── features/build.py           derived features
-│   ├── models/                     baseline, flaml_search, optuna_tune, champion, calibration
-│   ├── evaluation/                 metrics, explain (SHAP / permutation), fairness, real_data (EDA tables)
-│   ├── segments/rules.py           segment rules + interventions
-│   ├── experiment/                 power (sample size), assign (stratified randomisation), analysis (ITT)
-│   ├── policy/budget.py            greedy budget allocation under assumed effects
-│   └── viz/figures.py              English PNG charts from data.json
-├── app/dashboard.py                Streamlit dashboard
-├── ui/                             React dashboard (Vite + React + Recharts), see ui/README.md
-├── notebooks/
-│   ├── 01_eda.ipynb                exploratory analysis on the real data (committed without outputs)
-│   └── write_reports.py            regenerates the two docs below from EDA tables
-├── scripts/build_deck.py           backup pitch deck (PPTX) from data.json
-├── docs/
-│   ├── pitch.md                    pitch script with speaker notes
-│   ├── demo-script.md              one-minute dashboard demo
-│   ├── qa-prep.md                  expected jury questions and answers
-│   ├── segments-real-data.md       segment definitions and sizes on real data
-│   └── experiment-design.md        A/B test design
-├── tests/                          pytest suite (unit, regression, end-to-end, dashboard)
-└── data/, reports/, models/, mlflow.db   local only, git-ignored
-```
-
-## Caveats
-
-- **High risk ≠ high effect.** The model ranks risk; only the experiment shows whom an intervention helps
-  (next step: an uplift model trained on its results).
-- SHAP shows associations, not causes. Regional differences are not adjusted for age or invitation history.
-- Intervention costs and effects in the config (`interventions:`) are placeholders until the A/B test.
-- One woman appears in several years, so random splits would inflate metrics; we use an out-of-time test.
-- The Windows path of this repo contains non-ASCII characters; `threadpoolctl` breaks on such paths, so the
-  code avoids sklearn/joblib parallelism and logs LightGBM boosters natively to MLflow.
+- `src/screening/`: Python pipeline; `ui/`: React business and technical views.
+- `configs/`, `tests/`, `notebooks/`: settings, Python tests and EDA; `docs/`, `scripts/`: experiment and pitch tools.
+- `data/`, `reports/`, `models/`, `mlflow.db`: local, git-ignored inputs and outputs.

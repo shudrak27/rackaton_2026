@@ -31,12 +31,12 @@ function PersonaCard({ title, tone, icon, persona, headline, everyone }) {
     <div className="persona-headline"><strong>{share(persona.attendance)}</strong><span>{headline}</span></div>
     <ul className="persona-traits">{TRAITS.map(([ic, label, say, sayAvg = say]) => <li key={label}>
       <Icon name={ic} size={17} /><span className="trait-label">{label}</span>
-      <strong>{say(persona)}</strong>{everyone && <small>avg {sayAvg(everyone)}</small>}
+      <strong>{say(persona)}</strong>{everyone && <small>all women: {sayAvg(everyone)}</small>}
     </li>)}</ul>
   </section>;
 }
 
-export function WhoToCall({ d }) {
+export function WhoToCall({ d, navigate }) {
   const p = d.personas;
   const [share, setShare] = useState(0.1);
   if (!p) return <p className="result-error">Re-run <code>python -m screening export-ui</code> to add the portraits.</p>;
@@ -54,37 +54,38 @@ export function WhoToCall({ d }) {
     </div>
 
     <div className="persona-grid">
-      <PersonaCard title="Call her" tone="call" icon="phone" persona={call} everyone={p.everyone}
-        headline="come with the letter alone" />
-      <PersonaCard title="A letter is enough" tone="letter" icon="mail" persona={p.letter_enough}
-        headline="come with the letter alone" />
+      <PersonaCard title="Call pilot candidates" tone="call" icon="phone" persona={call} everyone={p.everyone}
+        headline={`attended in ${d.meta.test_year}`} />
+      <PersonaCard title="Most likely to attend" tone="letter" icon="mail" persona={p.letter_enough}
+        headline={`attended in ${d.meta.test_year}`} />
     </div>
-    <p className="persona-caveat"><Icon name="info" size={15} />The call goes to women who will almost certainly not come otherwise.
-      Whether the call changes that is what the pilot measures (04).</p>
+    <p className="persona-caveat"><Icon name="info" size={15} />Profiles describe groups, not one individual. Attendance is measured within 12 months; a pilot tests whether calls improve it.</p>
 
     <div className="grid2">
-      <Panel title="Why the model, not a simple rule?" subtitle={`Calling the highest-risk ${pct(share, 0)}`}>
+      <Panel title="Model vs baseline" subtitle={`Observed attenders in the highest-risk ${pct(share, 0)}`}>
         {t && <div className="versus">
-          {[["Our model", t.top_wasted_model, INDIGO], ["Rule: “invited many times”", t.top_wasted_rule, GREY]].map(([name, v, color]) =>
+          {[["Our model", t.top_wasted_model, INDIGO], ["History-based baseline", t.top_wasted_rule, GREY]].map(([name, v, color]) =>
             <div className="versus-row" key={name}><span>{name}</span>
-              <div className="versus-bar"><i style={{ width: `${100 * v / t.top_wasted_rule}%`, background: color }} /></div>
+              <div className="versus-bar"><i style={{ width: `${100 * v / Math.max(t.top_wasted_rule, t.top_wasted_model, 1)}%`, background: color }} /></div>
               <strong>{num(v)}</strong></div>)}
-          <p className="versus-note">calls wasted on women who would have come anyway ·
-            <b> {pct(1 - t.top_wasted_model / t.top_wasted_rule, 0)} fewer</b> with the model</p>
+          <p className="versus-note">Women who attended in the historical test data.
+            {t.top_wasted_rule > 0 && <> <b>{pct(1 - t.top_wasted_model / t.top_wasted_rule, 0)} fewer</b> selected by the model.</>} This is a targeting comparison, not measured call savings.</p>
         </div>}
+        {!t && <div className="chart-caption">Exact comparison counts are not in this export for {pct(share, 0)} capacity. See precision and recall on Model quality.</div>}
+        <div className="chart-caption"><button className="text-button" onClick={() => navigate("model-quality")}>Compare model metrics <Icon name="arrow" size={15} /></button></div>
       </Panel>
-      <Panel title="How well it ranks women" subtitle="Tested on 2024 — data the model never saw" action={<Badge tone="teal">AUC {auc?.model.toFixed(2)}</Badge>}>
+      <Panel title="How well it ranks women" subtitle={`Tested on held-out ${d.meta.test_year} invitations`} action={<Badge tone="teal">AUC {auc?.model?.toFixed(2) ?? "–"}</Badge>}>
         <Chart height={230} label="ROC curve of the model, the rule and a coin flip"><LineChart margin={{ top: 6, right: 18, left: -10, bottom: 6 }}>
           <CartesianGrid stroke="#eef0f6" strokeDasharray="4 4" />
           <XAxis {...AXIS} type="number" dataKey="fpr" domain={[0, 1]} tickFormatter={pctTick} />
           <YAxis {...AXIS} type="number" domain={[0, 1]} tickFormatter={pctTick} />
           <Tooltip content={<ChartTooltip labelFormat={(v) => `Wrongly flagged: ${pct(v)}`} />} />
           <Line data={d.roc.model} dataKey="tpr" name="Model" stroke={INDIGO} strokeWidth={3} dot={false} isAnimationActive={false} />
-          <Line data={d.roc.baseline} dataKey="tpr" name="Rule" stroke={CORAL} strokeWidth={2} dot={false} isAnimationActive={false} />
+          <Line data={d.roc.baseline} dataKey="tpr" name="Baseline" stroke={CORAL} strokeWidth={2} dot={false} isAnimationActive={false} />
           <Line data={[{ fpr: 0, tpr: 0 }, { fpr: 1, tpr: 1 }]} dataKey="tpr" name="Coin flip" stroke={GREY} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
         </LineChart></Chart>
-        <div className="chart-caption"><span className="key key-model" />Model {auc?.model.toFixed(2)}
-          <span className="key key-rule" />Rule {auc?.baseline.toFixed(2)} <span className="key key-coin" />Coin flip 0.50 · higher curve = better</div>
+        <div className="chart-caption"><span className="key key-model" />Model {auc?.model?.toFixed(2) ?? "–"}
+          <span className="key key-rule" />Baseline {auc?.baseline?.toFixed(2) ?? "–"} <span className="key key-coin" />Coin flip 0.50 · higher curve = better</div>
       </Panel>
     </div>
   </>;
